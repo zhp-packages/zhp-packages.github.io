@@ -8,6 +8,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -83,7 +88,7 @@
         width: auto; 
         height: 48px; 
         object-fit: contain;
-        background: #ffffff; /* Ensures black text is visible in dark mode */
+        background: #ffffff;
         padding: 4px 8px;
         border-radius: 8px;
         box-shadow: var(--shadow-sm);
@@ -651,6 +656,33 @@
 <div id="printArea" class="print-only"></div>
 
 <script>
+    // ===== FIREBASE CONFIGURATION =====
+    const firebaseConfig = {
+      apiKey: "AIzaSyCGBWrG4F3o4i8dOf4EultdQCjl6SIABQE",
+      authDomain: "production-board-d9ae1.firebaseapp.com",
+      databaseURL: "https://production-board-d9ae1-default-rtdb.firebaseio.com",
+      projectId: "production-board-d9ae1",
+      storageBucket: "production-board-d9ae1.firebasestorage.app",
+      messagingSenderId: "288437308546",
+      appId: "1:288437308546:web:36942f3df04181f301789b"
+    };
+    
+    let db = null;
+    let usingFirebase = false;
+
+    try {
+        if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY") {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+            usingFirebase = true;
+            console.log("Firebase initialized successfully.");
+        } else {
+            console.warn("Firebase not configured. Falling back to local storage only.");
+        }
+    } catch(e) {
+        console.error("Firebase init failed:", e);
+    }
+
     // ===== STATE & INIT =====
     let allJobs = [];
     let currentModalJobId = null;
@@ -658,10 +690,8 @@
     let chartParty = null;
     let chartStage = null;
     
-    // Filter State
     let activeFilter = null; 
 
-    // Production Board State
     const ALL_STAGES = [
         'Reel Issue', 'Offset Printing', 'Lamination', 'Matt Lamination', 'Varnish',
         'Corrugation', 'Pasting', 'Rotary', 'Flexo', 'Flexo Printing',
@@ -685,7 +715,6 @@
         localStorage.setItem('theme', newTheme);
         updateThemeBtn(newTheme);
         
-        // Refresh charts to adapt to new theme colors
         Chart.defaults.color = newTheme === 'dark' ? '#cbd5e1' : '#475569';
         if(chartParty) chartParty.update();
         if(chartStage) chartStage.update();
@@ -928,6 +957,14 @@
         return mapped;
     }
 
+    function saveAllJobsData(jobsArray) {
+        if (usingFirebase) {
+            db.ref('zhJobs').set(jobsArray);
+        } else {
+            localStorage.setItem('zhJobs', JSON.stringify(jobsArray));
+        }
+    }
+
     function handlePOSubmit(event) {
         if (!document.getElementById('poForm').checkValidity()) {
             return;
@@ -1001,11 +1038,10 @@
             }));
         }
 
-        localStorage.setItem('zhJobs', JSON.stringify(allJobs));
+        saveAllJobsData(allJobs);
 
         if (window.saveMode === 'multi') {
             showAlert('success', `Item saved! Keep adding items for PO: ${baseFields.po}`);
-            // Explicitly clear item fields
             document.getElementById('itemName').value = '';
             document.getElementById('quantity').value = '';
             document.getElementById('detailNotes').value = '';
@@ -1127,9 +1163,23 @@
     }
 
     function loadJobs() {
-        const stored = localStorage.getItem('zhJobs');
-        if (stored) allJobs = JSON.parse(stored);
+        if (usingFirebase) {
+            db.ref('zhJobs').on('value', (snapshot) => {
+                const data = snapshot.val();
+                allJobs = data ? data : [];
+                updateUIOnLoad();
+            });
+        } else {
+            const stored = localStorage.getItem('zhJobs');
+            if (stored) allJobs = JSON.parse(stored);
+            updateUIOnLoad();
+        }
+    }
+    
+    function updateUIOnLoad() {
         loadDashboard();
+        if (document.getElementById('jobs').classList.contains('active')) renderJobsTable();
+        if (document.getElementById('production-board').classList.contains('active')) renderProdBoardTable();
     }
 
     function applyFilters() {
@@ -1333,7 +1383,8 @@
         const t = job.tasks.find(x => x.id === taskId);
         if(t) t.done = !t.done;
         job.status = job.tasks.every(x=>x.done) ? 'Completed' : 'Pending';
-        localStorage.setItem('zhJobs', JSON.stringify(allJobs));
+        
+        saveAllJobsData(allJobs);
         
         renderJobsTable();
         loadDashboard();
@@ -1354,9 +1405,9 @@
     function deleteJob(id) {
         if(confirm('Delete this Job Card completely?')) {
             allJobs = allJobs.filter(j => j.id !== id);
-            localStorage.setItem('zhJobs', JSON.stringify(allJobs));
-            loadJobs();
+            saveAllJobsData(allJobs);
             renderJobsTable();
+            loadDashboard();
             if (document.getElementById('production-board').classList.contains('active')) {
                 renderProdBoardTable();
             }
@@ -1490,7 +1541,6 @@
         triggerPrint(html);
     }
 
-    // Print Consolidated (Exact 3-Section Layout)
     function printSelectedConsolidated() {
         const selectedIds = Array.from(document.querySelectorAll('.job-cb:checked')).map(cb => parseInt(cb.value));
         if (selectedIds.length === 0) {
