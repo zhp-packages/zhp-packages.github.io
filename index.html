@@ -102,6 +102,7 @@
         background: var(--bg-primary); border-bottom: 1px solid var(--border);
         padding: 1rem 2rem; display: flex; justify-content: space-between;
         align-items: center; position: sticky; top: 0; z-index: 301; gap: 1rem;
+        transition: background .35s var(--ease), border-color .35s var(--ease);
     }
     .brand-lockup { display: flex; align-items: center; gap: 1rem; }
     .brand-lockup img { height: 48px; object-fit: contain; background: #fff; padding: 4px 8px; border-radius: 8px; box-shadow: var(--shadow-sm); transition: transform 0.3s; }
@@ -122,10 +123,11 @@
     .main-content { padding: 2rem; overflow-y: auto; max-width: 1700px; width: 100%; margin: 0 auto; flex: 1; }
 
     /* Forms */
-    .form-container { background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); }
+    .form-container { background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); transition: background .35s var(--ease), border-color .35s var(--ease); }
     .form-header { background: linear-gradient(135deg, var(--primary-accent) 0%, #1e3a8a 100%); color: white; padding: 1.9rem 2rem; }
     [data-theme="dark"] .form-header { background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%); border-bottom: 1px solid var(--border); }
     .form-header h2 { font-size: 1.35rem; margin: 0; font-weight: 800; color: #fff; }
+    .form-header p { opacity: .9; font-size: .85rem; margin-top: .3rem; color: #e2e8f0; }
     .form-body { padding: 2.25rem; }
     .form-section { margin-bottom: 2.25rem; padding-bottom: 2.25rem; border-bottom: 1px solid var(--border); }
     .form-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
@@ -136,13 +138,13 @@
     label { font-weight: 600; margin-bottom: .6rem; color: var(--text-primary); font-size: .88rem; }
     .required::after { content: " *"; color: var(--danger); }
     input[type="text"], input[type="date"], input[type="number"], input[type="password"], select {
-        width: 100%; padding: .8rem 1.05rem; border: 1.5px solid var(--border); border-radius: 10px; background: var(--bg-primary); color: var(--text-primary); font-size: .92rem; font-family: inherit; transition: border-color .25s, box-shadow .25s;
+        width: 100%; padding: .8rem 1.05rem; border: 1.5px solid var(--border); border-radius: 10px; background: var(--bg-primary); color: var(--text-primary); font-size: .92rem; font-family: inherit; transition: border-color .25s, box-shadow .25s, background .35s, color .35s;
     }
-    input:focus, select:focus { outline: none; border-color: var(--primary-accent); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
-    input:read-only { background-color: var(--bg-tertiary); cursor: not-allowed; opacity: 0.9; }
+    input:focus, select:focus { outline: none; border-color: var(--primary-accent); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); background: var(--bg-primary); }
+    input:read-only { background-color: var(--bg-tertiary); cursor: not-allowed; opacity: 0.9; color: var(--text-secondary); }
     
     .button-group { display: flex; gap: 1rem; margin-top: 1.75rem; flex-wrap: wrap; }
-    button { padding: .8rem 1.5rem; border: none; border-radius: 10px; font-weight: 600; font-size: .92rem; cursor: pointer; transition: transform .2s, box-shadow .2s, filter .3s; font-family: inherit; }
+    button { padding: .8rem 1.5rem; border: none; border-radius: 10px; font-weight: 600; font-size: .92rem; cursor: pointer; transition: transform .2s, box-shadow .2s, filter .3s, background .3s; font-family: inherit; }
     button:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); filter: brightness(1.05); }
     .btn-primary { background: var(--primary-accent); color: white; }
     .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border); }
@@ -153,7 +155,7 @@
 
     /* Calc Grids */
     .calc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.15rem; margin: 1.75rem 0; }
-    .calc-box { background: var(--bg-tertiary); padding: 1.4rem; border-radius: 14px; border: 1px solid var(--border); border-left: 4px solid var(--primary-accent); }
+    .calc-box { background: var(--bg-tertiary); padding: 1.4rem; border-radius: 14px; border: 1px solid var(--border); border-left: 4px solid var(--primary-accent); transition: background .35s, border-color .35s; }
     .calc-label { font-size: .76rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: .05em; margin-bottom: .65rem; }
     .calc-value { font-size: 1.65rem; font-weight: 800; color: var(--primary-accent); font-family: var(--font-mono); }
     .calc-sub-value { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-top: 0.2rem; }
@@ -165,7 +167,7 @@
     .modal-header { background: linear-gradient(135deg, var(--primary-accent) 0%, #1e3a8a 100%); color: white; padding: 1.9rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
     [data-theme="dark"] .modal-header { background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%); border-bottom: 1px solid var(--border); }
     .modal-header h2 { font-size: 1.25rem; margin: 0; color: #fff;}
-    .modal-close { background: rgba(255,255,255,.15); border: none; font-size: 1.4rem; color: white; width: 36px; height: 36px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+    .modal-close { background: rgba(255,255,255,.15); border: none; font-size: 1.4rem; color: white; width: 36px; height: 36px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: background .2s; }
     .modal-close:hover { background: rgba(255,255,255,.3); }
     .modal-body { padding: 2rem; }
     
@@ -181,8 +183,8 @@
     .task-checklist-item input { accent-color: var(--success); width: 18px; height: 18px; }
 
     /* Tables & Filters */
-    .table-container { background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); margin-bottom: 2rem; }
-    .table-header { background: var(--bg-tertiary); padding: 1.9rem; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 1rem; }
+    .table-container { background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); margin-bottom: 2rem; transition: background .35s, border-color .35s; }
+    .table-header { background: var(--bg-tertiary); padding: 1.9rem; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 1rem; transition: background .35s; }
     .table-header-top { display: flex; justify-content: space-between; align-items: center; width: 100%; }
     .table-header h3 { margin: 0; color: var(--primary); font-weight: 800; }
     .filter-bar { display: flex; gap: 1rem; flex-wrap: wrap; width: 100%; align-items: center; background: var(--bg-primary); padding: 1rem; border-radius: 10px; border: 1px solid var(--border); }
@@ -211,6 +213,7 @@
     
     .stage-badge { background: rgba(0,0,0,0.1); padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; }
     .stage-tab.active .stage-badge { background: rgba(255,255,255,0.25); color: #fff; }
+    [data-theme="dark"] .stage-badge { background: rgba(255,255,255,0.1); }
 
     /* Workflow preview */
     .workflow-step { display: inline-block; padding: 4px 8px; margin: 4px 4px 4px 0; background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: 6px; font-weight: 600; color: var(--text-primary); }
@@ -240,7 +243,7 @@
         @page { size: A4 portrait; margin: 0; }
         body, html { margin: 0 !important; padding: 0 !important; background: #fff !important; color: #000 !important; width: 210mm; height: 297mm; }
         * { animation: none !important; transition: none !important; box-shadow: none !important; }
-        .login-screen, .app-container, .modal { display: none !important; }
+        .login-screen, .app-container, .modal, .nav-tabs, .navbar { display: none !important; }
         .print-only { display: block !important; width: 100%; height: 100%; }
 
         .a4-print-layout {
@@ -675,7 +678,6 @@
     } catch(e) {
         console.error("Firebase init failed:", e);
     }
-    }
 
     // ===== STATE & INIT =====
     let allJobs = [];
@@ -876,15 +878,13 @@
         const Win = convertToInches(W, unit);
         const Hin = convertToInches(H, unit);
 
-        // Roll Size calculation (W + H)
         const rsActual = Win + Hin;
         let rsRounded = Math.ceil(rsActual);
-        if (rsRounded % 2 !== 0) rsRounded += 1; // Always Even
+        if (rsRounded % 2 !== 0) rsRounded += 1;
         
         const manualRS = document.getElementById('manualRS').value;
         const finalRS = manualRS ? parseFloat(manualRS) : rsRounded;
 
-        // Cut length rounding strict logic (0, .25, .50, .75, 1) based on (L+W)*2 + 2
         const clActual = (Lin + Win) * 2 + 2;
         const baseCL = Math.floor(clActual);
         const decCL = clActual - baseCL;
