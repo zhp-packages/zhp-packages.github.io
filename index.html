@@ -302,7 +302,7 @@
         <form id="loginForm" onsubmit="handleLogin(event)">
             <div class="form-group-wrapper" style="margin-bottom: 1.2rem;">
                 <label>Username</label>
-                <input type="text" id="loginUser" value="Packages Dept" readonly autocomplete="username" style="background: var(--bg-tertiary); cursor: not-allowed; opacity: 0.8;">
+                <input type="text" id="loginUser" value="Packages Dept" readonly autocomplete="username">
             </div>
             <div class="form-group-wrapper">
                 <label>Password</label>
@@ -471,7 +471,7 @@
                                 <!-- AUTO CALCULATIONS -->
                                 <div class="calc-grid">
                                     <div class="calc-box">
-                                        <div class="calc-label">Roll Size (L+W)</div>
+                                        <div class="calc-label">Roll Size (W+H)</div>
                                         <div class="calc-value" id="calcRS">-</div>
                                         <div class="calc-sub-value" id="calcRS_actual">Actual: -</div>
                                         <input type="number" id="manualRS" placeholder="Override Rounded" step="1" oninput="calculateJob()" style="margin-top: 8px;">
@@ -521,15 +521,15 @@
                                 <div id="workflowPreview" style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-secondary);"></div>
 
                                 <!-- AUTO CALCULATED PAPER & ROLLS -->
-                                <h3 style="margin-top: 2rem; margin-bottom: 1rem; color: var(--text-primary);">📊 Auto-Calculated Requirements</h3>
+                                <h3 style="margin-top: 2rem; margin-bottom: 1rem; color: var(--text-primary); font-family: var(--font-display);">📊 Auto-Calculated Requirements</h3>
                                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
                                     <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 10px; border: 1px solid var(--border);">
                                         <strong>Material Issue Slip (Paper Breakdown)</strong>
-                                        <pre id="calcPaperSummary" style="font-size: 0.85rem; margin-top: 0.5rem; line-height: 1.4;">-</pre>
+                                        <pre id="calcPaperSummary" style="font-family: var(--font-mono); font-size: 0.85rem; margin-top: 0.5rem; white-space: pre-wrap; line-height: 1.4;">-</pre>
                                     </div>
                                     <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 10px; border: 1px solid var(--border);">
                                         <strong>Corrugation Work Order (Paired Rolls)</strong>
-                                        <pre id="calcRollsSummary" style="font-size: 0.85rem; margin-top: 0.5rem; line-height: 1.4;">-</pre>
+                                        <pre id="calcRollsSummary" style="font-family: var(--font-mono); font-size: 0.85rem; margin-top: 0.5rem; white-space: pre-wrap; line-height: 1.4;">-</pre>
                                     </div>
                                 </div>
                             </div>
@@ -652,13 +652,13 @@
     // ===== FIREBASE CONFIGURATION =====
     // REPLACE THIS WITH YOUR ACTUAL CONFIGURATION KEYS IF USING CLOUD SYNC
     const firebaseConfig = {
-      apiKey: "AIzaSyCGBWrG4F3o4i8dOf4EultdQCjl6SIABQE",
-      authDomain: "production-board-d9ae1.firebaseapp.com",
-      databaseURL: "https://production-board-d9ae1-default-rtdb.firebaseio.com",
-      projectId: "production-board-d9ae1",
-      storageBucket: "production-board-d9ae1.firebasestorage.app",
-      messagingSenderId: "288437308546",
-      appId: "1:288437308546:web:36942f3df04181f301789b"
+      // apiKey: "YOUR_API_KEY",
+      // authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      // databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+      // projectId: "YOUR_PROJECT_ID",
+      // storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      // messagingSenderId: "YOUR_SENDER_ID",
+      // appId: "YOUR_APP_ID"
     };
     
     let db = null;
@@ -866,22 +866,25 @@
         const unit = document.getElementById('dimUnit').value;
         const L = document.getElementById('dimL').value;
         const W = document.getElementById('dimW').value;
+        const H = document.getElementById('dimH').value;
         const qty = parseFloat(document.getElementById('quantity').value) || 0;
         const specStr = document.getElementById('paperSpec').value;
 
-        if (!L || !W) return;
+        if (!L || !W || !H) return;
 
         const Lin = convertToInches(L, unit);
         const Win = convertToInches(W, unit);
+        const Hin = convertToInches(H, unit);
 
-        const rsActual = Lin + Win;
+        // Roll Size calculation (W + H)
+        const rsActual = Win + Hin;
         let rsRounded = Math.ceil(rsActual);
         if (rsRounded % 2 !== 0) rsRounded += 1; // Always Even
         
         const manualRS = document.getElementById('manualRS').value;
         const finalRS = manualRS ? parseFloat(manualRS) : rsRounded;
 
-        // Cut length rounding strict logic (0, .25, .50, .75, 1)
+        // Cut length rounding strict logic (0, .25, .50, .75, 1) based on (L+W)*2 + 2
         const clActual = (Lin + Win) * 2 + 2;
         const baseCL = Math.floor(clActual);
         const decCL = clActual - baseCL;
