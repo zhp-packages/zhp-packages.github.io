@@ -62,9 +62,10 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes popIn { from { opacity: 0; transform: scale(.95) translateY(15px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-    @keyframes slideInRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes popIn { from { opacity: 0; transform: scale(.92) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    @keyframes slideInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes slideOutRight { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(30px); } }
 
     /* Logo & Brand */
     .logo-mark { display: block; width: auto; height: 48px; object-fit: contain; background: #ffffff; padding: 4px 8px; border-radius: 8px; box-shadow: var(--shadow-sm); transition: transform .4s var(--ease); will-change: transform; }
@@ -77,12 +78,10 @@
     /* Login Screen */
     .login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%); padding: 1rem; position: fixed; inset: 0; z-index: 9999; }
     .login-box { background: var(--bg-primary); padding: 3rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); width: 100%; max-width: 450px; animation: popIn .8s var(--ease); border: 1px solid var(--border); text-align: center; will-change: transform, opacity;}
-    .login-logo-wrap img { height: 80px; object-fit: contain; margin-bottom: 1.5rem; border-radius: 12px; box-shadow: var(--shadow); padding: 8px; background: #fff; transition: transform .4s var(--ease); will-change: transform; }
+    .login-logo-wrap img { height: 80px; object-fit: contain; margin-bottom: 1.5rem; border-radius: 12px; box-shadow: var(--shadow); padding: 8px; background: #fff; transition: transform .4s var(--ease); }
     .login-logo-wrap img:hover { transform: scale(1.1); }
     .login-logo-wrap h1 { font-size: 1.8rem; color: var(--text-primary); letter-spacing: -0.03em; margin-bottom: 0.5rem;}
-    .login-error { background: rgba(220, 38, 38, 0.1); color: var(--danger); padding: 0.8rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1.5rem; text-align: center; display: none; border: 1px solid rgba(220, 38, 38, 0.3); }
-    .login-error.show { display: block; animation: popIn 0.4s var(--ease); }
-
+    
     /* App Structure */
     .app-container { display: none; min-height: 100vh; animation: fadeIn .6s var(--ease) both; flex-direction: column; }
     .app-container.active { display: flex; }
@@ -96,7 +95,7 @@
     .nav-tab { padding: .85rem 1.5rem; background: transparent; border: none; border-bottom: 3px solid transparent; color: var(--text-secondary); cursor: pointer; font-weight: 700; font-size: .9rem; transition: all .3s var(--ease); margin-bottom: -2px; border-radius: 8px 8px 0 0; }
     .nav-tab:hover { color: var(--primary-accent); background: var(--bg-tertiary); }
     .nav-tab.active { color: var(--primary-accent); border-bottom-color: var(--primary-accent); background: var(--bg-tertiary); }
-    .page { display: none; animation: fadeIn .5s var(--ease); will-change: transform, opacity; }
+    .page { display: none; animation: fadeIn .4s var(--ease); }
     .page.active { display: block; }
     .main-content { padding: 2rem; overflow-y: auto; max-width: 1800px; width: 100%; margin: 0 auto; flex: 1; }
     .page-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
@@ -104,7 +103,7 @@
     .page-heading p { color: var(--text-secondary); font-size: .95rem; margin-top: .4rem; }
 
     /* Forms & Inputs */
-    .form-container { background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); transition: all .4s var(--ease); will-change: box-shadow; }
+    .form-container { background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); transition: all .4s var(--ease); }
     .form-container:hover { box-shadow: var(--shadow-lg); }
     .form-header { background: linear-gradient(135deg, var(--primary-accent) 0%, #1e3a8a 100%); color: white; padding: 2rem 2.5rem; position: relative; overflow: hidden;}
     .form-header::after { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: url('data:image/svg+xml;utf8,<svg opacity="0.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="white"/></svg>') no-repeat right -50px top -50px; background-size: 200px; pointer-events: none;}
@@ -119,16 +118,14 @@
     
     label { font-weight: 700; margin-bottom: .6rem; color: var(--text-secondary); font-size: .85rem; text-transform: uppercase; letter-spacing: 0.05em;}
     .required::after { content: " *"; color: var(--danger); }
-    input[type="text"], input[type="date"], input[type="number"], input[type="password"], select {
-        width: 100%; padding: .9rem 1.1rem; border: 2px solid var(--border); border-radius: 10px; background: var(--bg-secondary); color: var(--text-primary); font-size: .95rem; font-family: inherit; transition: all .3s var(--ease);
-    }
+    input[type="text"], input[type="date"], input[type="number"], input[type="password"], select { width: 100%; padding: .9rem 1.1rem; border: 2px solid var(--border); border-radius: 10px; background: var(--bg-secondary); color: var(--text-primary); font-size: .95rem; font-family: inherit; transition: all .3s var(--ease); }
     input:focus, select:focus { outline: none; border-color: var(--primary-accent); background: var(--bg-primary); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); transform: translateY(-1px); }
     input:read-only { background-color: var(--bg-tertiary); cursor: not-allowed; opacity: 0.8; border-style: dashed;}
     
     /* Buttons */
-    .button-group { display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
-    button { padding: .9rem 1.8rem; border: none; border-radius: 12px; font-weight: 700; font-size: .95rem; cursor: pointer; transition: all .3s var(--ease); font-family: inherit; display: inline-flex; align-items: center; justify-content: center; gap: 8px; will-change: transform, box-shadow;}
-    button:hover { transform: translateY(-4px); box-shadow: var(--shadow); filter: brightness(1.1); }
+    .button-group { display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; align-items: center; justify-content: center;}
+    button { padding: .9rem 1.8rem; border: none; border-radius: 12px; font-weight: 700; font-size: .95rem; cursor: pointer; transition: all .3s var(--ease); font-family: inherit; display: inline-flex; align-items: center; justify-content: center; gap: 8px;}
+    button:hover { transform: translateY(-3px); box-shadow: var(--shadow); filter: brightness(1.1); }
     button:active { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
     .btn-primary { background: var(--primary-accent); color: white; box-shadow: 0 4px 14px rgba(59,130,246,0.3); }
     .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border); }
@@ -145,32 +142,27 @@
     .calc-value { font-size: 1.6rem; font-weight: 800; color: var(--primary-accent); font-family: var(--font-mono); }
     .calc-sub-value { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-top: 0.4rem; }
 
-    /* Custom Print Modal */
+    /* Modals & Checklists */
     .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, .85); z-index: 9999; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(8px); }
-    .modal.active { display: flex; animation: fadeIn .4s var(--ease); }
-    .modal-content { background: var(--bg-primary); border-radius: var(--radius-lg); max-width: 95%; max-height: 95vh; overflow-y: auto; box-shadow: var(--shadow-lg); border: 1px solid var(--border); position: relative; width: 900px; will-change: transform; animation: popIn .5s var(--ease); }
+    .modal.active { display: flex; animation: fadeIn .3s var(--ease); }
+    .modal-content { background: var(--bg-primary); border-radius: var(--radius-lg); max-width: 95%; max-height: 95vh; overflow-y: auto; box-shadow: var(--shadow-lg); border: 1px solid var(--border); position: relative; width: 900px; animation: popIn .4s var(--ease); }
     .modal-content.compact { max-width: 450px; text-align: center; overflow: visible;}
     .modal-header { background: linear-gradient(135deg, var(--primary-accent) 0%, #1e3a8a 100%); color: white; padding: 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
     [data-theme="dark"] .modal-header { background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%); border-bottom: 1px solid var(--border); }
     .modal-header h2 { font-size: 1.3rem; margin: 0; color: #fff;}
-    .modal-close { background: rgba(255,255,255,.15); border: none; font-size: 1.5rem; color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all .3s var(--ease); }
-    .modal-close:hover { background: var(--danger); transform: rotate(90deg) scale(1.1); }
+    .modal-close { background: rgba(255,255,255,.15); border: none; font-size: 1.5rem; color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all .2s; }
+    .modal-close:hover { background: var(--danger); transform: rotate(90deg); }
     .modal-body { padding: 2.5rem; }
 
-    .celebration-icon { font-size: 4rem; margin-bottom: 1rem; display: inline-block; animation: popIn 0.6s var(--ease) both; animation-delay: 0.2s;}
-
-    /* Detail Grid & Checklist */
-    .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
-    .detail-item { background: var(--bg-tertiary); padding: 1.2rem; border-radius: 12px; border: 1px solid var(--border); transition: transform .3s var(--ease); }
-    .detail-item:hover { transform: translateY(-3px); box-shadow: var(--shadow-sm); }
-    .detail-item strong { display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.4rem; letter-spacing: 0.05em;}
-    .detail-item span { font-weight: 800; font-size: 1.05rem; color: var(--text-primary); }
-
-    .task-checklist { display: flex; flex-direction: column; gap: .75rem; margin-top: 1rem; }
-    .task-checklist-item { display: flex; align-items: center; gap: 1rem; background: var(--bg-tertiary); border: 2px solid var(--border); border-radius: 12px; padding: 1rem 1.2rem; cursor: pointer; font-weight: 700; font-size: .95rem; color: var(--text-primary); transition: all 0.3s var(--ease); }
-    .task-checklist-item:hover { border-color: var(--primary-accent); transform: translateX(8px); }
-    .task-checklist-item.done { background: rgba(16, 185, 129, 0.05); border-color: var(--success); color: var(--success); text-decoration: line-through; opacity: 0.8; }
-    .task-checklist-item input { accent-color: var(--success); width: 22px; height: 22px; cursor: pointer; }
+    /* Workflow Timeline / Checklist */
+    .timeline-container { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1.5rem; }
+    .timeline-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg-tertiary); border: 2px solid var(--border); border-radius: 12px; padding: 1rem 1.2rem; transition: transform .3s; }
+    .timeline-item:hover { border-color: var(--primary-accent); transform: translateX(5px); }
+    .timeline-item.done { background: rgba(16, 185, 129, 0.05); border-color: var(--success); }
+    .timeline-left { display: flex; align-items: center; gap: 1rem; font-weight: 700; font-size: .95rem; color: var(--text-primary); }
+    .timeline-left input { width: 22px; height: 22px; accent-color: var(--success); cursor: pointer; }
+    .timeline-right { text-align: right; font-size: 0.8rem; color: var(--text-secondary); font-family: var(--font-mono); font-weight: 600; display: flex; flex-direction: column; align-items: flex-end;}
+    .timeline-user-badge { background: var(--primary-soft); color: var(--primary-accent); padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-family: var(--font-body); margin-top:3px;}
 
     /* Tables & Filters */
     .table-container { background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); margin-bottom: 2rem; transition: all .4s var(--ease); }
@@ -184,54 +176,52 @@
     table { width: 100%; border-collapse: collapse; }
     th { padding: 1.2rem; text-align: left; font-weight: 800; color: var(--text-secondary); border-bottom: 2px solid var(--border); font-size: .8rem; text-transform: uppercase; letter-spacing: 0.05em; background: var(--bg-primary); }
     td { padding: 1.2rem; border-bottom: 1px solid var(--border); font-size: .9rem; color: var(--text-primary); font-weight: 500;}
-    tbody tr { transition: background .3s var(--ease); animation: slideInRight 0.4s var(--ease) forwards; opacity: 0; }
-    tbody tr:nth-child(even) { animation-delay: 0.05s; }
+    tbody tr { transition: background .3s var(--ease); }
     tbody tr:hover { background: var(--bg-tertiary); }
-    
     .status-badge { display: inline-flex; align-items: center; justify-content: center; padding: .4rem 1rem; border-radius: 20px; font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
     .status-pending { background: rgba(245, 158, 11, 0.1); color: #b45309; border: 1px solid rgba(245, 158, 11, 0.3); }
     .status-completed { background: rgba(16, 185, 129, 0.1); color: #047857; border: 1px solid rgba(16, 185, 129, 0.3); }
     [data-theme="dark"] .status-pending { color: #fcd34d; }
     [data-theme="dark"] .status-completed { color: #6ee7b7; }
-    .cb-cell { width: 50px; text-align: center; }
-    .cb-cell input { width: 18px; height: 18px; accent-color: var(--primary-accent); cursor: pointer; }
 
-    /* Production Board Tabs - Dynamic Flex Wrapping */
-    .stage-tabs-container { background: var(--bg-primary); padding: 1.5rem; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 2rem; }
+    /* Production Board Tabs */
+    .stage-tabs-container { background: var(--bg-primary); padding: 1.5rem; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 1.5rem; }
     .stage-tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; }
-    .stage-tab { padding: 0.6rem 1.2rem; border-radius: 30px; border: 2px solid var(--border); background: var(--bg-tertiary); color: var(--text-secondary); font-weight: 800; font-size: 0.85rem; transition: all 0.3s var(--ease); display: flex; align-items: center; gap: 8px; cursor: pointer; white-space: nowrap; flex-grow: 1; justify-content: center; max-width: 250px;}
-    .stage-tab:hover { background: var(--bg-primary); color: var(--primary-accent); border-color: var(--primary-accent); transform: translateY(-4px); box-shadow: var(--shadow-sm); }
+    .stage-tab { padding: 0.6rem 1.2rem; border-radius: 30px; border: 2px solid var(--border); background: var(--bg-tertiary); color: var(--text-secondary); font-weight: 800; font-size: 0.85rem; transition: all 0.3s var(--ease); display: flex; align-items: center; gap: 8px; cursor: pointer; white-space: nowrap; flex-grow: 1; justify-content: center; max-width: 200px;}
+    .stage-tab:hover { background: var(--bg-primary); color: var(--primary-accent); border-color: var(--primary-accent); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
     .stage-tab.active { background: var(--primary-accent); color: #fff; border-color: var(--primary-accent); box-shadow: 0 8px 20px rgba(59,130,246,0.3); transform: translateY(-2px); }
     .stage-badge { background: rgba(0,0,0,0.1); padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 900; color: inherit; transition: all .3s;}
     .stage-tab.active .stage-badge { background: rgba(255,255,255,0.25); color: #fff; }
-    [data-theme="dark"] .stage-badge { background: rgba(255,255,255,0.1); }
 
-    .workflow-step { display: inline-block; padding: 6px 12px; margin: 4px 4px 4px 0; background: var(--bg-primary); border: 2px solid var(--border); border-radius: 8px; font-weight: 700; color: var(--text-primary); font-size: 0.85rem;}
-    .workflow-arrow { display: inline-block; margin: 0 6px; color: var(--text-secondary); font-weight: bold;}
+    /* Status Board Compact Grid */
+    #statusBoardList { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+    .status-card { background: var(--bg-primary); border: 2px solid var(--border); border-radius: 16px; padding: 1.2rem; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); transition: transform 0.3s, box-shadow 0.3s; position: relative;}
+    .status-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); border-color: var(--primary-accent); }
+    .status-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem;}
+    .sc-jobno { font-size: 1.2rem; font-weight: 900; color: var(--primary-accent); }
+    .sc-party { font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); }
+    .status-card-body { display: flex; align-items: center; justify-content: space-between; }
+    .sc-stage { font-size: 0.85rem; font-weight: 800; text-transform: uppercase; color: var(--text-primary); margin-top: 5px;}
+    .progress-circle { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
+    .progress-circle-inner { width: 38px; height: 38px; border-radius: 50%; background: var(--bg-primary); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; color: var(--text-primary); }
 
-    /* Status Board Specific Styles */
-    .status-card { background: var(--bg-primary); border: 2px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-sm); transition: transform 0.3s, box-shadow 0.3s; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 1rem; }
-    .status-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); border-color: var(--primary-accent); }
-    .status-left { flex: 1; min-width: 250px; }
-    .status-center { flex: 1; display: flex; justify-content: center; align-items: center; min-width: 150px; }
-    .status-right { flex: 1; text-align: right; min-width: 200px; display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem;}
-    .progress-circle { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
-    .progress-circle-inner { width: 65px; height: 65px; border-radius: 50%; background: var(--bg-primary); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; color: var(--text-primary); }
+    /* Toast Notification System */
+    .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; pointer-events: none;}
+    .toast { padding: 14px 24px; border-radius: 12px; font-weight: 800; font-size: 0.95rem; color: #fff; background: var(--primary); box-shadow: var(--shadow-lg); animation: slideInRight 0.4s var(--ease) forwards; display: flex; align-items: center; gap: 10px; }
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--danger); }
+    .toast.hide { animation: slideOutRight 0.4s var(--ease) forwards; }
 
-    /* Dashboard Metrics & Charts */
-    .metric-card { padding: 2rem; text-align: left; border-left: 5px solid var(--primary-accent); cursor: pointer; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; background: var(--bg-primary); border-radius: var(--radius-lg); border-top: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); box-shadow: var(--shadow); transition: all .4s var(--ease); will-change: transform;}
-    .metric-card:hover { transform: translateY(-8px) scale(1.01); box-shadow: var(--shadow-lg); filter: brightness(1.02); }
-    .metric-card::after { content: '📊'; position: absolute; right: -10px; bottom: -20px; font-size: 6rem; opacity: 0.05; transition: all .5s var(--ease); }
-    .metric-card:hover::after { transform: scale(1.15) rotate(-5deg); opacity: 0.12; }
-    .metric-label { font-size: .85rem; color: var(--text-secondary); margin-bottom: .8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; z-index: 1;}
-    .metric-value { font-size: 3rem; font-weight: 900; font-family: var(--font-mono); line-height: 1; z-index: 1;}
-    
+    /* Dashboard Layouts */
     .dashboard-layout.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; margin-bottom: 2rem; }
     .dashboard-layout.compact { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
     .dashboard-layout.compact .chart-box { padding: 1rem; }
+    .dashboard-layout.analytics { display: flex; flex-direction: column; gap: 2rem; margin-bottom: 2rem; }
+    .dashboard-layout.analytics .chart-box { width: 100%; height: 350px; }
+    .dashboard-layout.masonry { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; align-items: start;}
     
     .chart-box { background: var(--bg-primary); padding: 2rem; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow); transition: transform 0.4s var(--ease); display: flex; flex-direction: column;}
-    .chart-box:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+    .chart-box:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
 
     /* Settings Page */
     .theme-card { border: 2px solid var(--border); border-radius: 12px; padding: 1rem; cursor: pointer; transition: all .4s var(--ease); display: flex; flex-direction: column; gap: 10px; background: var(--bg-primary);}
@@ -245,50 +235,54 @@
     .print-info-block strong { color: #222; }
 
     /* =========================================
-       PRINT STYLES - Dynamic A4 Non-Overlapping
+       PRINT STYLES - Safe Non-Overlapping Engine
        ========================================= */
     .print-only { display: none; }
     
     @media print {
-        @page { size: A4 portrait; margin: 0; }
-        body, html { margin: 0 !important; padding: 0 !important; background: #fff !important; color: #000 !important; width: 210mm; min-height: 297mm; }
+        @page { size: A4 portrait; margin: 5mm; }
+        body, html { margin: 0 !important; padding: 0 !important; background: #fff !important; color: #000 !important; width: 100%; }
         * { animation: none !important; transition: none !important; box-shadow: none !important; }
-        .login-screen, .app-container, .modal, .nav-tabs, .navbar { display: none !important; }
+        
+        .login-screen, .app-container, .modal, .toast-container { display: none !important; }
         .print-only { display: block !important; width: 100%; background: #fff; }
 
-        .a4-print-layout { display: block; width: 210mm; min-height: 297mm; box-sizing: border-box; background: #fff; }
+        .a4-print-layout { display: block; width: 100%; box-sizing: border-box; background: #fff; font-family: sans-serif;}
 
-        .print-sec-1 { border-bottom: 2px dashed #000; padding: 10mm 15mm; display: block; width: 100%; box-sizing: border-box;}
+        .print-sec-1 { border-bottom: 2px dashed #000; padding-bottom: 5mm; margin-bottom: 5mm; display: block; width: 100%;}
         
-        /* Float system prevents overlapping when item lists are long */
-        .print-bottom-wrap { display: block; width: 100%; }
-        .print-sec-2 { width: 50%; float: left; border-right: 2px dashed #000; padding: 10mm 15mm; box-sizing: border-box; min-height: 140mm; }
-        .print-sec-3 { width: 50%; float: right; padding: 10mm 15mm; box-sizing: border-box; min-height: 140mm;}
-        .clearfix::after { content: ""; clear: both; display: table; }
+        /* Side-by-side Layout with Flex to avoid floats breaking */
+        .print-bottom-wrap { display: flex; flex-direction: row; width: 100%; page-break-inside: avoid; break-inside: avoid; }
+        .print-sec-2 { width: 50%; padding-right: 5mm; border-right: 2px dashed #000; box-sizing: border-box; }
+        .print-sec-3 { width: 50%; padding-left: 5mm; box-sizing: border-box; }
 
         .print-header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 12px; align-items: flex-end; }
-        .print-title { font-size: 18pt; font-weight: 800; text-transform: uppercase; margin-bottom: 2px; color: #000;}
-        .print-company { font-size: 12pt; font-weight: bold; color: #444; }
-        .print-job-no { font-size: 16pt; font-weight: bold; padding: 2px 6px; border: 2px solid #000; display: inline-block; margin-bottom: 4px; color: #000; }
-        .print-date { font-size: 10pt; font-weight: 600; color: #000; }
+        .print-title { font-size: 16pt; font-weight: 800; text-transform: uppercase; margin-bottom: 2px; color: #000;}
+        .print-company { font-size: 11pt; font-weight: bold; color: #444; }
+        .print-job-no { font-size: 14pt; font-weight: bold; padding: 2px 6px; border: 2px solid #000; display: inline-block; margin-bottom: 4px; color: #000; }
+        .print-date { font-size: 9pt; font-weight: 600; color: #000; }
 
         .print-header-small { display: flex; justify-content: space-between; border-bottom: 1.5px solid #000; padding-bottom: 4px; margin-bottom: 8px; align-items: flex-end;}
-        .print-title-small { font-size: 13pt; font-weight: 800; text-transform: uppercase; color: #000; }
+        .print-title-small { font-size: 12pt; font-weight: 800; text-transform: uppercase; color: #000; }
 
         .print-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 8pt; page-break-inside: auto; }
-        .print-table th, .print-table td { border: 1px solid #000; padding: 4px 6px; text-align: left; color: #000; }
-        .print-table th { background: #e0e0e0 !important; -webkit-print-color-adjust: exact; font-weight: 800; text-transform: uppercase; font-size: 8pt; color: #000; }
+        .print-table th, .print-table td { border: 1px solid #000; padding: 4px; text-align: left; color: #000; }
+        .print-table th { background: #e0e0e0 !important; -webkit-print-color-adjust: exact; font-weight: 800; text-transform: uppercase; color: #000; }
         .print-table tr { page-break-inside: avoid; page-break-after: auto; }
+        .print-table thead { display: table-header-group; }
 
-        .print-signatures { display: flex; justify-content: space-between; margin-top: 25px; padding-top: 25px; }
+        .print-signatures { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px; }
         .sig-line { border-top: 1px solid #000; width: 45%; text-align: center; font-size: 9pt; font-weight: bold; padding-top: 4px; color: #000; }
 
-        .print-logo-main { height: 45px; width: auto; object-fit: contain; }
-        .print-logo-sub { height: 28px; width: auto; object-fit: contain; }
+        .print-logo-main { height: 40px; width: auto; object-fit: contain; }
+        .print-logo-sub { height: 25px; width: auto; object-fit: contain; }
     }
 </style>
 </head>
 <body>
+
+<!-- TOAST NOTIFICATION CONTAINER -->
+<div id="toastContainer" class="toast-container"></div>
 
 <!-- LOGIN SCREEN -->
 <div class="login-screen" id="loginScreen">
@@ -354,6 +348,8 @@
                         <select id="dashLayoutSelector" onchange="changeDashLayout(this.value)" style="padding: 0.6rem 1rem; border-radius: 8px; font-weight: bold; width: auto; min-width: 200px;">
                             <option value="grid">Grid Layout (Default)</option>
                             <option value="compact">Compact Layout</option>
+                            <option value="analytics">Full Analytics View</option>
+                            <option value="masonry">Masonry Cards Focus</option>
                         </select>
                     </div>
                 </div>
@@ -401,17 +397,13 @@
 
             <!-- NEW PO -->
             <div id="new-po" class="page">
-                <div class="alert alert-success" id="successAlert"></div>
-                <div class="alert alert-error" id="errorAlert"></div>
-
                 <div class="form-container">
                     <div class="form-header">
                         <h2>Create New Job Card</h2>
                         <p>Generate a Master Job Card. Add multiple items to tie them directly to this PO.</p>
                     </div>
                     <div class="form-body">
-                        <form id="poForm" onsubmit="handlePOSubmit(event)">
-                            
+                        <form id="poForm">
                             <!-- ORDER INFO -->
                             <div class="form-section">
                                 <div class="form-section-title"><span>📅</span> Master Order Information</div>
@@ -443,11 +435,7 @@
                             <!-- MULTI-ITEM CONTAINER -->
                             <div class="form-section">
                                 <div class="form-section-title"><span>📦</span> Product Specifications</div>
-                                
-                                <div id="itemsContainer">
-                                    <!-- Dynamic Items Injected Here -->
-                                </div>
-
+                                <div id="itemsContainer"></div>
                                 <div style="text-align: right; margin-top: 1rem;">
                                     <button type="button" class="btn-secondary" onclick="addItemBlock()">➕ Add Another Item</button>
                                 </div>
@@ -492,8 +480,9 @@
                             </div>
 
                             <div class="button-group">
-                                <button type="submit" class="btn-primary" style="font-size: 1.05rem; padding: 1rem 2rem; width: 100%; max-width: 400px; margin: 0 auto;">💾 Save &amp; Generate Job Card</button>
-                                <button type="button" class="btn-danger btn-small" onclick="startNewPO()" style="margin-left: auto;">🔄 Clear Entire Form</button>
+                                <button type="button" class="btn-success" onclick="submitForm('save')" style="font-size: 1.05rem; padding: 1rem 2rem;">💾 Just Save</button>
+                                <button type="button" class="btn-print" onclick="submitForm('print')" style="font-size: 1.05rem; padding: 1rem 2rem;">🖨️ Save &amp; Print Job Card</button>
+                                <button type="button" class="btn-danger btn-small" onclick="startNewPO()" style="margin-left: auto;">🔄 Clear Form</button>
                             </div>
                         </form>
                     </div>
@@ -546,9 +535,16 @@
                 <div class="page-heading">
                     <div>
                         <h2>🎬 Production Board</h2>
-                        <p>Track and advance entire jobs through specific manufacturing steps.</p>
+                        <p>Track jobs through each active manufacturing step.</p>
                     </div>
                 </div>
+
+                <div class="filter-bar" style="margin-bottom: 2rem;">
+                    <input type="text" id="pbFilterPO" placeholder="Filter by PO or Job #..." oninput="renderProdBoardTable()">
+                    <input type="text" id="pbFilterParty" list="partyDatalist" placeholder="Filter by Customer..." oninput="renderProdBoardTable()">
+                    <button class="btn-secondary" onclick="clearJobFilters('pb')">Reset Filters</button>
+                </div>
+
                 <div class="stage-tabs-container">
                     <div class="stage-tabs" id="stageTabs">
                         <!-- Populated by JS -->
@@ -568,7 +564,7 @@
                                     <th>Customer</th>
                                     <th>Items</th>
                                     <th>Total Qty</th>
-                                    <th>Action</th>
+                                    <th>Status & Action</th>
                                 </tr>
                             </thead>
                             <tbody id="prodBoardBody"></tbody>
@@ -597,7 +593,7 @@
                     <button class="btn-secondary" onclick="clearJobFilters('status-board')">Reset Filters</button>
                 </div>
 
-                <div id="statusBoardList" style="display: flex; flex-direction: column; gap: 1rem;">
+                <div id="statusBoardList">
                     <!-- Cards Populated by JS -->
                 </div>
             </div>
@@ -714,36 +710,21 @@
     </div>
 </div>
 
-<!-- VIEW JOB DETAIL MODAL -->
+<!-- VIEW JOB DETAIL MODAL (Workflow History) -->
 <div class="modal" id="jobModal" onclick="if (event.target === this) closeModal('jobModal')">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>📄 Job Details &amp; Workflow Checklist</h2>
+            <h2>📄 Job Details &amp; Workflow Audit</h2>
             <button class="modal-close" onclick="closeModal('jobModal')">×</button>
         </div>
         <div class="modal-body">
             <div id="jobDetail"></div>
             
-            <h3 style="margin-top:2rem; font-weight:800; color:var(--text-primary);">⚙️ Production Workflow Checklist</h3>
-            <div class="task-checklist" id="jobChecklist"></div>
+            <h3 style="margin-top:2rem; font-weight:800; color:var(--text-primary);">⚙️ Complete Production Timeline</h3>
+            <div class="timeline-container" id="jobChecklist"></div>
             
             <div style="margin-top: 2rem; display: flex; justify-content:flex-end;">
                 <button class="btn-print" onclick="printJobCard(currentModalJobId)">🖨️ Print A4 Job Card</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- CUSTOM PRINT CONFIRM MODAL -->
-<div class="modal" id="printConfirmModal">
-    <div class="modal-content compact">
-        <div class="modal-body">
-            <div class="celebration-icon">🎉</div>
-            <h2 style="font-weight: 800; color: var(--text-primary); margin-bottom: 10px;">Job Saved!</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.95rem;">The master job card has been successfully synchronized to the cloud.</p>
-            <div style="display: flex; gap: 1rem; justify-content: center;">
-                <button class="btn-secondary" onclick="handlePrintConfirm(false)" style="flex: 1;">💾 Just Save</button>
-                <button class="btn-print" onclick="handlePrintConfirm(true)" style="flex: 1;">🖨️ Print Job Card</button>
             </div>
         </div>
     </div>
@@ -773,18 +754,12 @@
             db = firebase.database();
             usingFirebase = true;
             console.log("Firebase initialized successfully.");
-        } else {
-            console.warn("Firebase not configured. Falling back to local storage only.");
         }
-    } catch(e) {
-        console.error("Firebase init failed:", e);
-    }
+    } catch(e) { console.error("Firebase init failed:", e); }
 
     // ===== STATE & INIT =====
     let allJobs = [];
-    let appUsers = [{ u: 'Packages Dept', p: '123' }]; // Default fallback
-    
-    // Default Parties List extracted from image
+    let appUsers = [{ u: 'Packages Dept', p: '123' }]; 
     let appParties = [
         "ZHP - IN HOUSE", "THE CRESCENT TEXTILE", "NAVEED ENTERPRISES", "DYNAMIC SPORTSWEAR", 
         "AL QURESH FABRICS", "SUNRISE FOOD INDUSTRY", "HIRA TAHIR PRINTERS", "Z.A.FOOD INDUSTRIES", 
@@ -803,12 +778,9 @@
 
     let currentModalJobId = null;
     let editingJobId = null;
-    let pendingPrintJobId = null;
     let itemCounter = 0;
     
-    let chartParty = null;
-    let chartStage = null;
-    let chartType = null;
+    let chartParty = null; let chartStage = null; let chartType = null;
     let activeFilter = null; 
 
     const ALL_STAGES = [
@@ -835,12 +807,24 @@
         }
     });
 
-    // ===== PREFERENCES =====
+    // ===== UI TOAST NOTIFICATIONS =====
+    function showToast(msg, type='success') {
+        let container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = (type === 'success' ? '✅ ' : '⚠️ ') + msg;
+        container.appendChild(toast);
+        
+        setTimeout(() => { toast.classList.add('hide'); }, 3000);
+        setTimeout(() => { toast.remove(); }, 3500);
+    }
+
+    // ===== PREFERENCES & DATA =====
     function savePreferences() {
         const unit = document.getElementById('prefDefaultUnit').value;
         localStorage.setItem('zhDefUnit', unit);
+        showToast('Preferences Saved', 'success');
     }
-
     function loadPreferences() {
         const unit = localStorage.getItem('zhDefUnit') || 'INCH';
         const prefEl = document.getElementById('prefDefaultUnit');
@@ -849,24 +833,19 @@
 
     function exportData() {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allJobs));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", "zh_jobs_backup_" + new Date().toISOString().slice(0,10) + ".json");
-        document.body.appendChild(downloadAnchorNode);
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
+        const a = document.createElement('a');
+        a.setAttribute("href", dataStr);
+        a.setAttribute("download", "zh_jobs_backup_" + new Date().toISOString().slice(0,10) + ".json");
+        document.body.appendChild(a); a.click(); a.remove();
+        showToast('Backup Downloaded', 'success');
     }
 
     function clearAllJobsData() {
-        if(confirm("DANGER: Are you sure you want to permanently delete ALL job records? This cannot be undone unless you have a backup!")) {
+        if(confirm("DANGER: Are you sure you want to permanently delete ALL job records?")) {
             if(prompt("Type 'DELETE' to confirm:") === 'DELETE') {
-                allJobs = [];
-                saveAllJobsData(allJobs);
-                loadDashboard();
-                renderJobsTable();
-                renderProdBoardTable();
-                renderStatusBoard();
-                alert("Database wiped.");
+                allJobs = []; saveAllJobsData(allJobs);
+                loadDashboard(); renderJobsTable(); renderProdBoardTable(); renderStatusBoard();
+                showToast("Database completely wiped.", "error");
             }
         }
     }
@@ -876,16 +855,13 @@
         if (usingFirebase) {
             db.ref('zhUsers').on('value', snap => {
                 const data = snap.val();
-                if (data) appUsers = data;
-                else saveUsersData(appUsers); 
-                populateLoginDropdown();
-                renderUsersTable();
+                if (data) appUsers = data; else saveUsersData(appUsers); 
+                populateLoginDropdown(); renderUsersTable();
             });
         } else {
             const stored = localStorage.getItem('zhUsers');
             if (stored) appUsers = JSON.parse(stored);
-            populateLoginDropdown();
-            renderUsersTable();
+            populateLoginDropdown(); renderUsersTable();
         }
     }
 
@@ -897,9 +873,7 @@
     function populateLoginDropdown() {
         const sel = document.getElementById('loginUser');
         sel.innerHTML = appUsers.map(u => `<option value="${u.u}">${u.u}</option>`).join('');
-        if(appUsers.some(u => u.u === 'Packages Dept')) {
-            sel.value = 'Packages Dept';
-        }
+        if(appUsers.some(u => u.u === 'Packages Dept')) sel.value = 'Packages Dept';
     }
 
     function handleLogin(e) {
@@ -911,17 +885,18 @@
         if (valid) {
             document.getElementById('loginError').classList.remove('show');
             sessionStorage.setItem('zhLogged', 'true');
+            sessionStorage.setItem('zhActiveUser', user);
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appContainer').classList.add('active');
-            loadJobs();
-            startNewPO();
+            loadJobs(); startNewPO();
+            showToast(`Welcome back, ${user}`, 'success');
         } else {
             document.getElementById('loginError').classList.add('show');
         }
     }
 
     function handleLogout() {
-        sessionStorage.removeItem('zhLogged');
+        sessionStorage.removeItem('zhLogged'); sessionStorage.removeItem('zhActiveUser');
         document.getElementById('appContainer').classList.remove('active');
         document.getElementById('loginScreen').style.display = 'flex';
         document.getElementById('loginPass').value = '';
@@ -931,40 +906,27 @@
         e.preventDefault();
         const u = document.getElementById('newUserName').value;
         const p = document.getElementById('newUserPass').value;
-        if(appUsers.some(x => x.u === u)) { alert("User already exists!"); return; }
-        appUsers.push({u, p});
-        saveUsersData(appUsers);
-        document.getElementById('newUserName').value = '';
-        document.getElementById('newUserPass').value = '';
+        if(appUsers.some(x => x.u === u)) { showToast("User already exists!", "error"); return; }
+        appUsers.push({u, p}); saveUsersData(appUsers);
+        document.getElementById('newUserName').value = ''; document.getElementById('newUserPass').value = '';
+        showToast("User added", 'success');
     }
 
     function removeUser(index) {
-        if(appUsers.length <= 1) { alert("Cannot remove the last user!"); return; }
-        if(confirm("Remove this user?")) {
-            appUsers.splice(index, 1);
-            saveUsersData(appUsers);
-        }
+        if(appUsers.length <= 1) { showToast("Cannot remove the last user!", "error"); return; }
+        if(confirm("Remove this user?")) { appUsers.splice(index, 1); saveUsersData(appUsers); showToast("User removed", 'success'); }
     }
 
     function renderUsersTable() {
         const tbody = document.getElementById('usersTableBody');
         if(!tbody) return;
-        
         const frag = document.createDocumentFragment();
         appUsers.forEach((user, i) => {
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td style="padding: 10px; border-bottom: 1px solid var(--border);"><strong>${user.u}</strong></td>
-                <td style="padding: 10px; border-bottom: 1px solid var(--border); font-family: monospace;">${user.p}</td>
-                <td style="padding: 10px; border-bottom: 1px solid var(--border);">
-                    <button type="button" class="btn-danger" style="padding: 4px 8px; font-size:0.75rem; border-radius:6px; box-shadow:none;" onclick="removeUser(${i})">Del</button>
-                </td>
-            `;
+            tr.innerHTML = `<td style="padding: 10px; border-bottom: 1px solid var(--border);"><strong>${user.u}</strong></td><td style="padding: 10px; border-bottom: 1px solid var(--border); font-family: monospace;">${user.p}</td><td style="padding: 10px; border-bottom: 1px solid var(--border);"><button type="button" class="btn-danger" style="padding: 4px 8px; font-size:0.75rem; border-radius:6px; box-shadow:none;" onclick="removeUser(${i})">Del</button></td>`;
             frag.appendChild(tr);
         });
-        
-        tbody.innerHTML = '';
-        tbody.appendChild(frag);
+        tbody.innerHTML = ''; tbody.appendChild(frag);
     }
 
     // ===== PARTIES / CUSTOMERS =====
@@ -972,16 +934,13 @@
         if (usingFirebase) {
             db.ref('zhParties').on('value', snap => {
                 const data = snap.val();
-                if (data) { appParties = data; }
-                else { savePartiesData(appParties); }
-                populatePartyDropdown();
-                renderPartiesTable();
+                if (data) { appParties = data; } else { savePartiesData(appParties); }
+                populatePartyDropdown(); renderPartiesTable();
             });
         } else {
             const stored = localStorage.getItem('zhParties');
             if (stored) appParties = JSON.parse(stored);
-            populatePartyDropdown();
-            renderPartiesTable();
+            populatePartyDropdown(); renderPartiesTable();
         }
     }
 
@@ -995,76 +954,51 @@
         const list = document.getElementById('partyDatalist');
         if(list) {
             const frag = document.createDocumentFragment();
-            appParties.forEach(p => {
-                const opt = document.createElement('option');
-                opt.value = p;
-                frag.appendChild(opt);
-            });
-            list.innerHTML = '';
-            list.appendChild(frag);
+            appParties.forEach(p => { const opt = document.createElement('option'); opt.value = p; frag.appendChild(opt); });
+            list.innerHTML = ''; list.appendChild(frag);
         }
     }
 
     function renderPartiesTable() {
         const tbody = document.getElementById('partiesTableBody');
         if(!tbody) return;
-        
         const frag = document.createDocumentFragment();
         appParties.forEach((party, i) => {
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td style="padding: 10px; border-bottom: 1px solid var(--border); font-weight: bold;">${party}</td>
-                <td style="padding: 10px; border-bottom: 1px solid var(--border); text-align: right; width: 120px;">
-                    <button type="button" class="btn-secondary" style="padding: 4px 8px; font-size:0.75rem; border-radius:6px; box-shadow:none; margin-right:5px;" onclick="editParty(${i})">Edit</button>
-                    <button type="button" class="btn-danger" style="padding: 4px 8px; font-size:0.75rem; border-radius:6px; box-shadow:none;" onclick="removeParty(${i})">Del</button>
-                </td>
-            `;
+            tr.innerHTML = `<td style="padding: 10px; border-bottom: 1px solid var(--border); font-weight: bold;">${party}</td><td style="padding: 10px; border-bottom: 1px solid var(--border); text-align: right; width: 120px;"><button type="button" class="btn-secondary" style="padding: 4px 8px; font-size:0.75rem; border-radius:6px; box-shadow:none; margin-right:5px;" onclick="editParty(${i})">Edit</button><button type="button" class="btn-danger" style="padding: 4px 8px; font-size:0.75rem; border-radius:6px; box-shadow:none;" onclick="removeParty(${i})">Del</button></td>`;
             frag.appendChild(tr);
         });
-        
-        tbody.innerHTML = '';
-        tbody.appendChild(frag);
+        tbody.innerHTML = ''; tbody.appendChild(frag);
     }
 
     function handleAddParty(e) {
         e.preventDefault();
         const input = document.getElementById('newPartyName');
         const newName = input.value.trim().toUpperCase();
-        if (appParties.includes(newName)) { alert("Party already exists!"); return; }
-        appParties.push(newName);
-        savePartiesData(appParties);
-        input.value = '';
+        if (appParties.includes(newName)) { showToast("Party already exists!", "error"); return; }
+        appParties.push(newName); savePartiesData(appParties); input.value = '';
+        showToast("Customer Added", 'success');
     }
 
     function editParty(index) {
         const newName = prompt("Edit Party Name:", appParties[index]);
-        if (newName && newName.trim() !== "") {
-            appParties[index] = newName.trim().toUpperCase();
-            savePartiesData(appParties);
-        }
+        if (newName && newName.trim() !== "") { appParties[index] = newName.trim().toUpperCase(); savePartiesData(appParties); showToast("Customer Updated", 'success'); }
     }
 
     function removeParty(index) {
-        if(confirm(`Remove ${appParties[index]} from database?`)) {
-            appParties.splice(index, 1);
-            savePartiesData(appParties);
-        }
+        if(confirm(`Remove ${appParties[index]} from database?`)) { appParties.splice(index, 1); savePartiesData(appParties); showToast("Customer Removed", 'success');}
     }
 
     // ===== THEMES =====
     function setAppTheme(theme) {
         document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem('zhTheme', theme);
-        
         document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
         const activeCard = document.querySelector(`.theme-card[onclick="setAppTheme('${theme}')"]`);
         if(activeCard) activeCard.classList.add('active');
-
         const isDarkish = ['dark', 'midnight', 'forest', 'sunset'].includes(theme);
         Chart.defaults.color = isDarkish ? '#cbd5e1' : '#475569';
-        if(chartParty) chartParty.update();
-        if(chartStage) chartStage.update();
-        if(chartType) chartType.update();
+        if(chartParty) chartParty.update(); if(chartStage) chartStage.update(); if(chartType) chartType.update();
     }
 
     // ===== NAVIGATION =====
@@ -1077,43 +1011,48 @@
         
         if (page === 'dashboard') loadDashboard();
         if (page === 'jobs') renderJobsTable();
-        if (page === 'production-board') {
-            renderStageTabs();
-            renderProdBoardTable();
-        }
-        if (page === 'status-board') {
-            renderStatusBoard();
-        }
+        if (page === 'production-board') { renderStageTabs(); renderProdBoardTable(); }
+        if (page === 'status-board') renderStatusBoard();
     }
 
-    // ===== PRINTING HELPER =====
+    // ===== SAFE PRINTING ENGINE =====
     function triggerPrint(html) {
         const printArea = document.getElementById('printArea');
         printArea.innerHTML = html;
-        const images = printArea.getElementsByTagName('img');
-        let loadedCount = 0;
-        if (images.length === 0) {
-            window.print(); closeModal('jobModal'); return;
+        
+        let printFired = false;
+        const doPrint = () => {
+            if(printFired) return;
+            printFired = true;
+            window.print();
+            closeModal('jobModal');
+            setTimeout(() => { printArea.innerHTML = ''; }, 1000);
         }
-        for (let img of images) {
-            if (img.complete) {
-                loadedCount++;
-                if (loadedCount === images.length) setTimeout(() => { window.print(); closeModal('jobModal'); }, 150);
-            } else {
-                img.onload = img.onerror = () => {
+
+        const images = printArea.getElementsByTagName('img');
+        if (images.length === 0) { 
+            setTimeout(doPrint, 200); 
+        } else {
+            let loadedCount = 0;
+            for (let img of images) {
+                if (img.complete) {
                     loadedCount++;
-                    if (loadedCount === images.length) setTimeout(() => { window.print(); closeModal('jobModal'); }, 150);
-                };
+                } else {
+                    img.onload = img.onerror = () => {
+                        loadedCount++;
+                        if (loadedCount === images.length) setTimeout(doPrint, 150);
+                    };
+                }
             }
+            if (loadedCount === images.length) setTimeout(doPrint, 150);
+            
+            // Absolute Fallback: Forces print screen to open within 1 second even if image hangs
+            setTimeout(doPrint, 1000);
         }
     }
 
     // ===== MULTI-ITEM CALCULATIONS =====
-
-    let globalPaperObj = {};
-    let globalRollObj = {};
-    let globalPaperText = "-";
-    let globalRollText = "-";
+    let globalPaperObj = {}; let globalRollObj = {}; let globalPaperText = "-"; let globalRollText = "-";
 
     function convertToInches(val, unit) {
         val = parseFloat(val) || 0;
@@ -1152,26 +1091,17 @@
                 rawKeys.push(layers[0] + "+" + layers[1]);
                 rawKeys.push(layers[n] + "+" + layers[n - 1]);
             } else {
-                for (let p = 0; p <= n - 4; p += 2) {
-                    rawKeys.push(layers[p] + "+" + layers[p + 1]);
-                }
+                for (let p = 0; p <= n - 4; p += 2) { rawKeys.push(layers[p] + "+" + layers[p + 1]); }
                 rawKeys.push(layers[n] + "+" + layers[n - 1]);
             }
         } else {
-            for (let p = 0; p <= n; p++) {
-                rawKeys.push(layers[p]);
-            }
+            for (let p = 0; p <= n; p++) { rawKeys.push(layers[p]); }
         }
 
         let counts = {};
-        for (let key of rawKeys) {
-            counts[key] = (counts[key] || 0) + 1;
-        }
-
+        for (let key of rawKeys) { counts[key] = (counts[key] || 0) + 1; }
         let results = {};
-        for (let key in counts) {
-            results[key] = baseRolls * counts[key];
-        }
+        for (let key in counts) { results[key] = baseRolls * counts[key]; }
         return results;
     }
 
@@ -1184,8 +1114,7 @@
 
         if (!ply) {
             container.innerHTML = '<span style="color: var(--text-secondary); font-size: 0.85rem;">Please select a Ply config first.</span>';
-            calculateAllJobs();
-            return;
+            calculateAllJobs(); return;
         }
 
         let num = parseInt(ply.charAt(0)); 
@@ -1200,15 +1129,12 @@
             </div>`;
         }
         container.innerHTML = html;
-        // Trigger calc in case inputs are empty
         calculateAllJobs();
     }
 
     function calculateAllJobs() {
-        globalPaperObj = {};
-        globalRollObj = {};
-        let perItemPaperText = '';
-        let perItemRollText = '';
+        globalPaperObj = {}; globalRollObj = {};
+        let perItemPaperText = ''; let perItemRollText = '';
         
         const blocks = document.querySelectorAll('.item-block');
         blocks.forEach((block, index) => {
@@ -1220,10 +1146,9 @@
             const qty = parseFloat(block.querySelector('.item-qty').value) || 0;
             const manualRS = block.querySelector('.item-manual-rs').value;
 
-            // Gather dynamically created ply inputs
             const plyInputs = Array.from(block.querySelectorAll('.ply-layer-input')).map(inp => inp.value.trim().toUpperCase());
             const specStr = (plyInputs.length > 0 && plyInputs.every(v => v !== '')) ? plyInputs.join('+') : '';
-            block.querySelector('.item-spec').value = specStr; // save hidden
+            block.querySelector('.item-spec').value = specStr; 
 
             if (L > 0 && W > 0 && H > 0) {
                 const Lin = convertToInches(L, unit);
@@ -1255,8 +1180,7 @@
 
                 if (specStr && qty > 0) {
                     const pbObj = buildPaperBreakdownObj(specStr, area, qty, finalRS);
-                    let itemPText = `${itemName}:\n`;
-                    let addedP = false;
+                    let itemPText = `${itemName}:\n`; let addedP = false;
                     for(let key in pbObj) {
                         globalPaperObj[key] = (globalPaperObj[key] || 0) + pbObj[key];
                         itemPText += `  ${key} = ${Math.ceil(pbObj[key])} KGs\n`;
@@ -1265,8 +1189,7 @@
                     if(addedP) perItemPaperText += itemPText + '\n';
                     
                     const rollObj = buildRollsSummaryObj(specStr, clRounded, qty);
-                    let itemRText = `${itemName}:\n`;
-                    let addedR = false;
+                    let itemRText = `${itemName}:\n`; let addedR = false;
                     for(let key in rollObj) {
                         let rKey = `[RS: ${finalRS}" | CL: ${clRounded.toFixed(2)}"] ${key}`;
                         globalRollObj[rKey] = (globalRollObj[rKey] || 0) + rollObj[key];
@@ -1284,34 +1207,20 @@
             }
         });
 
-        // Generate the final text string for display & print
         if(Object.keys(globalPaperObj).length > 0) {
             let finalPaperText = blocks.length > 1 ? perItemPaperText + "------------------\nGRAND TOTAL:\n" : "";
-            for(let key of Object.keys(globalPaperObj).sort()) {
-                finalPaperText += `${key} = ${Math.ceil(globalPaperObj[key])} KGs\n`;
-            }
-            globalPaperText = finalPaperText;
-            document.getElementById('calcPaperSummary').textContent = globalPaperText;
-        } else {
-            globalPaperText = "-";
-            document.getElementById('calcPaperSummary').textContent = "-";
-        }
+            for(let key of Object.keys(globalPaperObj).sort()) { finalPaperText += `${key} = ${Math.ceil(globalPaperObj[key])} KGs\n`; }
+            globalPaperText = finalPaperText; document.getElementById('calcPaperSummary').textContent = globalPaperText;
+        } else { globalPaperText = "-"; document.getElementById('calcPaperSummary').textContent = "-"; }
 
         if(Object.keys(globalRollObj).length > 0) {
             let finalRollText = blocks.length > 1 ? perItemRollText + "------------------\nGRAND TOTAL:\n" : "";
-            for(let key of Object.keys(globalRollObj).sort()) {
-                finalRollText += `• ${key} = ${(Math.round(globalRollObj[key] * 10) / 10).toFixed(1)} Rolls\n`;
-            }
-            globalRollText = finalRollText;
-            document.getElementById('calcRollsSummary').textContent = globalRollText;
-        } else {
-            globalRollText = "-";
-            document.getElementById('calcRollsSummary').textContent = "-";
-        }
+            for(let key of Object.keys(globalRollObj).sort()) { finalRollText += `• ${key} = ${(Math.round(globalRollObj[key] * 10) / 10).toFixed(1)} Rolls\n`; }
+            globalRollText = finalRollText; document.getElementById('calcRollsSummary').textContent = globalRollText;
+        } else { globalRollText = "-"; document.getElementById('calcRollsSummary').textContent = "-"; }
     }
 
     // ===== WORKFLOW & PO GENERATION =====
-
     function addItemBlock() {
         const index = itemCounter++;
         const defaultUnit = localStorage.getItem('zhDefUnit') || 'INCH';
@@ -1328,7 +1237,6 @@
                             <option value="">Select Item</option>
                             <option value="Carton">Carton</option>
                             <option value="Stiffener">Stiffener</option>
-                            <option value="Divider">Divider</option>
                         </select>
                     </div>
                     <div class="form-group-wrapper">
@@ -1362,8 +1270,6 @@
                         </select>
                     </div>
                 </div>
-                
-                <!-- Dynamic Ply Inputs -->
                 <div class="form-row ply-inputs-row" style="margin-bottom:0;">
                     <div class="form-group-wrapper" style="grid-column: 1 / -1; background: var(--bg-tertiary); padding: 1rem; border-radius: 10px; border: 1px dashed var(--border);">
                         <label class="required">Paper Specifications</label>
@@ -1373,7 +1279,6 @@
                         <input type="hidden" class="item-spec" value="">
                     </div>
                 </div>
-
                 <div class="calc-grid" style="margin: 1.5rem 0;">
                     <div class="calc-box" style="padding: 1.2rem; background: var(--bg-tertiary);">
                         <div class="calc-label">Roll Size (W+H)</div>
@@ -1401,10 +1306,7 @@
 
     function removeItemBlock(index) {
         const block = document.getElementById(`itemBlock_${index}`);
-        if(block) {
-            block.remove();
-            calculateAllJobs();
-        }
+        if(block) { block.remove(); calculateAllJobs(); }
     }
 
     function startNewPO() {
@@ -1413,23 +1315,15 @@
         document.getElementById('jobNumber').value = '';
         document.getElementById('poDate').valueAsDate = new Date();
         document.getElementById('itemsContainer').innerHTML = '';
-        itemCounter = 0;
-        addItemBlock();
-        updateCartonWorkflow();
-        
+        itemCounter = 0; addItemBlock(); updateCartonWorkflow();
         document.getElementById('calcPaperSummary').textContent = '-';
         document.getElementById('calcRollsSummary').textContent = '-';
-        
-        if(!document.getElementById('new-po').classList.contains('active')) {
-            switchPage('new-po');
-        }
     }
 
     function generateJobNumber() {
         const today = new Date();
         const dStr = today.getFullYear() + String(today.getMonth() + 1).padStart(2, '0') + String(today.getDate()).padStart(2, '0');
         const todaysJobs = allJobs.filter(j => j.jobNumber && j.jobNumber.includes(dStr));
-        
         let maxSeq = 0;
         todaysJobs.forEach(j => {
             const parts = j.jobNumber.split('-');
@@ -1438,16 +1332,13 @@
                 if(seq > maxSeq) maxSeq = seq;
             }
         });
-        
-        const seqStr = String(maxSeq + 1).padStart(3, '0');
-        return `JC-${dStr}-${seqStr}`;
+        return `JC-${dStr}-${String(maxSeq + 1).padStart(3, '0')}`;
     }
 
     function updateCartonWorkflow() {
         const type = document.getElementById('cartonType').value;
         const offsetWrap = document.getElementById('offsetFinishingWrapper');
         const preview = document.getElementById('workflowPreview');
-        
         if (type === 'Offset') {
             offsetWrap.style.display = 'flex';
             document.getElementById('laminationVarnish').required = true;
@@ -1455,23 +1346,18 @@
             offsetWrap.style.display = 'none';
             document.getElementById('laminationVarnish').required = false;
         }
-
         let finishVal = document.getElementById('laminationVarnish').value;
         if (finishVal === 'Shine') finishVal = 'Shine Lamination';
         if (finishVal === 'Matt') finishVal = 'Matt Lamination';
-
         const tasks = buildJobTasks({ cartonType: type, laminationVarnish: finishVal });
         if (tasks.length > 0) {
             preview.innerHTML = "<strong>Workflow Steps:</strong><br><br>" + tasks.map((t, i) => `<span class="workflow-step">${i+1}. ${t.label}</span>`).join('<span class="workflow-arrow">→</span>');
-        } else {
-            preview.innerHTML = '';
-        }
+        } else { preview.innerHTML = ''; }
     }
 
     function buildJobTasks(sel, previousTasks) {
         let tasks = [];
         if (!sel.cartonType) return tasks;
-
         if (sel.cartonType === 'Unprinted') {
             tasks = ['Reel Issue', 'Corrugation', 'Pasting', 'Rotary', 'Flexo', 'Glue (Gluing)', 'Pin', 'Drying/Bending', 'Dispatch'];
         } else if (sel.cartonType === 'Flexo') {
@@ -1480,38 +1366,30 @@
             const finish = sel.laminationVarnish || 'Shine Lamination';
             tasks = ['Reel Issue', 'Offset Printing', finish, 'Corrugation', 'Pasting', 'Rotary', 'Flexo', 'Glue (Gluing)', 'Pin', 'Drying/Bending', 'Dispatch'];
         }
-
         let mapped = tasks.map((label, idx) => ({ id: `task_${idx}`, label: label, done: false }));
         if (previousTasks && previousTasks.length) {
             mapped.forEach(t => {
                 const prev = previousTasks.find(p => p.label === t.label);
-                if (prev) t.done = !!prev.done;
+                if (prev) { t.done = !!prev.done; t.completedBy = prev.completedBy; t.completedAt = prev.completedAt; }
             });
         }
         return mapped;
     }
 
     function saveAllJobsData(jobsArray) {
-        if (usingFirebase) {
-            db.ref('zhJobs').set(jobsArray);
-        } else {
-            localStorage.setItem('zhJobs', JSON.stringify(jobsArray));
-        }
+        if (usingFirebase) db.ref('zhJobs').set(jobsArray);
+        else localStorage.setItem('zhJobs', JSON.stringify(jobsArray));
     }
 
-    function handlePOSubmit(event) {
-        event.preventDefault(); 
+    function submitForm(action) {
         if (!document.getElementById('poForm').checkValidity()) {
-            document.getElementById('poForm').reportValidity();
-            return;
+            document.getElementById('poForm').reportValidity(); return;
         }
-
         calculateAllJobs();
 
         const partyInput = document.getElementById('partyName').value.trim().toUpperCase();
         if (partyInput && !appParties.includes(partyInput)) {
-            appParties.push(partyInput);
-            savePartiesData(appParties);
+            appParties.push(partyInput); savePartiesData(appParties);
         }
 
         const type = document.getElementById('cartonType').value;
@@ -1522,61 +1400,31 @@
         let jobNo = document.getElementById('jobNumber').value;
         if (!jobNo && !editingJobId) jobNo = generateJobNumber();
 
-        // Build Items Array
-        let itemsArray = [];
-        let missingSpecs = false;
+        let itemsArray = []; let missingSpecs = false;
         const blocks = document.querySelectorAll('.item-block');
-        
         blocks.forEach(block => {
             const specVal = block.querySelector('.item-spec').value;
             if(!specVal) missingSpecs = true;
-            
             itemsArray.push({
                 itemName: block.querySelector('.item-name').value,
                 ply: block.querySelector('.item-ply').value,
                 quantity: parseFloat(block.querySelector('.item-qty').value) || 0,
                 detailNotes: block.querySelector('.item-notes').value,
-                dimensions: {
-                    L: block.querySelector('.item-l').value,
-                    W: block.querySelector('.item-w').value,
-                    H: block.querySelector('.item-h').value,
-                    unit: block.querySelector('.item-unit').value
-                },
-                calc: {
-                    RS: block.querySelector('.calc-rs').textContent,
-                    CL: block.querySelector('.calc-cl').textContent,
-                    Area: block.querySelector('.calc-area').textContent
-                },
-                specString: specVal,
-                manualRS: block.querySelector('.item-manual-rs').value
+                dimensions: { L: block.querySelector('.item-l').value, W: block.querySelector('.item-w').value, H: block.querySelector('.item-h').value, unit: block.querySelector('.item-unit').value },
+                calc: { RS: block.querySelector('.calc-rs').textContent, CL: block.querySelector('.calc-cl').textContent, Area: block.querySelector('.calc-area').textContent },
+                specString: specVal, manualRS: block.querySelector('.item-manual-rs').value
             });
         });
 
-        if (itemsArray.length === 0) { alert("Please add at least one item."); return; }
-        if (missingSpecs) { alert("Please complete the Paper Specifications for all items."); return; }
+        if (itemsArray.length === 0) { showToast("Please add at least one item.", "error"); return; }
+        if (missingSpecs) { showToast("Please complete the Paper Specifications for all items.", "error"); return; }
 
         const sel = { cartonType: type, laminationVarnish: finishVal };
-
         const baseFields = {
-            jobNumber: jobNo,
-            date: document.getElementById('poDate').value,
-            targetDeliveryDate: document.getElementById('targetDeliveryDate').value,
-            party: partyInput,
-            po: document.getElementById('poNumber').value,
-            
-            items: itemsArray,
-            
-            // Legacy fallbacks for single-item rendering support
-            itemName: itemsArray.map(i => i.itemName).join(', '),
-            quantity: itemsArray.reduce((acc, i) => acc + i.quantity, 0),
-            dimensions: itemsArray[0].dimensions, 
-
-            paperSummaryText: globalPaperText,
-            rollsSummaryText: globalRollText,
-            paperObj: globalPaperObj,
-            rollObj: globalRollObj,
-            cartonType: type,
-            laminationVarnish: type === 'Offset' ? finishVal : ''
+            jobNumber: jobNo, date: document.getElementById('poDate').value, targetDeliveryDate: document.getElementById('targetDeliveryDate').value,
+            party: partyInput, po: document.getElementById('poNumber').value, items: itemsArray,
+            itemName: itemsArray.map(i => i.itemName).join(', '), quantity: itemsArray.reduce((acc, i) => acc + i.quantity, 0), dimensions: itemsArray[0].dimensions, 
+            paperSummaryText: globalPaperText, rollsSummaryText: globalRollText, paperObj: globalPaperObj, rollObj: globalRollObj, cartonType: type, laminationVarnish: type === 'Offset' ? finishVal : ''
         };
 
         if (editingJobId) {
@@ -1584,45 +1432,27 @@
             if (idx !== -1) {
                 const existing = allJobs[idx];
                 const tasks = buildJobTasks(sel, existing.tasks);
-                allJobs[idx] = Object.assign({}, existing, baseFields, { 
-                    tasks, 
-                    status: tasks.every(t=>t.done) ? 'Completed' : 'Pending' 
-                });
+                allJobs[idx] = Object.assign({}, existing, baseFields, { tasks, status: tasks.every(t=>t.done) ? 'Completed' : 'Pending' });
             }
         } else {
             const tasks = buildJobTasks(sel);
-            allJobs.push(Object.assign({ id: Date.now() + Math.floor(Math.random() * 1000) }, baseFields, { 
-                tasks, 
-                status: 'Pending' 
-            }));
+            allJobs.push(Object.assign({ id: Date.now() + Math.floor(Math.random() * 1000) }, baseFields, { tasks, status: 'Pending' }));
         }
 
         saveAllJobsData(allJobs);
-
         document.getElementById('jobNumber').value = jobNo;
-        pendingPrintJobId = editingJobId || allJobs[allJobs.length-1].id;
-        document.getElementById('printConfirmModal').classList.add('active');
-    }
+        const savedId = editingJobId || allJobs[allJobs.length-1].id;
 
-    function handlePrintConfirm(doPrint) {
-        document.getElementById('printConfirmModal').classList.remove('active');
-        if(doPrint && pendingPrintJobId) {
-            printJobCard(pendingPrintJobId);
-        } else {
-            showAlert('success', 'Job Card saved successfully!');
-        }
-        startNewPO();
-    }
-
-    function showAlert(type, message) {
-        const alert = document.getElementById(type === 'success' ? 'successAlert' : 'errorAlert');
-        alert.textContent = message;
-        alert.classList.add('show');
-        setTimeout(() => alert.classList.remove('show'), 4000);
+        const overlay = document.getElementById('successOverlay');
+        overlay.style.display = 'flex';
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            if(action === 'print') { printJobCard(savedId); }
+            startNewPO();
+        }, 1200);
     }
 
     // ===== DASHBOARD CHARTS & JOB FILTERING =====
-
     function getJobCurrentStage(job) {
         if (job.status === 'Completed') return 'Completed';
         const pendingTask = job.tasks.find(t => !t.done);
@@ -1632,9 +1462,7 @@
     function changeDashLayout(layout) {
         const cont = document.getElementById('dashChartsContainer');
         cont.className = 'dashboard-layout ' + layout;
-        if(chartParty) chartParty.resize();
-        if(chartStage) chartStage.resize();
-        if(chartType) chartType.resize();
+        if(chartParty) chartParty.resize(); if(chartStage) chartStage.resize(); if(chartType) chartType.resize();
     }
 
     function loadDashboard() {
@@ -1648,10 +1476,7 @@
         if(elCompleted) elCompleted.textContent = allJobs.filter(j => j.status === 'Completed').length;
         if(elCorrugation) elCorrugation.textContent = allJobs.filter(j => j.status !== 'Completed' && getJobCurrentStage(j) === 'Corrugation').length;
 
-        let parties = {};
-        let stages = {};
-        let types = {};
-
+        let parties = {}; let stages = {}; let types = {};
         allJobs.forEach(job => {
             if (job.status !== 'Completed') {
                 parties[job.party] = (parties[job.party] || 0) + 1;
@@ -1662,135 +1487,71 @@
         });
 
         const isDark = ['dark', 'midnight', 'forest', 'sunset'].includes(document.documentElement.getAttribute('data-theme'));
-        const textColor = isDark ? '#cbd5e1' : '#475569';
+        Chart.defaults.color = isDark ? '#cbd5e1' : '#475569';
         const gridColor = isDark ? '#334155' : '#e2e8f0';
-        Chart.defaults.color = textColor;
 
-        // Stage Chart (Horizontal Bar)
         const stageCtx = document.getElementById('stageChart');
         if (chartStage) chartStage.destroy();
         if (stageCtx) {
             const sortedStages = ALL_STAGES.filter(s => stages[s] > 0);
-            const stageData = sortedStages.map(s => stages[s]);
-
             chartStage = new Chart(stageCtx.getContext('2d'), {
                 type: 'bar',
-                data: {
-                    labels: sortedStages,
-                    datasets: [{
-                        label: 'Jobs Waiting',
-                        data: stageData,
-                        backgroundColor: '#10b981',
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { x: { grid: { color: gridColor } }, y: { grid: { display: false } } },
-                    onClick: (evt, activeElements) => {
-                        if (activeElements.length > 0) goToJobs('Stage', sortedStages[activeElements[0].index]);
-                    }
-                }
+                data: { labels: sortedStages, datasets: [{ label: 'Jobs Waiting', data: sortedStages.map(s => stages[s]), backgroundColor: '#10b981', borderRadius: 4 }] },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: gridColor } }, y: { grid: { display: false } } }, onClick: (evt, activeElements) => { if (activeElements.length > 0) goToJobs('Stage', sortedStages[activeElements[0].index]); } }
             });
         }
 
-        // Party Chart
         const partyCtx = document.getElementById('partyChart');
         if (chartParty) chartParty.destroy();
         if (partyCtx) {
             chartParty = new Chart(partyCtx.getContext('2d'), {
                 type: 'bar',
-                data: {
-                    labels: Object.keys(parties),
-                    datasets: [{
-                        label: 'Pending Orders',
-                        data: Object.values(parties),
-                        backgroundColor: '#3b82f6',
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { y: { grid: { color: gridColor } }, x: { grid: { display: false } } },
-                    onClick: (evt, activeElements) => {
-                        if (activeElements.length > 0) goToJobs('Party', Object.keys(parties)[activeElements[0].index]);
-                    }
-                }
+                data: { labels: Object.keys(parties), datasets: [{ label: 'Pending Orders', data: Object.values(parties), backgroundColor: '#3b82f6', borderRadius: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: gridColor } }, x: { grid: { display: false } } }, onClick: (evt, activeElements) => { if (activeElements.length > 0) goToJobs('Party', Object.keys(parties)[activeElements[0].index]); } }
             });
         }
 
-        // Type Doughnut
         const typeCtx = document.getElementById('typeChart');
         if (chartType) chartType.destroy();
         if (typeCtx) {
             chartType = new Chart(typeCtx.getContext('2d'), {
                 type: 'doughnut',
-                data: {
-                    labels: Object.keys(types),
-                    datasets: [{
-                        data: Object.values(types),
-                        backgroundColor: ['#f59e0b', '#8b5cf6', '#06b6d4'],
-                        borderColor: isDark ? '#1e293b' : '#ffffff',
-                        borderWidth: 2
-                    }]
-                },
+                data: { labels: Object.keys(types), datasets: [{ data: Object.values(types), backgroundColor: ['#f59e0b', '#8b5cf6', '#06b6d4'], borderColor: isDark ? '#1e293b' : '#ffffff', borderWidth: 2 }] },
                 options: { responsive: true, maintainAspectRatio: false }
             });
         }
     }
 
-    function goToJobs(type, value) {
-        activeFilter = { type, value };
-        switchPage('jobs');
-    }
+    function goToJobs(type, value) { activeFilter = { type, value }; switchPage('jobs'); }
 
     function loadJobs() {
         if (usingFirebase) {
-            db.ref('zhJobs').on('value', (snapshot) => {
-                const data = snapshot.val();
-                allJobs = data ? data : [];
-                updateUIOnLoad();
-            });
+            db.ref('zhJobs').on('value', (snapshot) => { const data = snapshot.val(); allJobs = data ? data : []; updateUIOnLoad(); });
         } else {
-            const stored = localStorage.getItem('zhJobs');
-            if (stored) allJobs = JSON.parse(stored);
-            updateUIOnLoad();
+            const stored = localStorage.getItem('zhJobs'); if (stored) allJobs = JSON.parse(stored); updateUIOnLoad();
         }
     }
     
     function updateUIOnLoad() {
         if (document.getElementById('dashboard').classList.contains('active')) loadDashboard();
         if (document.getElementById('jobs').classList.contains('active')) renderJobsTable();
-        if (document.getElementById('production-board').classList.contains('active')) {
-            renderStageTabs();
-            renderProdBoardTable();
-        }
+        if (document.getElementById('production-board').classList.contains('active')) { renderStageTabs(); renderProdBoardTable(); }
         if (document.getElementById('status-board').classList.contains('active')) renderStatusBoard();
     }
 
-    function applyFilters() {
-        renderJobsTable();
-    }
-
-    function applySBFilters() {
-        renderStatusBoard();
-    }
+    function applyFilters() { renderJobsTable(); }
+    function applySBFilters() { renderStatusBoard(); }
 
     function clearJobFilters(page) {
         activeFilter = null;
         if (page === 'jobs') {
-            document.getElementById('filterPO').value = '';
-            document.getElementById('filterParty').value = '';
-            document.getElementById('filterItem').value = '';
-            document.getElementById('filterStage').value = '';
+            document.getElementById('filterPO').value = ''; document.getElementById('filterParty').value = ''; document.getElementById('filterItem').value = ''; document.getElementById('filterStage').value = '';
             renderJobsTable();
+        } else if (page === 'pb') {
+            document.getElementById('pbFilterPO').value = ''; document.getElementById('pbFilterParty').value = '';
+            renderProdBoardTable();
         } else if (page === 'status-board') {
-            document.getElementById('sbFilterPO').value = '';
-            document.getElementById('sbFilterParty').value = '';
-            document.getElementById('sbFilterStage').value = '';
+            document.getElementById('sbFilterPO').value = ''; document.getElementById('sbFilterParty').value = ''; document.getElementById('sbFilterStage').value = '';
             renderStatusBoard();
         }
     }
@@ -1806,43 +1567,25 @@
         const fStage = document.getElementById('filterStage').value;
 
         let dispJobs = allJobs;
-
         if (activeFilter) {
-            if (activeFilter.type === 'Party') {
-                dispJobs = allJobs.filter(j => j.party === activeFilter.value && j.status !== 'Completed');
-                label.textContent = `(Dashboard Filter: ${activeFilter.value})`;
-            } else if (activeFilter.type === 'Stage') {
-                dispJobs = allJobs.filter(j => getJobCurrentStage(j) === activeFilter.value);
-                label.textContent = `(Dashboard Filter: ${activeFilter.value})`;
-            } else if (activeFilter.type === 'Pending') {
-                dispJobs = allJobs.filter(j => j.status !== 'Completed');
-                label.textContent = `(Pending Only)`;
-            } else if (activeFilter.type === 'Completed') {
-                dispJobs = allJobs.filter(j => j.status === 'Completed');
-                label.textContent = `(Completed Only)`;
-            }
+            if (activeFilter.type === 'Party') { dispJobs = allJobs.filter(j => j.party === activeFilter.value && j.status !== 'Completed'); label.textContent = `(Dashboard Filter: ${activeFilter.value})`; }
+            else if (activeFilter.type === 'Stage') { dispJobs = allJobs.filter(j => getJobCurrentStage(j) === activeFilter.value); label.textContent = `(Dashboard Filter: ${activeFilter.value})`; }
+            else if (activeFilter.type === 'Pending') { dispJobs = allJobs.filter(j => j.status !== 'Completed'); label.textContent = `(Pending Only)`; }
+            else if (activeFilter.type === 'Completed') { dispJobs = allJobs.filter(j => j.status === 'Completed'); label.textContent = `(Completed Only)`; }
         } else {
             label.textContent = "";
             dispJobs = allJobs.filter(job => {
                 const stage = getJobCurrentStage(job);
                 const itemsStr = job.items ? job.items.map(i => i.itemName).join(', ') : job.itemName;
-
                 if (fPO && !job.po.toLowerCase().includes(fPO) && !job.jobNumber.toLowerCase().includes(fPO)) return false;
                 if (fParty && !job.party.toLowerCase().includes(fParty)) return false;
                 if (fItem && !itemsStr.toLowerCase().includes(fItem)) return false;
-                if (fStage) {
-                    if (fStage === 'Pending' && job.status === 'Completed') return false;
-                    if (fStage === 'Completed' && job.status !== 'Completed') return false;
-                }
+                if (fStage) { if (fStage === 'Pending' && job.status === 'Completed') return false; if (fStage === 'Completed' && job.status !== 'Completed') return false; }
                 return true;
             });
         }
 
-        if (dispJobs.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: var(--text-secondary); padding: 3rem;">No jobs found matching criteria</td></tr>';
-            return;
-        }
-
+        if (dispJobs.length === 0) { tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: var(--text-secondary); padding: 3rem;">No jobs found matching criteria</td></tr>'; return; }
         dispJobs.sort((a,b) => b.id - a.id);
 
         const frag = document.createDocumentFragment();
@@ -1853,25 +1596,10 @@
             const dimStr = job.items && job.items.length > 1 ? 'Multiple Sizes' : (job.items ? `${job.items[0].dimensions.L}×${job.items[0].dimensions.W}×${job.items[0].dimensions.H}` : `${job.dimensions.L}×${job.dimensions.W}×${job.dimensions.H}`);
             
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td class="cb-cell"><input type="checkbox" class="job-cb" value="${job.id}"></td>
-                <td>${job.date}</td>
-                <td><strong>${job.jobNumber}</strong><br><small style="color:var(--text-secondary)">PO: ${job.po}</small></td>
-                <td>${job.party}</td>
-                <td>${itemsStr}</td>
-                <td>${qtyTotal}</td>
-                <td>${dimStr}</td>
-                <td><span class="status-badge ${job.status === 'Completed' ? 'status-completed' : 'status-pending'}">${currentStage}</span></td>
-                <td style="white-space: nowrap;">
-                    <button class="btn-primary btn-small" onclick="viewJob(${job.id})">Open</button>
-                    <button class="btn-danger btn-small" onclick="deleteJob(${job.id})">Del</button>
-                </td>
-            `;
+            tr.innerHTML = `<td class="cb-cell"><input type="checkbox" class="job-cb" value="${job.id}"></td><td>${job.date}</td><td><strong>${job.jobNumber}</strong><br><small style="color:var(--text-secondary)">PO: ${job.po}</small></td><td>${job.party}</td><td>${itemsStr}</td><td>${qtyTotal}</td><td>${dimStr}</td><td><span class="status-badge ${job.status === 'Completed' ? 'status-completed' : 'status-pending'}">${currentStage}</span></td><td style="white-space: nowrap;"><button class="btn-primary btn-small" onclick="viewJob(${job.id})">Open</button> <button class="btn-danger btn-small" onclick="deleteJob(${job.id})">Del</button></td>`;
             frag.appendChild(tr);
         });
-
-        tbody.innerHTML = '';
-        tbody.appendChild(frag);
+        tbody.innerHTML = ''; tbody.appendChild(frag);
         document.getElementById('selectAllJobs').checked = false;
     }
 
@@ -1880,7 +1608,7 @@
         document.querySelectorAll('.job-cb').forEach(cb => cb.checked = isChecked);
     }
 
-    // ===== STATUS BOARD (NEW) =====
+    // ===== STATUS BOARD =====
     function renderStatusBoard() {
         const container = document.getElementById('statusBoardList');
         if(!container) return;
@@ -1905,7 +1633,7 @@
             return;
         }
 
-        dispJobs.sort((a,b) => b.id - a.id); // Newest first
+        dispJobs.sort((a,b) => b.id - a.id); 
 
         const frag = document.createDocumentFragment();
         dispJobs.forEach(job => {
@@ -1917,22 +1645,21 @@
             const card = document.createElement('div');
             card.className = 'status-card';
             card.innerHTML = `
-                <div class="status-left">
-                    <div style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 700; letter-spacing: 0.05em; margin-bottom: 4px;">${job.date} | TARGET: ${job.targetDeliveryDate}</div>
-                    <div style="font-size: 1.25rem; font-weight: 900; color: var(--primary-accent); margin-bottom: 2px;">${job.jobNumber}</div>
-                    <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">PO: ${job.po}</div>
-                    <div style="font-size: 0.9rem; font-weight: 600; color: var(--text-secondary);">PARTY: ${job.party}</div>
+                <div class="status-card-header">
+                    <div>
+                        <div class="sc-jobno">${job.jobNumber}</div>
+                        <div class="sc-party">${job.party} | PO: ${job.po}</div>
+                    </div>
+                    <div style="text-align: right; font-size: 0.75rem; color: var(--text-secondary); font-weight: 700;">Target: ${job.targetDeliveryDate}</div>
                 </div>
-                <div class="status-center">
+                <div class="status-card-body">
+                    <div>
+                        <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase;">Current State</div>
+                        <div class="sc-stage">${currentStage}</div>
+                        <button class="btn-secondary btn-small" onclick="viewJob(${job.id})" style="margin-top: 10px; font-size: 0.7rem; padding: 4px 8px; box-shadow:none;">🔍 View Flow</button>
+                    </div>
                     <div class="progress-circle" style="background: conic-gradient(var(--success) ${pct}%, var(--border) 0);">
                         <div class="progress-circle-inner">${pct}%</div>
-                    </div>
-                </div>
-                <div class="status-right">
-                    <div style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 800; text-transform: uppercase; margin-bottom: 0.4rem; letter-spacing:0.05em;">Current Stage</div>
-                    <span class="status-badge ${job.status === 'Completed' ? 'status-completed' : 'status-pending'}">${currentStage}</span>
-                    <div style="margin-top: 1rem;">
-                        <button class="btn-primary btn-small" onclick="viewJob(${job.id})" style="box-shadow:none;">🔍 Update Job</button>
                     </div>
                 </div>
             `;
@@ -1944,7 +1671,6 @@
     }
 
     // ===== PRODUCTION BOARD =====
-
     function renderStageTabs() {
         const container = document.getElementById('stageTabs');
         if (!container) return;
@@ -1955,9 +1681,7 @@
         allJobs.forEach(job => {
             if (job.status !== 'Completed') {
                 const currentTask = job.tasks.find(t => !t.done);
-                if (currentTask && stageCounts[currentTask.label] !== undefined) {
-                    stageCounts[currentTask.label]++;
-                }
+                if (currentTask && stageCounts[currentTask.label] !== undefined) { stageCounts[currentTask.label]++; }
             }
         });
 
@@ -1969,42 +1693,60 @@
             btn.innerHTML = `${stage} <span class="stage-badge">${stageCounts[stage]}</span>`;
             frag.appendChild(btn);
         });
-        
-        container.innerHTML = '';
-        container.appendChild(frag);
+        container.innerHTML = ''; container.appendChild(frag);
     }
 
-    function selectBoardStage(stage) {
-        currentBoardStage = stage;
-        renderStageTabs();
-        renderProdBoardTable();
-    }
+    function selectBoardStage(stage) { currentBoardStage = stage; renderStageTabs(); renderProdBoardTable(); }
 
     function renderProdBoardTable() {
         const tbody = document.getElementById('prodBoardBody');
         const title = document.getElementById('prodBoardStageTitle');
         if (!tbody || !title) return;
 
-        title.textContent = `Jobs Waiting at: ${currentBoardStage}`;
+        title.textContent = `Jobs Pipeline: ${currentBoardStage}`;
         
-        const jobsInStage = allJobs.filter(j => {
-            if (j.status === 'Completed') return false;
-            const currentTask = j.tasks.find(t => !t.done);
-            return currentTask && currentTask.label === currentBoardStage;
+        const fPO = document.getElementById('pbFilterPO').value.toLowerCase();
+        const fParty = document.getElementById('pbFilterParty').value.toLowerCase();
+
+        const jobsInStage = allJobs.filter(job => {
+            if (fPO && !job.po.toLowerCase().includes(fPO) && !job.jobNumber.toLowerCase().includes(fPO)) return false;
+            if (fParty && !job.party.toLowerCase().includes(fParty)) return false;
+            const hasTask = job.tasks.find(t => t.label === currentBoardStage);
+            return !!hasTask;
         });
 
         if (jobsInStage.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 3rem; color: var(--text-secondary);">No jobs currently waiting at the <strong>${currentBoardStage}</strong> stage.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 3rem; color: var(--text-secondary);">No jobs matching criteria for <strong>${currentBoardStage}</strong>.</td></tr>`;
             return;
         }
 
         const frag = document.createDocumentFragment();
         jobsInStage.forEach(job => {
-            const currentTask = job.tasks.find(t => !t.done);
+            const tIndex = job.tasks.findIndex(t => t.label === currentBoardStage);
+            const task = job.tasks[tIndex];
+            let statusHtml = '';
+            
+            if (task.done) {
+                statusHtml = `<span style="color: var(--success); font-weight: 800; font-size: 0.85rem;">✅ Completed</span>`;
+            } else {
+                let ready = true;
+                let blocker = '';
+                for(let i=0; i<tIndex; i++) {
+                    if(!job.tasks[i].done) { ready = false; blocker = job.tasks[i].label; break; }
+                }
+                if (ready) {
+                    statusHtml = `<button class="btn-success btn-small" onclick="advanceJobTask(${job.id}, '${task.id}')">✅ Complete Step</button>`;
+                } else {
+                    statusHtml = `<span style="color: var(--warning); font-weight: 700; font-size: 0.8rem;">⏳ Waiting on:<br>${blocker}</span>`;
+                }
+            }
+
             const itemsStr = job.items ? job.items.map(i => i.itemName).join(', ') : job.itemName;
             const qtyTotal = job.items ? job.items.reduce((s, i) => s + (parseInt(i.quantity)||0), 0) : job.quantity;
 
             const tr = document.createElement('tr');
+            if (task.done) tr.style.opacity = '0.6';
+
             tr.innerHTML = `
                 <td>${job.date}</td>
                 <td><strong>${job.jobNumber}</strong></td>
@@ -2012,9 +1754,9 @@
                 <td>${job.party}</td>
                 <td>${itemsStr}</td>
                 <td>${qtyTotal}</td>
-                <td>
-                    <button class="btn-success btn-small" onclick="advanceJobTask(${job.id}, '${currentTask.id}')">✅ Complete Step</button>
-                    <button class="btn-secondary btn-small" onclick="viewJob(${job.id})">View Job</button>
+                <td style="display: flex; align-items: center; gap: 10px;">
+                    ${statusHtml}
+                    <button class="btn-secondary btn-small" onclick="viewJob(${job.id})" style="box-shadow:none;">🔍 Flow</button>
                 </td>
             `;
             frag.appendChild(tr);
@@ -2024,9 +1766,7 @@
         tbody.appendChild(frag);
     }
 
-    function advanceJobTask(jobId, taskId) {
-        toggleTask(jobId, taskId, true); 
-    }
+    function advanceJobTask(jobId, taskId) { toggleTask(jobId, taskId, true); }
 
     // Modal & Task Logic
     function viewJob(id) {
@@ -2037,23 +1777,11 @@
         const jobItems = job.items ? job.items : [job];
         let itemsHtml = `
             <table class="print-table" style="width:100%; margin-bottom: 2rem;">
-                <thead>
-                    <tr><th>Item Name</th><th>Ply</th><th>Size</th><th>Quantity</th><th>Roll Size</th><th>Cut Length</th></tr>
-                </thead>
+                <thead><tr><th>Item Name</th><th>Ply</th><th>Size</th><th>Quantity</th><th>Roll Size</th><th>Cut Length</th></tr></thead>
                 <tbody>
-                    ${jobItems.map(i => `
-                        <tr>
-                            <td>${i.itemName}</td>
-                            <td>${i.ply}</td>
-                            <td>${i.dimensions.L}×${i.dimensions.W}×${i.dimensions.H} ${i.dimensions.unit}</td>
-                            <td>${i.quantity}</td>
-                            <td>${i.calc.RS}</td>
-                            <td>${i.calc.CL}</td>
-                        </tr>
-                    `).join('')}
+                    ${jobItems.map(i => `<tr><td>${i.itemName}</td><td>${i.ply}</td><td>${i.dimensions.L}×${i.dimensions.W}×${i.dimensions.H} ${i.dimensions.unit}</td><td>${i.quantity}</td><td>${i.calc.RS}</td><td>${i.calc.CL}</td></tr>`).join('')}
                 </tbody>
-            </table>
-        `;
+            </table>`;
 
         const html = `
             <div class="detail-grid">
@@ -2064,395 +1792,214 @@
                 <div class="detail-item"><strong>Target Delivery</strong><span>${job.targetDeliveryDate}</span></div>
                 <div class="detail-item"><strong>Process</strong><span>${job.cartonType}</span></div>
             </div>
-            
             <h3 style="margin-top:1rem; font-weight:800; color:var(--text-primary);">📦 Sub-Items in this Job</h3>
             ${itemsHtml}
-            
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
-                <div class="detail-item">
-                    <strong>COMBINED MATERIAL ISSUE SLIP</strong>
-                    <pre style="font-family: var(--font-mono); font-size: 0.9rem; margin-top:0.4rem;">${job.paperSummaryText}</pre>
-                </div>
-                <div class="detail-item">
-                    <strong>COMBINED CORRUGATION WORK ORDER</strong>
-                    <pre style="font-family: var(--font-mono); font-size: 0.9rem; margin-top:0.4rem;">${job.rollsSummaryText}</pre>
-                </div>
-            </div>
-        `;
+                <div class="detail-item"><strong>COMBINED MATERIAL ISSUE SLIP</strong><pre style="font-family: var(--font-mono); font-size: 0.9rem; margin-top:0.4rem;">${job.paperSummaryText}</pre></div>
+                <div class="detail-item"><strong>COMBINED CORRUGATION WORK ORDER</strong><pre style="font-family: var(--font-mono); font-size: 0.9rem; margin-top:0.4rem;">${job.rollsSummaryText}</pre></div>
+            </div>`;
         document.getElementById('jobDetail').innerHTML = html;
 
-        document.getElementById('jobChecklist').innerHTML = (job.tasks || []).map(t => `
-            <label class="task-checklist-item ${t.done ? 'done' : ''}">
-                <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTask(${job.id}, '${t.id}')">
-                <span>${t.label}</span>
-            </label>
-        `).join('');
+        document.getElementById('jobChecklist').innerHTML = (job.tasks || []).map(t => {
+            let metaHtml = '';
+            if(t.done && t.completedBy) {
+                metaHtml = `<div class="timeline-user-badge">✅ ${t.completedBy} on ${t.completedAt}</div>`;
+            }
+            return `
+            <div class="timeline-item ${t.done ? 'done' : ''}">
+                <div class="timeline-left">
+                    <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTask(${job.id}, '${t.id}')">
+                    <span>${t.label}</span>
+                </div>
+                <div class="timeline-right">${metaHtml}</div>
+            </div>`;
+        }).join('');
 
         document.getElementById('jobModal').classList.add('active');
     }
 
-    function toggleTask(jobId, taskId, skipModalRefresh = false) {
+    function toggleTask(jobId, taskId, isFromProdBoard = false) {
         const job = allJobs.find(j => j.id === jobId);
         if(!job) return;
         const t = job.tasks.find(x => x.id === taskId);
-        if(t) t.done = !t.done;
-        job.status = job.tasks.every(x=>x.done) ? 'Completed' : 'Pending';
         
+        if(t && !t.done) {
+            const tIndex = job.tasks.indexOf(t);
+            for(let i=0; i<tIndex; i++) {
+                if(!job.tasks[i].done) {
+                    showToast("Please complete previous workflow steps first.", "error");
+                    if(document.getElementById('jobModal').classList.contains('active')) viewJob(jobId);
+                    return;
+                }
+            }
+        }
+
+        if(t) {
+            t.done = !t.done;
+            if(t.done) {
+                const now = new Date();
+                t.completedBy = sessionStorage.getItem('zhActiveUser') || 'Unknown User';
+                t.completedAt = now.toLocaleString();
+                showToast("Task completed!", "success");
+            } else {
+                delete t.completedBy; delete t.completedAt;
+            }
+        }
+        job.status = job.tasks.every(x=>x.done) ? 'Completed' : 'Pending';
         saveAllJobsData(allJobs);
         
-        renderJobsTable();
-        loadDashboard();
-
-        if (document.getElementById('production-board').classList.contains('active')) {
-            renderStageTabs();
-            renderProdBoardTable();
-        }
-        
-        if (document.getElementById('status-board').classList.contains('active')) {
-            renderStatusBoard();
-        }
-
-        if (!skipModalRefresh && document.getElementById('jobModal').classList.contains('active')) {
-            viewJob(jobId); 
-        }
+        renderJobsTable(); loadDashboard();
+        if (document.getElementById('production-board').classList.contains('active')) { renderStageTabs(); renderProdBoardTable(); }
+        if (document.getElementById('status-board').classList.contains('active')) { renderStatusBoard(); }
+        if (document.getElementById('jobModal').classList.contains('active')) { viewJob(jobId); }
     }
 
-    function closeModal(modalId) {
-        document.getElementById(modalId).classList.remove('active');
-    }
+    function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
 
     function deleteJob(id) {
         if(confirm('Delete this Job Card completely?')) {
-            allJobs = allJobs.filter(j => j.id !== id);
-            saveAllJobsData(allJobs);
-            renderJobsTable();
-            loadDashboard();
-            if (document.getElementById('production-board').classList.contains('active')) {
-                renderStageTabs();
-                renderProdBoardTable();
-            }
-            if (document.getElementById('status-board').classList.contains('active')) {
-                renderStatusBoard();
-            }
+            allJobs = allJobs.filter(j => j.id !== id); saveAllJobsData(allJobs);
+            renderJobsTable(); loadDashboard();
+            if (document.getElementById('production-board').classList.contains('active')) { renderStageTabs(); renderProdBoardTable(); }
+            if (document.getElementById('status-board').classList.contains('active')) renderStatusBoard();
+            showToast("Job deleted.", "error");
         }
     }
 
-    // ===== PRINTING SECTION (A4 Floating Non-Overlap Engine) =====
-
+    // ===== PRINTING SECTION =====
     function printJobCard(id) {
-        const job = allJobs.find(j => j.id === id);
-        if (!job) return;
-
+        const job = allJobs.find(j => j.id === id); if (!job) return;
         const jobItems = job.items ? job.items : [job];
         let totalQty = jobItems.reduce((s, i) => s + (parseInt(i.quantity)||0), 0);
 
-        const jobRows = jobItems.map(i => `
-            <tr>
-                <td style="padding:4px 6px;">${i.itemName}</td>
-                <td style="padding:4px 6px;">${i.dimensions.L}×${i.dimensions.W}×${i.dimensions.H}</td>
-                <td style="padding:4px 6px;">${i.quantity}</td>
-                <td style="padding:4px 6px;">${i.calc.RS}</td>
-                <td style="padding:4px 6px;">${i.calc.CL}</td>
-                <td style="padding:4px 6px;">${i.specString}</td>
-            </tr>
-        `).join('');
+        const jobRows = jobItems.map(i => `<tr><td style="padding:4px 6px;">${i.itemName}</td><td style="padding:4px 6px;">${i.dimensions.L}×${i.dimensions.W}×${i.dimensions.H}</td><td style="padding:4px 6px;">${i.quantity}</td><td style="padding:4px 6px;">${i.calc.RS}</td><td style="padding:4px 6px;">${i.calc.CL}</td><td style="padding:4px 6px;">${i.specString}</td></tr>`).join('');
 
         const html = `
             <div class="a4-print-layout">
-                <!-- SECTION 1: MASTER JOB DETAILS -->
                 <div class="print-sec-1">
                     <div class="print-header">
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <img src="Logo.jpeg" alt="Zafar Habib Logo" class="print-logo-main" onerror="this.style.display='none'">
-                            <div>
-                                <div class="print-company">Zafar Habib Packages (Pvt) Ltd</div>
-                                <div class="print-title">Master Job Card</div>
-                            </div>
+                            <div><div class="print-company">Zafar Habib Packages (Pvt) Ltd</div><div class="print-title">Master Job Card</div></div>
                         </div>
-                        <div style="text-align: right;">
-                            <div class="print-job-no">${job.jobNumber}</div>
-                            <div class="print-date">Date: ${job.date}</div>
-                        </div>
+                        <div style="text-align: right;"><div class="print-job-no">${job.jobNumber}</div><div class="print-date">Date: ${job.date}</div></div>
                     </div>
-                    
                     <div class="print-grid-4" style="margin-bottom: 8px;">
                         <div class="print-field" style="grid-column: span 2;"><strong>Customer Name:</strong> <span>${job.party}</span></div>
                         <div class="print-field"><strong>PO Number:</strong> <span>${job.po}</span></div>
                         <div class="print-field"><strong>Total Master Qty:</strong> <span>${totalQty}</span></div>
                     </div>
-                    
                     <div style="font-size: 8pt; font-weight: bold; margin-bottom: 2px;">Sub-Items in this Job:</div>
-                    <div class="table-wrap-compact">
-                        <table class="print-table" style="margin-top:0;">
-                            <thead>
-                                <tr>
-                                    <th>Item Name</th>
-                                    <th>Dimensions</th>
-                                    <th>Qty</th>
-                                    <th>Roll Size</th>
-                                    <th>Cut Length</th>
-                                    <th>Paper Specs</th>
-                                </tr>
-                            </thead>
-                            <tbody>${jobRows}</tbody>
-                        </table>
-                    </div>
+                    <table class="print-table" style="margin-top:0;">
+                        <thead><tr><th>Item Name</th><th>Dimensions</th><th>Qty</th><th>Roll Size</th><th>Cut Length</th><th>Paper Specs</th></tr></thead>
+                        <tbody>${jobRows}</tbody>
+                    </table>
                 </div>
-
-                <!-- BOTTOM SECTIONS WRAPPER -->
-                <div class="print-bottom-wrap clearfix">
-                    <!-- SECTION 2: STORE MATERIAL DEMAND -->
+                <div class="print-bottom-wrap">
                     <div class="print-sec-2">
                         <div class="print-header-small">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'">
-                                <div class="print-title-small">MATERIAL ISSUE SLIP</div>
-                            </div>
-                            <div style="text-align: right;">
-                                <div style="font-weight: bold; font-size: 11pt;">${job.jobNumber}</div>
-                                <div style="font-size: 8pt;">Date: ${job.date}</div>
-                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">MATERIAL ISSUE SLIP</div></div>
+                            <div style="text-align: right;"><div style="font-weight: bold; font-size: 11pt;">${job.jobNumber}</div><div style="font-size: 8pt;">Date: ${job.date}</div></div>
                         </div>
-                        
-                        <div class="print-info-block">
-                            <strong>Customer:</strong> ${job.party} <br>
-                            <strong>PO Number:</strong> ${job.po} &nbsp;|&nbsp; <strong>Target:</strong> ${job.targetDeliveryDate} <br>
-                            <strong>Total Quantity:</strong> ${totalQty}
-                        </div>
-                        
+                        <div class="print-info-block"><strong>Customer:</strong> ${job.party} <br><strong>PO Number:</strong> ${job.po} &nbsp;|&nbsp; <strong>Target:</strong> ${job.targetDeliveryDate} <br><strong>Total Quantity:</strong> ${totalQty}</div>
                         <table class="print-table" style="margin-bottom: auto;">
                             <tr><th>Paper Requirements (Type/GSM)</th><th>Total KGs</th></tr>
                             ${job.paperSummaryText.split('\n').map(line => {
-                                if(!line.trim()) return '';
-                                // Highlight item headers
-                                if(line.includes(':') && !line.includes('=')) {
-                                    return `<tr><td colspan="2" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">${line}</td></tr>`;
-                                }
-                                if(line.includes('GRAND TOTAL')) {
-                                    return `<tr><td colspan="2" style="background:#e2e8f0 !important; font-weight:900; font-size:9pt; padding:6px 4px; text-align:center;">${line}</td></tr>`;
-                                }
-                                if(line.includes('---')) return '';
-                                
-                                const pts = line.split('=');
-                                if(pts.length === 2) return `<tr><td>${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`;
-                                return `<tr><td colspan="2">${line}</td></tr>`;
+                                if(!line.trim()) return ''; if(line.includes(':') && !line.includes('=')) return `<tr><td colspan="2" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">${line}</td></tr>`; if(line.includes('GRAND TOTAL')) return `<tr><td colspan="2" style="background:#e2e8f0 !important; font-weight:900; font-size:9pt; padding:6px 4px; text-align:center;">${line}</td></tr>`; if(line.includes('---')) return '';
+                                const pts = line.split('='); if(pts.length === 2) return `<tr><td>${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`; return `<tr><td colspan="2">${line}</td></tr>`;
                             }).join('')}
                         </table>
-
-                        <div class="print-signatures">
-                            <div class="sig-line">Issued By</div>
-                            <div class="sig-line">Received By</div>
-                        </div>
+                        <div class="print-signatures"><div class="sig-line">Issued By</div><div class="sig-line">Received By</div></div>
                     </div>
-
-                    <!-- SECTION 3: CORRUGATION CONFIGURATION -->
                     <div class="print-sec-3">
                         <div class="print-header-small">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'">
-                                <div class="print-title-small">CORRUGATION W.O.</div>
-                            </div>
-                            <div style="text-align: right;">
-                                <div style="font-weight: bold; font-size: 11pt;">${job.jobNumber}</div>
-                                <div style="font-size: 8pt;">Date: ${job.date}</div>
-                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">CORRUGATION WORK ORDER</div></div>
+                            <div style="text-align: right;"><div style="font-weight: bold; font-size: 11pt;">${job.jobNumber}</div><div style="font-size: 8pt;">Date: ${job.date}</div></div>
                         </div>
-
-                        <div class="print-info-block">
-                            <strong>Customer:</strong> ${job.party} <br>
-                            <strong>PO Number:</strong> ${job.po} &nbsp;|&nbsp; <strong>Target:</strong> ${job.targetDeliveryDate} <br>
-                            <strong>Process:</strong> ${job.cartonType} &nbsp;|&nbsp; <strong>Total Cuts:</strong> ${totalQty}
-                        </div>
-
+                        <div class="print-info-block"><strong>Customer:</strong> ${job.party} <br><strong>PO Number:</strong> ${job.po} &nbsp;|&nbsp; <strong>Target:</strong> ${job.targetDeliveryDate} <br><strong>Process:</strong> ${job.cartonType} &nbsp;|&nbsp; <strong>Total Cuts:</strong> ${totalQty}</div>
                         <table class="print-table" style="margin-bottom: auto;">
                             <tr><th>Paired Roll Setup (Size & Layers)</th><th style="text-align:right;">Total Rolls</th></tr>
                             ${job.rollsSummaryText.split('\n').map(line => {
-                                if(!line.trim()) return '';
-                                // Highlight item headers
-                                if(line.includes(':') && !line.includes('=')) {
-                                    return `<tr><td colspan="2" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">${line}</td></tr>`;
-                                }
-                                if(line.includes('GRAND TOTAL')) {
-                                    return `<tr><td colspan="2" style="background:#e2e8f0 !important; font-weight:900; font-size:9pt; padding:6px 4px; text-align:center;">${line}</td></tr>`;
-                                }
-                                if(line.includes('---')) return '';
-                                
-                                const pts = line.split('=');
-                                if(pts.length === 2) return `<tr><td>${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`;
-                                return `<tr><td colspan="2">${line}</td></tr>`;
+                                if(!line.trim()) return ''; if(line.includes(':') && !line.includes('=')) return `<tr><td colspan="2" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">${line}</td></tr>`; if(line.includes('GRAND TOTAL')) return `<tr><td colspan="2" style="background:#e2e8f0 !important; font-weight:900; font-size:9pt; padding:6px 4px; text-align:center;">${line}</td></tr>`; if(line.includes('---')) return '';
+                                const pts = line.split('='); if(pts.length === 2) return `<tr><td>${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`; return `<tr><td colspan="2">${line}</td></tr>`;
                             }).join('')}
                         </table>
-                        
-                        <div class="print-signatures" style="margin-top: auto;">
-                            <div class="sig-line">Operator</div>
-                            <div class="sig-line">QC Check</div>
-                        </div>
+                        <div class="print-signatures"><div class="sig-line">Operator</div><div class="sig-line">QC Check</div></div>
                     </div>
                 </div>
-            </div>
-        `;
-
+            </div>`;
         triggerPrint(html);
     }
 
     function printSelectedConsolidated() {
         const selectedIds = Array.from(document.querySelectorAll('.job-cb:checked')).map(cb => parseInt(cb.value));
-        if (selectedIds.length === 0) {
-            alert('Please select at least one job from the table to print a consolidated card.');
-            return;
-        }
-
+        if (selectedIds.length === 0) { showToast('Please select at least one job.', 'error'); return; }
         const jobs = allJobs.filter(j => selectedIds.includes(j.id));
-
-        let masterPaper = {};
-        let masterRoll = {};
-        let totalQty = 0;
-        let jobRowsHtml = '';
+        let masterPaper = {}; let masterRoll = {}; let totalQty = 0; let jobRowsHtml = '';
 
         jobs.forEach(job => {
             const jobItems = job.items ? job.items : [job];
-            
             jobItems.forEach(i => {
                 totalQty += parseInt(i.quantity) || 0;
-                jobRowsHtml += `
-                    <tr>
-                        <td style="padding:2px 4px;">${job.jobNumber}</td>
-                        <td style="padding:2px 4px;">${i.itemName}</td>
-                        <td style="padding:2px 4px;">${i.dimensions.L}×${i.dimensions.W}×${i.dimensions.H}</td>
-                        <td style="padding:2px 4px;">${i.quantity}</td>
-                        <td style="padding:2px 4px;">${i.calc.RS}"</td>
-                        <td style="padding:2px 4px;">${i.calc.CL}"</td>
-                    </tr>
-                `;
+                jobRowsHtml += `<tr><td style="padding:2px 4px;">${job.jobNumber}</td><td style="padding:2px 4px;">${i.itemName}</td><td style="padding:2px 4px;">${i.dimensions.L}×${i.dimensions.W}×${i.dimensions.H}</td><td style="padding:2px 4px;">${i.quantity}</td><td style="padding:2px 4px;">${i.calc.RS}"</td><td style="padding:2px 4px;">${i.calc.CL}"</td></tr>`;
             });
-
-            if (job.paperObj) {
-                for (let key in job.paperObj) { masterPaper[key] = (masterPaper[key] || 0) + job.paperObj[key]; }
-            }
-            if (job.rollObj) {
-                for (let key in job.rollObj) { masterRoll[key] = (masterRoll[key] || 0) + job.rollObj[key]; }
-            }
+            if (job.paperObj) { for (let key in job.paperObj) { masterPaper[key] = (masterPaper[key] || 0) + job.paperObj[key]; } }
+            if (job.rollObj) { for (let key in job.rollObj) { masterRoll[key] = (masterRoll[key] || 0) + job.rollObj[key]; } }
         });
 
         const parties = Array.from(new Set(jobs.map(j => j.party))).join(', ');
         const pos = Array.from(new Set(jobs.map(j => j.po))).join(', ');
-
-        const paperTableRows = Object.keys(masterPaper).sort().map(key => `
-            <tr>
-                <td>${key}</td>
-                <td style="text-align:right; font-weight:bold;">${Math.ceil(masterPaper[key])} KGs</td>
-            </tr>
-        `).join('');
-
-        const rollTableRows = Object.keys(masterRoll).sort().map(key => `
-            <tr>
-                <td>${key}</td>
-                <td style="text-align:right; font-weight:bold;">${(Math.round(masterRoll[key] * 10) / 10).toFixed(1)} Rolls</td>
-            </tr>
-        `).join('');
+        const paperTableRows = Object.keys(masterPaper).sort().map(key => `<tr><td>${key}</td><td style="text-align:right; font-weight:bold;">${Math.ceil(masterPaper[key])} KGs</td></tr>`).join('');
+        const rollTableRows = Object.keys(masterRoll).sort().map(key => `<tr><td>${key}</td><td style="text-align:right; font-weight:bold;">${(Math.round(masterRoll[key] * 10) / 10).toFixed(1)} Rolls</td></tr>`).join('');
 
         const html = `
             <div class="a4-print-layout">
-                
-                <!-- SECTION 1: MASTER JOB DETAILS -->
                 <div class="print-sec-1">
                     <div class="print-header">
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <img src="Logo.jpeg" alt="Zafar Habib Logo" class="print-logo-main" onerror="this.style.display='none'">
-                            <div>
-                                <div class="print-company">Zafar Habib Packages (Pvt) Ltd</div>
-                                <div class="print-title">CONSOLIDATED BATCH CARD</div>
-                            </div>
+                            <div><div class="print-company">Zafar Habib Packages (Pvt) Ltd</div><div class="print-title">CONSOLIDATED BATCH CARD</div></div>
                         </div>
-                        <div style="text-align: right;">
-                            <div class="print-job-no" style="font-size:12pt;">BATCH PRINT</div>
-                            <div class="print-date">Date: ${new Date().toLocaleDateString()}</div>
-                        </div>
+                        <div style="text-align: right;"><div class="print-job-no" style="font-size:12pt;">BATCH PRINT</div><div class="print-date">Date: ${new Date().toLocaleDateString()}</div></div>
                     </div>
-                    
                     <div class="print-grid-4" style="margin-bottom: 4px;">
                         <div class="print-field" style="grid-column: span 2;"><strong>Customer(s):</strong> <span>${parties}</span></div>
                         <div class="print-field"><strong>PO Number(s):</strong> <span>${pos}</span></div>
                         <div class="print-field"><strong>Total Master Qty:</strong> <span>${totalQty}</span></div>
                     </div>
-                    
                     <div style="font-size: 8pt; font-weight: bold; margin-bottom: 2px;">All Items in Batch:</div>
-                    <div class="table-wrap-compact">
-                        <table class="print-table" style="margin-top:0;">
-                            <thead>
-                                <tr>
-                                    <th>Job #</th>
-                                    <th>Item</th>
-                                    <th>Size</th>
-                                    <th>Qty</th>
-                                    <th>Roll Size</th>
-                                    <th>Cut Length</th>
-                                </tr>
-                            </thead>
-                            <tbody>${jobRowsHtml}</tbody>
-                        </table>
-                    </div>
+                    <table class="print-table" style="margin-top:0;">
+                        <thead><tr><th>Job #</th><th>Item</th><th>Size</th><th>Qty</th><th>Roll Size</th><th>Cut Length</th></tr></thead>
+                        <tbody>${jobRowsHtml}</tbody>
+                    </table>
                 </div>
-
-                <!-- BOTTOM SECTIONS WRAPPER -->
                 <div class="print-bottom-wrap clearfix">
-                    <!-- SECTION 2: STORE MATERIAL DEMAND -->
                     <div class="print-sec-2">
                         <div class="print-header-small">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'">
-                                <div class="print-title-small">MATERIAL ISSUE SLIP</div>
-                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">MATERIAL ISSUE SLIP</div></div>
                             <div style="text-align: right; font-weight: bold; font-size:10pt;">CONSOLIDATED</div>
                         </div>
-                        
-                        <div class="print-info-block">
-                            <strong>Customers:</strong> ${parties} <br>
-                            <strong>POs:</strong> ${pos} <br>
-                            <strong>Total Batch Qty:</strong> ${totalQty}
-                        </div>
-                        
+                        <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos} <br><strong>Total Batch Qty:</strong> ${totalQty}</div>
                         <table class="print-table" style="margin-bottom: auto;">
                             <tr><th>Paper Requirement (Roll Size & Type)</th><th style="text-align:right;">Total KGs</th></tr>
                             ${paperTableRows || '<tr><td colspan="2" style="text-align:center;">No paper required</td></tr>'}
                         </table>
-
-                        <div class="print-signatures">
-                            <div class="sig-line">Issued By</div>
-                            <div class="sig-line">Received By</div>
-                        </div>
+                        <div class="print-signatures"><div class="sig-line">Issued By</div><div class="sig-line">Received By</div></div>
                     </div>
-
-                    <!-- SECTION 3: CORRUGATION CONFIGURATION -->
                     <div class="print-sec-3">
                         <div class="print-header-small">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'">
-                                <div class="print-title-small">CORRUGATION W.O.</div>
-                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">CORRUGATION WORK ORDER</div></div>
                             <div style="text-align: right; font-weight: bold; font-size:10pt;">CONSOLIDATED</div>
                         </div>
-
-                        <div class="print-info-block">
-                            <strong>Customers:</strong> ${parties} <br>
-                            <strong>POs:</strong> ${pos} <br>
-                            <strong>Total Batch Qty:</strong> ${totalQty}
-                        </div>
-
+                        <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos} <br><strong>Total Batch Qty:</strong> ${totalQty}</div>
                         <table class="print-table" style="margin-bottom: auto;">
                             <tr><th>Paired Roll Setup (Size & Layers)</th><th style="text-align:right;">Total Rolls</th></tr>
                             ${rollTableRows || '<tr><td colspan="2" style="text-align:center;">No rolls required</td></tr>'}
                         </table>
-                        
-                        <div class="print-signatures" style="margin-top: auto;">
-                            <div class="sig-line">Operator</div>
-                            <div class="sig-line">QC Check</div>
-                        </div>
+                        <div class="print-signatures"><div class="sig-line">Operator</div><div class="sig-line">QC Check</div></div>
                     </div>
                 </div>
-            </div>
-        `;
-
+            </div>`;
         triggerPrint(html);
     }
 </script>
