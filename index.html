@@ -17,7 +17,6 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-        /* Default Light Theme */
         --primary: #0f172a; --primary-light: #1e3a8a; --primary-accent: #3b82f6; --primary-soft: #eff6ff;
         --secondary: #059669; --danger: #dc2626; --warning: #f59e0b; --success: #10b981;
         --bg-primary: #ffffff; --bg-secondary: #f8fafc; --bg-tertiary: #f1f5f9;
@@ -134,6 +133,7 @@
     .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border); }
     .btn-success { background: var(--success); color: white; box-shadow: 0 4px 14px rgba(16,185,129,0.3); }
     .btn-danger { background: var(--danger); color: white; box-shadow: 0 4px 14px rgba(220,38,38,0.3); }
+    .btn-warning { background: var(--warning); color: white; box-shadow: 0 4px 14px rgba(245,158,11,0.3); }
     .btn-print { background: linear-gradient(135deg, #059669, #10b981); color: white; box-shadow: 0 4px 14px rgba(16,185,129,0.3); }
     .btn-small { padding: .6rem 1.2rem; font-size: .85rem; border-radius: 8px; }
 
@@ -145,9 +145,9 @@
     .calc-value { font-size: 1.6rem; font-weight: 800; color: var(--primary-accent); font-family: var(--font-mono); }
     .calc-sub-value { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-top: 0.4rem; }
 
-    /* Modals & Checklists */
+    /* Custom Modals */
     .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, .85); z-index: 9999; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(8px); }
-    .modal.active { display: flex; animation: fadeIn .4s var(--ease); }
+    .modal.active { display: flex; animation: fadeIn .3s var(--ease); }
     .modal-content { background: var(--bg-primary); border-radius: var(--radius-lg); max-width: 95%; max-height: 95vh; overflow-y: auto; box-shadow: var(--shadow-lg); border: 1px solid var(--border); position: relative; width: 900px; animation: popIn .4s var(--ease); }
     .modal-content.compact { max-width: 450px; text-align: center; overflow: visible;}
     .modal-header { background: linear-gradient(135deg, var(--primary-accent) 0%, #1e3a8a 100%); color: white; padding: 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
@@ -156,6 +156,12 @@
     .modal-close { background: rgba(255,255,255,.15); border: none; font-size: 1.5rem; color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all .2s; }
     .modal-close:hover { background: var(--danger); transform: rotate(90deg); }
     .modal-body { padding: 2.5rem; }
+
+    /* Success Overlay Animation */
+    .success-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+    .success-box { background: var(--bg-primary); padding: 3rem; border-radius: var(--radius-lg); text-align: center; box-shadow: var(--shadow-lg); animation: successPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    .success-icon { font-size: 5rem; margin-bottom: 1rem; display: block; }
+    .success-text { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); font-family: var(--font-display); }
 
     /* Workflow Timeline / Checklist */
     .timeline-container { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1.5rem; }
@@ -218,12 +224,6 @@
     .progress-circle { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
     .progress-circle-inner { width: 38px; height: 38px; border-radius: 50%; background: var(--bg-primary); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; color: var(--text-primary); }
 
-    /* Success Overlay Animation */
-    .success-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-    .success-box { background: var(--bg-primary); padding: 3rem; border-radius: var(--radius-lg); text-align: center; box-shadow: var(--shadow-lg); animation: successPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-    .success-icon { font-size: 5rem; margin-bottom: 1rem; display: block; }
-    .success-text { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); font-family: var(--font-display); }
-
     /* Toast Notification System */
     .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; pointer-events: none;}
     .toast { padding: 14px 24px; border-radius: 12px; font-weight: 800; font-size: 0.95rem; color: #fff; background: var(--primary); box-shadow: var(--shadow-lg); animation: slideInRight 0.4s var(--ease) forwards; display: flex; align-items: center; gap: 10px; }
@@ -249,6 +249,13 @@
     .theme-colors { display: flex; gap: 5px; height: 30px; border-radius: 6px; overflow: hidden; }
     .tc-1 { flex: 1; } .tc-2 { flex: 1; } .tc-3 { flex: 1; }
 
+    /* Detail Item Grid Print Details */
+    .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
+    .detail-item { background: var(--bg-tertiary); padding: 1.2rem; border-radius: 12px; border: 1px solid var(--border); transition: transform .3s var(--ease); }
+    .detail-item:hover { transform: translateY(-3px); box-shadow: var(--shadow-sm); }
+    .detail-item strong { display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.4rem; letter-spacing: 0.05em;}
+    .detail-item span { font-weight: 800; font-size: 1.05rem; color: var(--text-primary); }
+
     pre { color: var(--text-primary); font-family: var(--font-mono); white-space: pre-wrap; margin: 0;}
     .print-info-block { font-size: 8.5pt; margin-bottom: 8px; line-height: 1.4; border-bottom: 1px solid #000; padding-bottom: 6px; }
     .print-info-block strong { color: #222; }
@@ -270,6 +277,7 @@
 
         .print-sec-1 { border-bottom: 2px dashed #000; padding-bottom: 5mm; margin-bottom: 5mm; display: block; width: 100%;}
         
+        /* Side-by-side Layout with Flex to avoid floats breaking */
         .print-bottom-wrap { display: flex; flex-direction: row; width: 100%; page-break-inside: avoid; break-inside: avoid; }
         .print-sec-2 { width: 50%; padding-right: 5mm; border-right: 2px dashed #000; box-sizing: border-box; }
         .print-sec-3 { width: 50%; padding-left: 5mm; box-sizing: border-box; }
@@ -356,7 +364,7 @@
         <div class="main-content">
             <div class="nav-tabs">
                 <button class="nav-tab active" data-page="dashboard" onclick="switchPage('dashboard')">📊 Dashboard</button>
-                <!-- Navigate normally to prevent form clearing -->
+                <!-- Navigate silently without clearing form -->
                 <button class="nav-tab" data-page="new-po" onclick="switchPage('new-po')">➕ New Job Card</button>
                 <button class="nav-tab" data-page="jobs" onclick="switchPage('jobs'); clearJobFilters('jobs');">📋 Detailed Job View</button>
                 <button class="nav-tab" data-page="production-board" onclick="switchPage('production-board')">🎬 Production Board</button>
@@ -839,8 +847,8 @@
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appContainer').classList.add('active');
             loadJobs();
-            // Automatically switch to dashboard on successful login load
-            switchPage('dashboard');
+            startNewPO(true); // primes the form silently in background
+            switchPage('dashboard'); // Ensures landing on dashboard
         }
     });
 
@@ -926,6 +934,7 @@
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appContainer').classList.add('active');
             loadJobs(); 
+            startNewPO(true); // primes the form
             switchPage('dashboard');
             showToast(`Welcome back, ${user}`, 'success');
         } else {
@@ -1345,7 +1354,7 @@
         if(block) { block.remove(); calculateAllJobs(); }
     }
 
-    function startNewPO(forceClear = true) {
+    function startNewPO(silent = true) {
         editingJobId = null;
         document.getElementById('poForm').reset();
         document.getElementById('jobNumber').value = '';
@@ -1354,7 +1363,7 @@
         itemCounter = 0; addItemBlock(); updateCartonWorkflow();
         document.getElementById('calcPaperSummary').textContent = '-';
         document.getElementById('calcRollsSummary').textContent = '-';
-        if (forceClear) showToast("Form Cleared", 'success');
+        if (!silent) showToast("Form Reset & Cleared", 'success');
     }
 
     function generateJobNumber() {
@@ -1480,17 +1489,65 @@
         document.getElementById('jobNumber').value = jobNo;
         const savedId = editingJobId || allJobs[allJobs.length-1].id;
 
-        const overlay = document.getElementById('successOverlay');
-        overlay.style.display = 'flex';
-        setTimeout(() => {
-            overlay.style.display = 'none';
-            startNewPO(false); 
-            if(action === 'print') {
-                printJobCard(savedId);
-            } else {
+        if (action === 'print') {
+            startNewPO(true); 
+            printJobCard(savedId); 
+        } else {
+            const overlay = document.getElementById('successOverlay');
+            overlay.style.display = 'flex';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                startNewPO(true);
                 showToast("Job Card Saved", 'success');
+            }, 1000); 
+        }
+    }
+
+    function editJob(id) {
+        const job = allJobs.find(j => j.id === id);
+        if (!job) return;
+        editingJobId = id;
+        
+        document.getElementById('jobNumber').value = job.jobNumber;
+        document.getElementById('poDate').value = job.date;
+        document.getElementById('targetDeliveryDate').value = job.targetDeliveryDate;
+        document.getElementById('partyName').value = job.party;
+        document.getElementById('poNumber').value = job.po;
+        document.getElementById('cartonType').value = job.cartonType;
+        updateCartonWorkflow(); 
+        if (job.laminationVarnish) document.getElementById('laminationVarnish').value = job.laminationVarnish;
+
+        document.getElementById('itemsContainer').innerHTML = '';
+        itemCounter = 0;
+        const jobItems = job.items ? job.items : [job]; 
+        
+        jobItems.forEach(i => {
+            addItemBlock();
+            const block = document.getElementById(`itemBlock_${itemCounter - 1}`);
+            block.querySelector('.item-name').value = i.itemName || '';
+            block.querySelector('.item-ply').value = i.ply || '';
+            handlePlyChange(block.querySelector('.item-ply')); 
+            
+            block.querySelector('.item-qty').value = i.quantity || '';
+            block.querySelector('.item-notes').value = i.detailNotes || '';
+            if (i.dimensions) {
+                block.querySelector('.item-l').value = i.dimensions.L || '';
+                block.querySelector('.item-w').value = i.dimensions.W || '';
+                block.querySelector('.item-h').value = i.dimensions.H || '';
+                block.querySelector('.item-unit').value = i.dimensions.unit || 'INCH';
             }
-        }, 800);
+            if (i.manualRS) block.querySelector('.item-manual-rs').value = i.manualRS;
+            
+            if (i.specString) {
+                const specs = i.specString.split('+');
+                const inputs = block.querySelectorAll('.ply-layer-input');
+                inputs.forEach((inp, idx) => { if(specs[idx]) inp.value = specs[idx]; });
+            }
+        });
+        
+        calculateAllJobs();
+        switchPage('new-po');
+        showToast("Editing Job...", "success");
     }
 
     // ===== DASHBOARD CHARTS & JOB FILTERING =====
@@ -1683,16 +1740,12 @@
             const totalTasks = job.tasks ? job.tasks.length : 1;
             const pct = Math.round((doneCount / totalTasks) * 100);
             
-            // Build Timeline
             let foundCurrent = false;
             const timelineHtml = (job.tasks || []).map(t => {
                 let cls = 'status-timeline-step';
                 let icon = '';
-                if (t.done) {
-                    cls += ' done'; icon = '✅ ';
-                } else if (!foundCurrent) {
-                    cls += ' current'; icon = '⏳ '; foundCurrent = true;
-                }
+                if (t.done) { cls += ' done'; icon = '✅ '; } 
+                else if (!foundCurrent) { cls += ' current'; icon = '⏳ '; foundCurrent = true; }
                 return `<div class="${cls}">${icon}${t.label}</div>`;
             }).join(`<span class="timeline-arrow">→</span>`);
 
@@ -1716,9 +1769,7 @@
                         <div class="progress-circle-inner">${pct}%</div>
                     </div>
                 </div>
-                <div class="status-timeline">
-                    ${timelineHtml}
-                </div>
+                <div class="status-timeline">${timelineHtml}</div>
             `;
             frag.appendChild(card);
         });
@@ -1825,9 +1876,11 @@
                 <td>${job.party}</td>
                 <td>${itemsStr}</td>
                 <td>${qtyTotal}</td>
-                <td style="display: flex; align-items: center; gap: 10px;">
+                <td style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                     ${statusHtml}
                     <button class="btn-secondary btn-small" onclick="viewJob(${job.id})" style="box-shadow:none;">🔍 Flow</button>
+                    <button class="btn-warning btn-small" onclick="editJob(${job.id})" style="box-shadow:none; background:var(--warning); color:#fff;">✏️ Edit</button>
+                    <button class="btn-danger btn-small" onclick="deleteJob(${job.id})" style="box-shadow:none;">🗑️ Del</button>
                 </td>
             `;
             frag.appendChild(tr);
@@ -2006,7 +2059,11 @@
         const selectedIds = Array.from(document.querySelectorAll('.job-cb:checked')).map(cb => parseInt(cb.value));
         if (selectedIds.length === 0) { showToast('Please select at least one job.', 'error'); return; }
         const jobs = allJobs.filter(j => selectedIds.includes(j.id));
-        let masterPaper = {}; let masterRoll = {}; let totalQty = 0; let jobRowsHtml = '';
+        
+        let htmlContentPaper = '';
+        let htmlContentRolls = '';
+        let totalQty = 0; 
+        let jobRowsHtml = '';
 
         jobs.forEach(job => {
             const jobItems = job.items ? job.items : [job];
@@ -2014,14 +2071,33 @@
                 totalQty += parseInt(i.quantity) || 0;
                 jobRowsHtml += `<tr><td style="padding:2px 4px;">${job.jobNumber}</td><td style="padding:2px 4px;">${i.itemName}</td><td style="padding:2px 4px;">${i.dimensions.L}×${i.dimensions.W}×${i.dimensions.H}</td><td style="padding:2px 4px;">${i.quantity}</td><td style="padding:2px 4px;">${i.calc.RS}"</td><td style="padding:2px 4px;">${i.calc.CL}"</td></tr>`;
             });
-            if (job.paperObj) { for (let key in job.paperObj) { masterPaper[key] = (masterPaper[key] || 0) + job.paperObj[key]; } }
-            if (job.rollObj) { for (let key in job.rollObj) { masterRoll[key] = (masterRoll[key] || 0) + job.rollObj[key]; } }
+            
+            // Build separate individual item lists without merging calculations
+            htmlContentPaper += `<tr><td colspan="2" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">JOB: ${job.jobNumber} (${job.party})</td></tr>`;
+            job.paperSummaryText.split('\n').forEach(line => {
+                if(!line.trim() || line.includes('GRAND TOTAL') || line.includes('---')) return;
+                if(line.includes(':') && !line.includes('=')) {
+                    htmlContentPaper += `<tr><td colspan="2" style="font-weight:bold; padding-top:4px;">${line}</td></tr>`;
+                } else {
+                    const pts = line.split('=');
+                    if(pts.length === 2) htmlContentPaper += `<tr><td>${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`;
+                }
+            });
+
+            htmlContentRolls += `<tr><td colspan="2" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">JOB: ${job.jobNumber} (${job.party})</td></tr>`;
+            job.rollsSummaryText.split('\n').forEach(line => {
+                if(!line.trim() || line.includes('GRAND TOTAL') || line.includes('---')) return;
+                if(line.includes(':') && !line.includes('=')) {
+                    htmlContentRolls += `<tr><td colspan="2" style="font-weight:bold; padding-top:4px;">${line}</td></tr>`;
+                } else {
+                    const pts = line.split('=');
+                    if(pts.length === 2) htmlContentRolls += `<tr><td>${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`;
+                }
+            });
         });
 
         const parties = Array.from(new Set(jobs.map(j => j.party))).join(', ');
         const pos = Array.from(new Set(jobs.map(j => j.po))).join(', ');
-        const paperTableRows = Object.keys(masterPaper).sort().map(key => `<tr><td>${key}</td><td style="text-align:right; font-weight:bold;">${Math.ceil(masterPaper[key])} KGs</td></tr>`).join('');
-        const rollTableRows = Object.keys(masterRoll).sort().map(key => `<tr><td>${key}</td><td style="text-align:right; font-weight:bold;">${(Math.round(masterRoll[key] * 10) / 10).toFixed(1)} Rolls</td></tr>`).join('');
 
         const html = `
             <div class="a4-print-layout">
@@ -2052,8 +2128,8 @@
                         </div>
                         <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos} <br><strong>Total Batch Qty:</strong> ${totalQty}</div>
                         <table class="print-table" style="margin-bottom: auto;">
-                            <tr><th>Paper Requirement (Roll Size & Type)</th><th style="text-align:right;">Total KGs</th></tr>
-                            ${paperTableRows || '<tr><td colspan="2" style="text-align:center;">No paper required</td></tr>'}
+                            <tr><th colspan="2">Paper Requirement Breakdown</th></tr>
+                            ${htmlContentPaper || '<tr><td colspan="2" style="text-align:center;">No paper required</td></tr>'}
                         </table>
                         <div class="print-signatures"><div class="sig-line">Issued By</div><div class="sig-line">Received By</div></div>
                     </div>
@@ -2064,8 +2140,8 @@
                         </div>
                         <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos} <br><strong>Total Batch Qty:</strong> ${totalQty}</div>
                         <table class="print-table" style="margin-bottom: auto;">
-                            <tr><th>Paired Roll Setup (Size & Layers)</th><th style="text-align:right;">Total Rolls</th></tr>
-                            ${rollTableRows || '<tr><td colspan="2" style="text-align:center;">No rolls required</td></tr>'}
+                            <tr><th colspan="2">Paired Roll Setup Breakdown</th></tr>
+                            ${htmlContentRolls || '<tr><td colspan="2" style="text-align:center;">No rolls required</td></tr>'}
                         </table>
                         <div class="print-signatures"><div class="sig-line">Operator</div><div class="sig-line">QC Check</div></div>
                     </div>
