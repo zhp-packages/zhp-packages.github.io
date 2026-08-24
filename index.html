@@ -242,7 +242,7 @@
     
     .chart-box { background: var(--bg-primary); padding: 2rem; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow); transition: transform 0.4s var(--ease); display: flex; flex-direction: column;}
     .chart-box:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
-
+    
     /* Settings Page */
     .theme-card { border: 2px solid var(--border); border-radius: 12px; padding: 1rem; cursor: pointer; transition: all .4s var(--ease); display: flex; flex-direction: column; gap: 10px; background: var(--bg-primary);}
     .theme-card:hover { border-color: var(--primary-accent); transform: translateY(-4px); box-shadow: var(--shadow-sm); }
@@ -278,7 +278,6 @@
 
         .print-sec-1 { border-bottom: 2px dashed #000; padding-bottom: 5mm; margin-bottom: 5mm; display: block; width: 100%;}
         
-        /* Side-by-side Layout with Flex to avoid floats breaking */
         .print-bottom-wrap { display: flex; flex-direction: row; width: 100%; page-break-inside: avoid; break-inside: avoid; }
         .print-sec-2 { width: 50%; padding-right: 5mm; border-right: 2px dashed #000; box-sizing: border-box; }
         .print-sec-3 { width: 50%; padding-left: 5mm; box-sizing: border-box; }
@@ -365,7 +364,6 @@
         <div class="main-content">
             <div class="nav-tabs">
                 <button class="nav-tab active" data-page="dashboard" onclick="switchPage('dashboard')">📊 Dashboard</button>
-                <!-- Navigate silently without clearing form -->
                 <button class="nav-tab" data-page="new-po" onclick="switchPage('new-po')">➕ New Job Card</button>
                 <button class="nav-tab" data-page="jobs" onclick="switchPage('jobs'); clearJobFilters('jobs');">📋 Detailed Job View</button>
                 <button class="nav-tab" data-page="production-board" onclick="switchPage('production-board')">🎬 Production Board</button>
@@ -522,7 +520,7 @@
                             <div class="button-group">
                                 <button type="button" class="btn-success" onclick="submitForm('save')" style="font-size: 1.05rem; padding: 1rem 2rem;">💾 Just Save</button>
                                 <button type="button" class="btn-print" onclick="submitForm('print')" style="font-size: 1.05rem; padding: 1rem 2rem;">🖨️ Save &amp; Print Job Card</button>
-                                <button type="button" class="btn-danger btn-small" onclick="startNewPO(true)" style="margin-left: auto;">🔄 Clear Form</button>
+                                <button type="button" class="btn-danger btn-small" onclick="startNewPO(false)" style="margin-left: auto;">🔄 Clear Form</button>
                             </div>
                         </form>
                     </div>
@@ -843,15 +841,15 @@
         loadUsers();
         loadParties();
 
-        const isLogged = sessionStorage.getItem('zhLogged');
+        const isLogged = localStorage.getItem('zhLogged') || sessionStorage.getItem('zhLogged');
         if(isLogged === 'true') {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appContainer').classList.add('active');
             loadJobs();
-            // Primes the form layout WITHOUT resetting master fields if they exist
+            // Primes form elements without wiping data
             if (itemCounter === 0) addItemBlock(); 
             updateCartonWorkflow();
-            switchPage('dashboard'); // Ensures landing on dashboard
+            switchPage('dashboard');
         }
     });
 
@@ -914,8 +912,8 @@
     }
 
     function saveUsersData(users) {
-        if (usingFirebase) db.ref('zhUsers').set(users);
-        else localStorage.setItem('zhUsers', JSON.stringify(users));
+        try { localStorage.setItem('zhUsers', JSON.stringify(users)); } catch(e){}
+        if (usingFirebase && db) db.ref('zhUsers').set(users);
     }
 
     function populateLoginDropdown() {
@@ -934,11 +932,12 @@
             document.getElementById('loginError').classList.remove('show');
             sessionStorage.setItem('zhLogged', 'true');
             sessionStorage.setItem('zhActiveUser', user);
+            localStorage.setItem('zhLogged', 'true');
+            localStorage.setItem('zhActiveUser', user);
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appContainer').classList.add('active');
             loadJobs(); 
-            // Primes the form layout WITHOUT resetting master fields if they exist
-            if (itemCounter === 0) addItemBlock(); 
+            if (itemCounter === 0) addItemBlock();
             updateCartonWorkflow();
             switchPage('dashboard');
             showToast(`Welcome back, ${user}`, 'success');
@@ -949,6 +948,7 @@
 
     function handleLogout() {
         sessionStorage.removeItem('zhLogged'); sessionStorage.removeItem('zhActiveUser');
+        localStorage.removeItem('zhLogged'); localStorage.removeItem('zhActiveUser');
         document.getElementById('appContainer').classList.remove('active');
         document.getElementById('loginScreen').style.display = 'flex';
         document.getElementById('loginPass').value = '';
@@ -998,8 +998,8 @@
 
     function savePartiesData(parties) {
         parties.sort();
-        if (usingFirebase) db.ref('zhParties').set(parties);
-        else localStorage.setItem('zhParties', JSON.stringify(parties));
+        try { localStorage.setItem('zhParties', JSON.stringify(parties)); } catch(e){}
+        if (usingFirebase && db) db.ref('zhParties').set(parties);
     }
 
     function populatePartyDropdown() {
@@ -1102,7 +1102,8 @@
     }
 
     // ===== MULTI-ITEM CALCULATIONS =====
-    let globalPaperObj = {}; let globalRollObj = {}; let globalPaperText = "-"; let globalRollText = "-";
+    let globalPaperText = "-"; 
+    let globalRollText = "-";
 
     function convertToInches(val, unit) {
         val = parseFloat(val) || 0;
@@ -1183,8 +1184,10 @@
     }
 
     function calculateAllJobs() {
-        globalPaperObj = {}; globalRollObj = {};
-        let perItemPaperText = ''; let perItemRollText = '';
+        let globalPaperObj = {};
+        let globalRollObj = {};
+        let perItemPaperText = ''; 
+        let perItemRollText = '';
         
         const blocks = document.querySelectorAll('.item-block');
         blocks.forEach((block, index) => {
@@ -1428,8 +1431,13 @@
     }
 
     function saveAllJobsData(jobsArray) {
-        if (usingFirebase) db.ref('zhJobs').set(jobsArray);
-        else localStorage.setItem('zhJobs', JSON.stringify(jobsArray));
+        try { localStorage.setItem('zhJobs', JSON.stringify(jobsArray)); } catch(e){}
+        if (usingFirebase && db) {
+            db.ref('zhJobs').set(jobsArray).catch(err => {
+                console.error("Firebase save error:", err);
+                showToast("Firebase Sync Error: " + err.message, "error");
+            });
+        }
     }
 
     function submitForm(action) {
@@ -1475,7 +1483,7 @@
             jobNumber: jobNo, date: document.getElementById('poDate').value, targetDeliveryDate: document.getElementById('targetDeliveryDate').value,
             party: partyInput, po: document.getElementById('poNumber').value, items: itemsArray,
             itemName: itemsArray.map(i => i.itemName).join(', '), quantity: itemsArray.reduce((acc, i) => acc + i.quantity, 0), dimensions: itemsArray[0].dimensions, 
-            paperSummaryText: globalPaperText, rollsSummaryText: globalRollText, paperObj: globalPaperObj, rollObj: globalRollObj, cartonType: type, laminationVarnish: type === 'Offset' ? finishVal : ''
+            paperSummaryText: globalPaperText, rollsSummaryText: globalRollText, cartonType: type, laminationVarnish: type === 'Offset' ? finishVal : ''
         };
 
         if (editingJobId) {
@@ -1495,7 +1503,7 @@
         const savedId = editingJobId || allJobs[allJobs.length-1].id;
 
         if (action === 'print') {
-            startNewPO(true); // Bypass animation for printing
+            startNewPO(true); 
             printJobCard(savedId); 
         } else {
             const overlay = document.getElementById('successOverlay');
@@ -1503,7 +1511,7 @@
             setTimeout(() => {
                 overlay.style.display = 'none';
                 startNewPO(true);
-            }, 1000); // exactly one second popup
+            }, 1000); 
         }
     }
 
@@ -1528,7 +1536,7 @@
         jobItems.forEach(i => {
             addItemBlock();
             const block = document.getElementById(`itemBlock_${itemCounter - 1}`);
-            block.querySelector('.item-name').value = i.itemName || '';
+            block.querySelector('.item-name').value = i.itemName || 'Carton';
             block.querySelector('.item-ply').value = i.ply || '';
             handlePlyChange(block.querySelector('.item-ply')); 
             
@@ -1551,7 +1559,7 @@
         
         calculateAllJobs();
         switchPage('new-po');
-        showToast("Editing Job...", "success");
+        showToast("Editing Job Card " + job.jobNumber, "success");
     }
 
     // ===== DASHBOARD CHARTS & JOB FILTERING =====
@@ -1628,7 +1636,12 @@
 
     function loadJobs() {
         if (usingFirebase) {
-            db.ref('zhJobs').on('value', (snapshot) => { const data = snapshot.val(); allJobs = data ? data : []; updateUIOnLoad(); });
+            db.ref('zhJobs').on('value', (snapshot) => { 
+                const data = snapshot.val(); 
+                allJobs = data ? data : []; 
+                try { localStorage.setItem('zhJobs', JSON.stringify(allJobs)); } catch(e){}
+                updateUIOnLoad(); 
+            });
         } else {
             const stored = localStorage.getItem('zhJobs'); if (stored) allJobs = JSON.parse(stored); updateUIOnLoad();
         }
@@ -1896,7 +1909,7 @@
 
     function advanceJobTask(event, jobId, taskId) { 
         const row = event.target.closest('tr');
-        if(row) row.style.display = 'none'; // Instant visual feedback
+        if(row) row.style.display = 'none';
         toggleTask(jobId, taskId, true); 
     }
 
@@ -1970,8 +1983,8 @@
             t.done = !t.done;
             if(t.done) {
                 const now = new Date();
-                t.completedBy = sessionStorage.getItem('zhActiveUser') || 'Unknown User';
-                t.completedAt = now.toLocaleString();
+                t.completedBy = localStorage.getItem('zhActiveUser') || sessionStorage.getItem('zhActiveUser') || 'Packages Dept';
+                t.completedAt = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                 showToast("Task completed!", "success");
             } else {
                 delete t.completedBy; delete t.completedAt;
