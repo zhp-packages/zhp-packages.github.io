@@ -193,8 +193,6 @@
     .status-completed { background: rgba(16, 185, 129, 0.1); color: #047857; border: 1px solid rgba(16, 185, 129, 0.3); }
     [data-theme="dark"] .status-pending { color: #fcd34d; }
     [data-theme="dark"] .status-completed { color: #6ee7b7; }
-    .cb-cell { width: 50px; text-align: center; }
-    .cb-cell input { width: 18px; height: 18px; accent-color: var(--primary-accent); cursor: pointer; }
 
     /* Production Board Tabs */
     .stage-tabs-container { background: var(--bg-primary); padding: 1.5rem; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 1.5rem; }
@@ -317,7 +315,7 @@
 <div class="success-overlay" id="successOverlay">
     <div class="success-box">
         <span class="success-icon">✅</span>
-        <div class="success-text">Job Successfully Saved!</div>
+        <div class="success-text">Success!</div>
     </div>
 </div>
 
@@ -441,7 +439,7 @@
                         <p>Generate a Master Job Card. Add multiple items to tie them directly to this PO.</p>
                     </div>
                     <div class="form-body">
-                        <form id="poForm">
+                        <form id="poForm" onsubmit="event.preventDefault();">
                             <!-- ORDER INFO -->
                             <div class="form-section">
                                 <div class="form-section-title"><span>📅</span> Master Order Information</div>
@@ -850,9 +848,10 @@
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appContainer').classList.add('active');
             loadJobs();
-            // Start the PO form silently, but route to dashboard.
-            startNewPO(false); 
-            switchPage('dashboard'); 
+            // Primes the form layout WITHOUT resetting master fields if they exist
+            if (itemCounter === 0) addItemBlock(); 
+            updateCartonWorkflow();
+            switchPage('dashboard'); // Ensures landing on dashboard
         }
     });
 
@@ -938,7 +937,9 @@
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appContainer').classList.add('active');
             loadJobs(); 
-            startNewPO(false);
+            // Primes the form layout WITHOUT resetting master fields if they exist
+            if (itemCounter === 0) addItemBlock(); 
+            updateCartonWorkflow();
             switchPage('dashboard');
             showToast(`Welcome back, ${user}`, 'success');
         } else {
@@ -1494,17 +1495,15 @@
         const savedId = editingJobId || allJobs[allJobs.length-1].id;
 
         if (action === 'print') {
-            startNewPO(true); 
+            startNewPO(true); // Bypass animation for printing
             printJobCard(savedId); 
         } else {
             const overlay = document.getElementById('successOverlay');
-            const successText = overlay.querySelector('.success-text');
-            if(successText) successText.textContent = "Success!";
             overlay.style.display = 'flex';
             setTimeout(() => {
                 overlay.style.display = 'none';
                 startNewPO(true);
-            }, 1000); 
+            }, 1000); // exactly one second popup
         }
     }
 
@@ -2069,8 +2068,8 @@
         if (selectedIds.length === 0) { showToast('Please select at least one job.', 'error'); return; }
         const jobs = allJobs.filter(j => selectedIds.includes(j.id));
         
-        let masterPaper = {}; 
-        let masterRoll = {}; 
+        let htmlContentPaper = '';
+        let htmlContentRolls = '';
         let totalQty = 0; 
         let jobRowsHtml = '';
 
@@ -2081,26 +2080,31 @@
                 jobRowsHtml += `<tr><td style="padding:2px 4px;">${job.jobNumber}</td><td style="padding:2px 4px;">${i.itemName}</td><td style="padding:2px 4px;">${i.dimensions.L}×${i.dimensions.W}×${i.dimensions.H}</td><td style="padding:2px 4px;">${i.quantity}</td><td style="padding:2px 4px;">${i.calc.RS}"</td><td style="padding:2px 4px;">${i.calc.CL}"</td></tr>`;
             });
             
-            if (job.paperSummaryText) {
-                masterPaper[`<strong>Job: ${job.jobNumber}</strong><br>${job.paperSummaryText.replace(/\n/g, '<br>')}`] = 0;
-            }
-            if (job.rollsSummaryText) {
-                masterRoll[`<strong>Job: ${job.jobNumber}</strong><br>${job.rollsSummaryText.replace(/\n/g, '<br>')}`] = 0;
-            }
+            htmlContentPaper += `<tr><td colspan="2" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">JOB: ${job.jobNumber} (${job.party})</td></tr>`;
+            job.paperSummaryText.split('\n').forEach(line => {
+                if(!line.trim() || line.includes('TOTAL REQUIREMENT') || line.includes('---')) return;
+                if(line.includes(':') && !line.includes('=')) {
+                    htmlContentPaper += `<tr><td colspan="2" style="font-weight:bold; padding-top:4px;">${line}</td></tr>`;
+                } else {
+                    const pts = line.split('=');
+                    if(pts.length === 2) htmlContentPaper += `<tr><td>${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`;
+                }
+            });
+
+            htmlContentRolls += `<tr><td colspan="2" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">JOB: ${job.jobNumber} (${job.party})</td></tr>`;
+            job.rollsSummaryText.split('\n').forEach(line => {
+                if(!line.trim() || line.includes('TOTAL REQUIREMENT') || line.includes('---')) return;
+                if(line.includes(':') && !line.includes('=')) {
+                    htmlContentRolls += `<tr><td colspan="2" style="font-weight:bold; padding-top:4px;">${line}</td></tr>`;
+                } else {
+                    const pts = line.split('=');
+                    if(pts.length === 2) htmlContentRolls += `<tr><td>${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`;
+                }
+            });
         });
 
         const parties = Array.from(new Set(jobs.map(j => j.party))).join(', ');
         const pos = Array.from(new Set(jobs.map(j => j.po))).join(', ');
-        
-        const paperTableRows = Object.keys(masterPaper).map(key => {
-            let formatKey = key.replace(/TOTAL REQUIREMENT:/g, '<strong style="color:var(--text-primary); font-size:9pt;">TOTAL REQUIREMENT:</strong>');
-            return `<tr><td colspan="2" style="padding-bottom: 10px; border-bottom: 1px dashed #ccc;">${formatKey}</td></tr>`;
-        }).join('');
-        
-        const rollTableRows = Object.keys(masterRoll).map(key => {
-            let formatKey = key.replace(/TOTAL REQUIREMENT:/g, '<strong style="color:var(--text-primary); font-size:9pt;">TOTAL REQUIREMENT:</strong>');
-            return `<tr><td colspan="2" style="padding-bottom: 10px; border-bottom: 1px dashed #ccc;">${formatKey}</td></tr>`;
-        }).join('');
 
         const html = `
             <div class="a4-print-layout">
@@ -2132,7 +2136,7 @@
                         <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos} <br><strong>Total Batch Qty:</strong> ${totalQty}</div>
                         <table class="print-table" style="margin-bottom: auto;">
                             <tr><th colspan="2">Paper Requirement Breakdown</th></tr>
-                            ${paperTableRows || '<tr><td colspan="2" style="text-align:center;">No paper required</td></tr>'}
+                            ${htmlContentPaper || '<tr><td colspan="2" style="text-align:center;">No paper required</td></tr>'}
                         </table>
                         <div class="print-signatures"><div class="sig-line">Issued By</div><div class="sig-line">Received By</div></div>
                     </div>
@@ -2144,7 +2148,7 @@
                         <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos} <br><strong>Total Batch Qty:</strong> ${totalQty}</div>
                         <table class="print-table" style="margin-bottom: auto;">
                             <tr><th colspan="2">Paired Roll Setup Breakdown</th></tr>
-                            ${rollTableRows || '<tr><td colspan="2" style="text-align:center;">No rolls required</td></tr>'}
+                            ${htmlContentRolls || '<tr><td colspan="2" style="text-align:center;">No rolls required</td></tr>'}
                         </table>
                         <div class="print-signatures"><div class="sig-line">Operator</div><div class="sig-line">QC Check</div></div>
                     </div>
