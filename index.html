@@ -17,6 +17,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
+        /* Default Light Theme */
         --primary: #0f172a; --primary-light: #1e3a8a; --primary-accent: #3b82f6; --primary-soft: #eff6ff;
         --secondary: #059669; --danger: #dc2626; --warning: #f59e0b; --success: #10b981;
         --bg-primary: #ffffff; --bg-secondary: #f8fafc; --bg-tertiary: #f1f5f9;
@@ -192,6 +193,8 @@
     .status-completed { background: rgba(16, 185, 129, 0.1); color: #047857; border: 1px solid rgba(16, 185, 129, 0.3); }
     [data-theme="dark"] .status-pending { color: #fcd34d; }
     [data-theme="dark"] .status-completed { color: #6ee7b7; }
+    .cb-cell { width: 50px; text-align: center; }
+    .cb-cell input { width: 18px; height: 18px; accent-color: var(--primary-accent); cursor: pointer; }
 
     /* Production Board Tabs */
     .stage-tabs-container { background: var(--bg-primary); padding: 1.5rem; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 1.5rem; }
@@ -438,7 +441,7 @@
                         <p>Generate a Master Job Card. Add multiple items to tie them directly to this PO.</p>
                     </div>
                     <div class="form-body">
-                        <form id="poForm" onsubmit="event.preventDefault();">
+                        <form id="poForm">
                             <!-- ORDER INFO -->
                             <div class="form-section">
                                 <div class="form-section-title"><span>📅</span> Master Order Information</div>
@@ -847,8 +850,9 @@
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appContainer').classList.add('active');
             loadJobs();
-            startNewPO(true); // primes the form silently in background
-            switchPage('dashboard'); // Ensures landing on dashboard
+            // Start the PO form silently, but route to dashboard.
+            startNewPO(false); 
+            switchPage('dashboard'); 
         }
     });
 
@@ -934,7 +938,7 @@
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appContainer').classList.add('active');
             loadJobs(); 
-            startNewPO(true); // primes the form
+            startNewPO(false);
             switchPage('dashboard');
             showToast(`Welcome back, ${user}`, 'success');
         } else {
@@ -1253,13 +1257,13 @@
         });
 
         if(Object.keys(globalPaperObj).length > 0) {
-            let finalPaperText = blocks.length > 1 ? perItemPaperText + "------------------\nGRAND TOTAL:\n" : "";
+            let finalPaperText = blocks.length > 1 ? perItemPaperText + "------------------\nTOTAL REQUIREMENT:\n" : "";
             for(let key of Object.keys(globalPaperObj).sort()) { finalPaperText += `${key} = ${Math.ceil(globalPaperObj[key])} KGs\n`; }
             globalPaperText = finalPaperText; document.getElementById('calcPaperSummary').textContent = globalPaperText;
         } else { globalPaperText = "-"; document.getElementById('calcPaperSummary').textContent = "-"; }
 
         if(Object.keys(globalRollObj).length > 0) {
-            let finalRollText = blocks.length > 1 ? perItemRollText + "------------------\nGRAND TOTAL:\n" : "";
+            let finalRollText = blocks.length > 1 ? perItemRollText + "------------------\nTOTAL REQUIREMENT:\n" : "";
             for(let key of Object.keys(globalRollObj).sort()) { finalRollText += `• ${key} = ${(Math.round(globalRollObj[key] * 10) / 10).toFixed(1)} Rolls\n`; }
             globalRollText = finalRollText; document.getElementById('calcRollsSummary').textContent = globalRollText;
         } else { globalRollText = "-"; document.getElementById('calcRollsSummary').textContent = "-"; }
@@ -1354,7 +1358,7 @@
         if(block) { block.remove(); calculateAllJobs(); }
     }
 
-    function startNewPO(silent = true) {
+    function startNewPO(silent = false) {
         editingJobId = null;
         document.getElementById('poForm').reset();
         document.getElementById('jobNumber').value = '';
@@ -1494,11 +1498,12 @@
             printJobCard(savedId); 
         } else {
             const overlay = document.getElementById('successOverlay');
+            const successText = overlay.querySelector('.success-text');
+            if(successText) successText.textContent = "Success!";
             overlay.style.display = 'flex';
             setTimeout(() => {
                 overlay.style.display = 'none';
                 startNewPO(true);
-                showToast("Job Card Saved", 'success');
             }, 1000); 
         }
     }
@@ -1857,7 +1862,7 @@
                     if(!job.tasks[i].done) { ready = false; blocker = job.tasks[i].label; break; }
                 }
                 if (ready) {
-                    statusHtml = `<button class="btn-success btn-small" onclick="advanceJobTask(${job.id}, '${task.id}')">✅ Complete Step</button>`;
+                    statusHtml = `<button class="btn-success btn-small" onclick="advanceJobTask(event, ${job.id}, '${task.id}')">✅ Complete Step</button>`;
                 } else {
                     statusHtml = `<span style="color: var(--warning); font-weight: 700; font-size: 0.8rem;">⏳ Waiting on:<br>${blocker}</span>`;
                 }
@@ -1890,7 +1895,11 @@
         tbody.appendChild(frag);
     }
 
-    function advanceJobTask(jobId, taskId) { toggleTask(jobId, taskId, true); }
+    function advanceJobTask(event, jobId, taskId) { 
+        const row = event.target.closest('tr');
+        if(row) row.style.display = 'none'; // Instant visual feedback
+        toggleTask(jobId, taskId, true); 
+    }
 
     // Modal & Task Logic
     function viewJob(id) {
@@ -2029,7 +2038,7 @@
                         <table class="print-table" style="margin-bottom: auto;">
                             <tr><th>Paper Requirements (Type/GSM)</th><th>Total KGs</th></tr>
                             ${job.paperSummaryText.split('\n').map(line => {
-                                if(!line.trim()) return ''; if(line.includes(':') && !line.includes('=')) return `<tr><td colspan="2" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">${line}</td></tr>`; if(line.includes('GRAND TOTAL')) return `<tr><td colspan="2" style="background:#e2e8f0 !important; font-weight:900; font-size:9pt; padding:6px 4px; text-align:center;">${line}</td></tr>`; if(line.includes('---')) return '';
+                                if(!line.trim()) return ''; if(line.includes(':') && !line.includes('=')) return `<tr><td colspan="2" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">${line}</td></tr>`; if(line.includes('TOTAL REQUIREMENT')) return `<tr><td colspan="2" style="background:#e2e8f0 !important; font-weight:900; font-size:9pt; padding:6px 4px; text-align:center;">${line}</td></tr>`; if(line.includes('---')) return '';
                                 const pts = line.split('='); if(pts.length === 2) return `<tr><td>${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`; return `<tr><td colspan="2">${line}</td></tr>`;
                             }).join('')}
                         </table>
@@ -2044,7 +2053,7 @@
                         <table class="print-table" style="margin-bottom: auto;">
                             <tr><th>Paired Roll Setup (Size & Layers)</th><th style="text-align:right;">Total Rolls</th></tr>
                             ${job.rollsSummaryText.split('\n').map(line => {
-                                if(!line.trim()) return ''; if(line.includes(':') && !line.includes('=')) return `<tr><td colspan="2" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">${line}</td></tr>`; if(line.includes('GRAND TOTAL')) return `<tr><td colspan="2" style="background:#e2e8f0 !important; font-weight:900; font-size:9pt; padding:6px 4px; text-align:center;">${line}</td></tr>`; if(line.includes('---')) return '';
+                                if(!line.trim()) return ''; if(line.includes(':') && !line.includes('=')) return `<tr><td colspan="2" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">${line}</td></tr>`; if(line.includes('TOTAL REQUIREMENT')) return `<tr><td colspan="2" style="background:#e2e8f0 !important; font-weight:900; font-size:9pt; padding:6px 4px; text-align:center;">${line}</td></tr>`; if(line.includes('---')) return '';
                                 const pts = line.split('='); if(pts.length === 2) return `<tr><td>${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`; return `<tr><td colspan="2">${line}</td></tr>`;
                             }).join('')}
                         </table>
@@ -2060,8 +2069,8 @@
         if (selectedIds.length === 0) { showToast('Please select at least one job.', 'error'); return; }
         const jobs = allJobs.filter(j => selectedIds.includes(j.id));
         
-        let htmlContentPaper = '';
-        let htmlContentRolls = '';
+        let masterPaper = {}; 
+        let masterRoll = {}; 
         let totalQty = 0; 
         let jobRowsHtml = '';
 
@@ -2072,32 +2081,26 @@
                 jobRowsHtml += `<tr><td style="padding:2px 4px;">${job.jobNumber}</td><td style="padding:2px 4px;">${i.itemName}</td><td style="padding:2px 4px;">${i.dimensions.L}×${i.dimensions.W}×${i.dimensions.H}</td><td style="padding:2px 4px;">${i.quantity}</td><td style="padding:2px 4px;">${i.calc.RS}"</td><td style="padding:2px 4px;">${i.calc.CL}"</td></tr>`;
             });
             
-            // Build separate individual item lists without merging calculations
-            htmlContentPaper += `<tr><td colspan="2" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">JOB: ${job.jobNumber} (${job.party})</td></tr>`;
-            job.paperSummaryText.split('\n').forEach(line => {
-                if(!line.trim() || line.includes('GRAND TOTAL') || line.includes('---')) return;
-                if(line.includes(':') && !line.includes('=')) {
-                    htmlContentPaper += `<tr><td colspan="2" style="font-weight:bold; padding-top:4px;">${line}</td></tr>`;
-                } else {
-                    const pts = line.split('=');
-                    if(pts.length === 2) htmlContentPaper += `<tr><td>${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`;
-                }
-            });
-
-            htmlContentRolls += `<tr><td colspan="2" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">JOB: ${job.jobNumber} (${job.party})</td></tr>`;
-            job.rollsSummaryText.split('\n').forEach(line => {
-                if(!line.trim() || line.includes('GRAND TOTAL') || line.includes('---')) return;
-                if(line.includes(':') && !line.includes('=')) {
-                    htmlContentRolls += `<tr><td colspan="2" style="font-weight:bold; padding-top:4px;">${line}</td></tr>`;
-                } else {
-                    const pts = line.split('=');
-                    if(pts.length === 2) htmlContentRolls += `<tr><td>${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`;
-                }
-            });
+            if (job.paperSummaryText) {
+                masterPaper[`<strong>Job: ${job.jobNumber}</strong><br>${job.paperSummaryText.replace(/\n/g, '<br>')}`] = 0;
+            }
+            if (job.rollsSummaryText) {
+                masterRoll[`<strong>Job: ${job.jobNumber}</strong><br>${job.rollsSummaryText.replace(/\n/g, '<br>')}`] = 0;
+            }
         });
 
         const parties = Array.from(new Set(jobs.map(j => j.party))).join(', ');
         const pos = Array.from(new Set(jobs.map(j => j.po))).join(', ');
+        
+        const paperTableRows = Object.keys(masterPaper).map(key => {
+            let formatKey = key.replace(/TOTAL REQUIREMENT:/g, '<strong style="color:var(--text-primary); font-size:9pt;">TOTAL REQUIREMENT:</strong>');
+            return `<tr><td colspan="2" style="padding-bottom: 10px; border-bottom: 1px dashed #ccc;">${formatKey}</td></tr>`;
+        }).join('');
+        
+        const rollTableRows = Object.keys(masterRoll).map(key => {
+            let formatKey = key.replace(/TOTAL REQUIREMENT:/g, '<strong style="color:var(--text-primary); font-size:9pt;">TOTAL REQUIREMENT:</strong>');
+            return `<tr><td colspan="2" style="padding-bottom: 10px; border-bottom: 1px dashed #ccc;">${formatKey}</td></tr>`;
+        }).join('');
 
         const html = `
             <div class="a4-print-layout">
@@ -2129,7 +2132,7 @@
                         <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos} <br><strong>Total Batch Qty:</strong> ${totalQty}</div>
                         <table class="print-table" style="margin-bottom: auto;">
                             <tr><th colspan="2">Paper Requirement Breakdown</th></tr>
-                            ${htmlContentPaper || '<tr><td colspan="2" style="text-align:center;">No paper required</td></tr>'}
+                            ${paperTableRows || '<tr><td colspan="2" style="text-align:center;">No paper required</td></tr>'}
                         </table>
                         <div class="print-signatures"><div class="sig-line">Issued By</div><div class="sig-line">Received By</div></div>
                     </div>
@@ -2141,7 +2144,7 @@
                         <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos} <br><strong>Total Batch Qty:</strong> ${totalQty}</div>
                         <table class="print-table" style="margin-bottom: auto;">
                             <tr><th colspan="2">Paired Roll Setup Breakdown</th></tr>
-                            ${htmlContentRolls || '<tr><td colspan="2" style="text-align:center;">No rolls required</td></tr>'}
+                            ${rollTableRows || '<tr><td colspan="2" style="text-align:center;">No rolls required</td></tr>'}
                         </table>
                         <div class="print-signatures"><div class="sig-line">Operator</div><div class="sig-line">QC Check</div></div>
                     </div>
