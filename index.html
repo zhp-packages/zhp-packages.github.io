@@ -17,11 +17,11 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-        /* Default Light Theme */
         --primary: #0f172a; --primary-light: #1e3a8a; --primary-accent: #3b82f6; --primary-soft: #eff6ff;
         --secondary: #059669; --danger: #dc2626; --warning: #f59e0b; --success: #10b981;
         --bg-primary: #ffffff; --bg-secondary: #f8fafc; --bg-tertiary: #f1f5f9;
         --text-primary: #0f172a; --text-secondary: #475569; --border: #e2e8f0;
+        --type-flexo: #3b82f6; --type-offset: #8b5cf6; --type-unprinted: #64748b;
         --font-display: 'Plus Jakarta Sans', 'Inter', sans-serif;
         --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         --font-mono: 'JetBrains Mono', 'Courier New', monospace;
@@ -66,7 +66,6 @@
     @keyframes popIn { from { opacity: 0; transform: scale(.92) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
     @keyframes slideInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
     @keyframes slideOutRight { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(30px); } }
-    @keyframes successPop { 0% { transform: scale(0.5); opacity: 0; } 60% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
 
     /* Logo & Brand */
     .logo-mark { display: block; width: auto; height: 48px; object-fit: contain; background: #ffffff; padding: 4px 8px; border-radius: 8px; box-shadow: var(--shadow-sm); transition: transform .4s var(--ease); will-change: transform; }
@@ -104,6 +103,13 @@
     .page-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
     .page-heading h2 { font-weight: 800; font-size: 1.8rem; color: var(--text-primary); letter-spacing: -0.02em;}
     .page-heading p { color: var(--text-secondary); font-size: .95rem; margin-top: .4rem; }
+
+    /* Custom Dropdown Search */
+    .searchable-dropdown { position: relative; width: 100%; }
+    .dropdown-list { display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-primary); border: 2px solid var(--primary-accent); border-radius: 8px; max-height: 200px; overflow-y: auto; z-index: 100; box-shadow: var(--shadow-lg); }
+    .dropdown-list.show { display: block; animation: popIn 0.2s var(--ease); }
+    .dropdown-item { padding: 10px 15px; cursor: pointer; font-weight: 600; color: var(--text-primary); border-bottom: 1px solid var(--border); }
+    .dropdown-item:hover, .dropdown-item.focused { background: var(--bg-tertiary); color: var(--primary-accent); }
 
     /* Forms & Inputs */
     .form-container { background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); transition: all .4s var(--ease); }
@@ -146,6 +152,12 @@
     .calc-value { font-size: 1.6rem; font-weight: 800; color: var(--primary-accent); font-family: var(--font-mono); }
     .calc-sub-value { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-top: 0.4rem; }
 
+    /* Custom Checkboxes for Workflow */
+    .custom-checkbox-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+    .custom-cb-label { display: flex; align-items: center; gap: 8px; background: var(--bg-tertiary); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; font-size: 0.85rem; font-weight: 700; color: var(--text-primary); transition: all 0.2s; }
+    .custom-cb-label:hover { border-color: var(--primary-accent); }
+    .custom-cb-label input { width: 16px; height: 16px; accent-color: var(--primary-accent); cursor: pointer; margin:0; padding:0;}
+
     /* Custom Modals */
     .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, .85); z-index: 9999; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(8px); }
     .modal.active { display: flex; animation: fadeIn .3s var(--ease); }
@@ -157,12 +169,6 @@
     .modal-close { background: rgba(255,255,255,.15); border: none; font-size: 1.5rem; color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all .2s; }
     .modal-close:hover { background: var(--danger); transform: rotate(90deg); }
     .modal-body { padding: 2.5rem; }
-
-    /* Success Overlay Animation */
-    .success-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-    .success-box { background: var(--bg-primary); padding: 3rem; border-radius: var(--radius-lg); text-align: center; box-shadow: var(--shadow-lg); animation: successPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-    .success-icon { font-size: 5rem; margin-bottom: 1rem; display: block; }
-    .success-text { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); font-family: var(--font-display); }
 
     /* Workflow Timeline / Checklist */
     .timeline-container { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1.5rem; }
@@ -186,8 +192,14 @@
     table { width: 100%; border-collapse: collapse; }
     th { padding: 1.2rem; text-align: left; font-weight: 800; color: var(--text-secondary); border-bottom: 2px solid var(--border); font-size: .8rem; text-transform: uppercase; letter-spacing: 0.05em; background: var(--bg-primary); }
     td { padding: 1.2rem; border-bottom: 1px solid var(--border); font-size: .9rem; color: var(--text-primary); font-weight: 500;}
-    tbody tr { transition: background .3s var(--ease); }
+    tbody tr { transition: background .3s var(--ease); border-left: 5px solid transparent; }
     tbody tr:hover { background: var(--bg-tertiary); }
+    
+    /* Type Colors */
+    tr[data-type="Flexo"] { border-left-color: var(--type-flexo); }
+    tr[data-type="Offset"] { border-left-color: var(--type-offset); }
+    tr[data-type="Unprinted"] { border-left-color: var(--type-unprinted); }
+
     .status-badge { display: inline-flex; align-items: center; justify-content: center; padding: .4rem 1rem; border-radius: 20px; font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
     .status-pending { background: rgba(245, 158, 11, 0.1); color: #b45309; border: 1px solid rgba(245, 158, 11, 0.3); }
     .status-completed { background: rgba(16, 185, 129, 0.1); color: #047857; border: 1px solid rgba(16, 185, 129, 0.3); }
@@ -215,8 +227,11 @@
 
     /* Status Board Compact Grid */
     #statusBoardList { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
-    .status-card { background: var(--bg-primary); border: 2px solid var(--border); border-radius: 16px; padding: 1.2rem; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); transition: transform 0.3s, box-shadow 0.3s; position: relative;}
-    .status-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); border-color: var(--primary-accent); }
+    .status-card { background: var(--bg-primary); border: 2px solid var(--border); border-left: 5px solid transparent; border-radius: 16px; padding: 1.2rem; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); transition: transform 0.3s, box-shadow 0.3s; position: relative;}
+    .status-card[data-type="Flexo"] { border-left-color: var(--type-flexo); }
+    .status-card[data-type="Offset"] { border-left-color: var(--type-offset); }
+    .status-card[data-type="Unprinted"] { border-left-color: var(--type-unprinted); }
+    .status-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
     .status-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem;}
     .sc-jobno { font-size: 1.2rem; font-weight: 900; color: var(--primary-accent); }
     .sc-party { font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); }
@@ -242,7 +257,7 @@
     
     .chart-box { background: var(--bg-primary); padding: 2rem; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow); transition: transform 0.4s var(--ease); display: flex; flex-direction: column;}
     .chart-box:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
-    
+
     /* Settings Page */
     .theme-card { border: 2px solid var(--border); border-radius: 12px; padding: 1rem; cursor: pointer; transition: all .4s var(--ease); display: flex; flex-direction: column; gap: 10px; background: var(--bg-primary);}
     .theme-card:hover { border-color: var(--primary-accent); transform: translateY(-4px); box-shadow: var(--shadow-sm); }
@@ -262,25 +277,26 @@
     .print-info-block strong { color: #222; }
 
     /* =========================================
-       PRINT STYLES - Safe Non-Overlapping Engine
+       PRINT STYLES - Fixed Heights, No Overlap
        ========================================= */
     .print-only { display: none; }
     
     @media print {
         @page { size: A4 portrait; margin: 5mm; }
-        body, html { margin: 0 !important; padding: 0 !important; background: #fff !important; color: #000 !important; width: 100%; }
+        body, html { margin: 0 !important; padding: 0 !important; background: #fff !important; color: #000 !important; width: 100%; height: 100%; }
         * { animation: none !important; transition: none !important; box-shadow: none !important; }
         
         .login-screen, .app-container, .modal, .toast-container { display: none !important; }
         .print-only { display: block !important; width: 100%; background: #fff; }
 
-        .a4-print-layout { display: block; width: 100%; box-sizing: border-box; background: #fff; font-family: sans-serif;}
+        .a4-print-layout { display: block; width: 100%; box-sizing: border-box; background: #fff; font-family: sans-serif; overflow: hidden; height: 287mm;}
 
-        .print-sec-1 { border-bottom: 2px dashed #000; padding-bottom: 5mm; margin-bottom: 5mm; display: block; width: 100%;}
+        /* Locking the heights guarantees the bottom never gets pushed off page or overlapped */
+        .print-sec-1 { border-bottom: 2px dashed #000; padding-bottom: 5mm; margin-bottom: 5mm; display: block; width: 100%; height: 130mm; overflow: hidden;}
         
-        .print-bottom-wrap { display: flex; flex-direction: row; width: 100%; page-break-inside: avoid; break-inside: avoid; }
-        .print-sec-2 { width: 50%; padding-right: 5mm; border-right: 2px dashed #000; box-sizing: border-box; }
-        .print-sec-3 { width: 50%; padding-left: 5mm; box-sizing: border-box; }
+        .print-bottom-wrap { display: block; width: 100%; height: 140mm; overflow: hidden; }
+        .print-sec-2 { width: 50%; padding-right: 5mm; border-right: 2px dashed #000; box-sizing: border-box; float: left; height: 100%;}
+        .print-sec-3 { width: 50%; padding-left: 5mm; box-sizing: border-box; float: right; height: 100%;}
 
         .print-header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 12px; align-items: flex-end; }
         .print-title { font-size: 16pt; font-weight: 800; text-transform: uppercase; margin-bottom: 2px; color: #000;}
@@ -297,7 +313,7 @@
         .print-table tr { page-break-inside: avoid; page-break-after: auto; }
         .print-table thead { display: table-header-group; }
 
-        .print-signatures { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px; }
+        .print-signatures { display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; }
         .sig-line { border-top: 1px solid #000; width: 45%; text-align: center; font-size: 9pt; font-weight: bold; padding-top: 4px; color: #000; }
 
         .print-logo-main { height: 40px; width: auto; object-fit: contain; }
@@ -309,14 +325,6 @@
 
 <!-- TOAST NOTIFICATION CONTAINER -->
 <div id="toastContainer" class="toast-container"></div>
-
-<!-- SUCCESS OVERLAY (For saving) -->
-<div class="success-overlay" id="successOverlay">
-    <div class="success-box">
-        <span class="success-icon">✅</span>
-        <div class="success-text">Success!</div>
-    </div>
-</div>
 
 <!-- LOGIN SCREEN -->
 <div class="login-screen" id="loginScreen">
@@ -448,20 +456,22 @@
                                     </div>
                                     <div class="form-group-wrapper">
                                         <label class="required">Date</label>
-                                        <input type="date" id="poDate" required>
+                                        <input type="date" id="poDate" required onchange="saveDraft()">
                                     </div>
                                     <div class="form-group-wrapper">
                                         <label class="required">Target Delivery Date</label>
-                                        <input type="date" id="targetDeliveryDate" required>
+                                        <input type="date" id="targetDeliveryDate" required onchange="saveDraft()">
                                     </div>
                                     <div class="form-group-wrapper">
                                         <label class="required">Customer Name</label>
-                                        <input type="text" id="partyName" list="partyDatalist" placeholder="Select or type customer..." required autocomplete="off">
-                                        <datalist id="partyDatalist"></datalist>
+                                        <div class="searchable-dropdown" id="partyDropdownContainer">
+                                            <input type="text" id="partyName" placeholder="Search or add customer..." required autocomplete="off" onfocus="showPartyDropdown()" oninput="filterParties(); saveDraft();" onblur="setTimeout(hidePartyDropdown, 200)">
+                                            <div id="partyDropdownList" class="dropdown-list"></div>
+                                        </div>
                                     </div>
                                     <div class="form-group-wrapper">
                                         <label class="required">PO Number</label>
-                                        <input type="text" id="poNumber" placeholder="e.g., PO-001" required>
+                                        <input type="text" id="poNumber" placeholder="e.g., PO-001" required oninput="saveDraft()">
                                     </div>
                                 </div>
                             </div>
@@ -470,9 +480,7 @@
                             <div class="form-section">
                                 <div class="form-section-title"><span>📦</span> Product Specifications</div>
                                 
-                                <div id="itemsContainer">
-                                    <!-- Dynamic Items Injected Here -->
-                                </div>
+                                <div id="itemsContainer"></div>
 
                                 <div style="text-align: right; margin-top: 1rem;">
                                     <button type="button" class="btn-secondary" onclick="addItemBlock()">➕ Add Another Item</button>
@@ -501,7 +509,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div id="workflowPreview" style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-secondary);"></div>
+                                <div id="workflowPreview" class="custom-checkbox-grid" style="margin-top: 1.5rem;"></div>
 
                                 <!-- AUTO CALCULATED GLOBAL PAPER & ROLLS -->
                                 <h3 style="margin-top: 2.5rem; margin-bottom: 1.5rem; color: var(--text-primary); font-family: var(--font-display);">📊 Global Job Requirements</h3>
@@ -533,11 +541,15 @@
                     <div class="table-header">
                         <div class="table-header-top">
                             <h3>📋 Detailed Job View <span id="jobsFilterLabel" style="font-size: 0.95rem; font-weight: normal; color: var(--text-secondary); margin-left: 10px; background: var(--bg-primary); padding: 4px 10px; border-radius: 12px;"></span></h3>
-                            <button class="btn-print" onclick="printSelectedConsolidated()">🖨️ Print Consolidated Batch Card</button>
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn-print btn-small" onclick="printSelectedConsolidated('paper')" style="background:var(--primary-accent);">🖨️ Print Batch Paper</button>
+                                <button class="btn-print btn-small" onclick="printSelectedConsolidated('rolls')" style="background:var(--warning);">🖨️ Print Batch Rolls</button>
+                                <button class="btn-print btn-small" onclick="printSelectedConsolidated('full')">🖨️ Print Master Batch</button>
+                            </div>
                         </div>
                         <div class="filter-bar">
                             <input type="text" id="filterPO" placeholder="Filter by PO Number..." oninput="applyFilters()">
-                            <input type="text" id="filterParty" list="partyDatalist" placeholder="Filter by Customer..." oninput="applyFilters()">
+                            <input type="text" id="filterParty" placeholder="Filter by Customer..." oninput="applyFilters()">
                             <input type="text" id="filterItem" placeholder="Filter by Item Name..." oninput="applyFilters()">
                             <select id="filterStage" onchange="applyFilters()">
                                 <option value="">All Stages</option>
@@ -579,7 +591,7 @@
 
                 <div class="filter-bar" style="margin-bottom: 2rem;">
                     <input type="text" id="pbFilterPO" placeholder="Filter by PO or Job #..." oninput="renderProdBoardTable()">
-                    <input type="text" id="pbFilterParty" list="partyDatalist" placeholder="Filter by Customer..." oninput="renderProdBoardTable()">
+                    <input type="text" id="pbFilterParty" placeholder="Filter by Customer..." oninput="renderProdBoardTable()">
                     <select id="pbViewMode" onchange="renderProdBoardTable()" style="margin-left:auto; background:var(--primary-soft); color:var(--primary-light); font-weight:800;">
                         <option value="pending">⏳ Current &amp; Incoming Jobs</option>
                         <option value="completed">✅ Completed in this Step</option>
@@ -626,7 +638,7 @@
                 
                 <div class="filter-bar" style="margin-bottom: 2rem;">
                     <input type="text" id="sbFilterPO" placeholder="Filter by PO or Job #..." oninput="applySBFilters()">
-                    <input type="text" id="sbFilterParty" list="partyDatalist" placeholder="Filter by Customer..." oninput="applySBFilters()">
+                    <input type="text" id="sbFilterParty" placeholder="Filter by Customer..." oninput="applySBFilters()">
                     <select id="sbFilterStage" onchange="applySBFilters()">
                         <option value="">All Stages</option>
                         <option value="Pending">Pending / In Production</option>
@@ -705,7 +717,7 @@
                         </div>
                         <div class="form-body">
                             <form onsubmit="handleAddParty(event)" style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
-                                <input type="text" id="newPartyName" placeholder="Add New Customer..." required style="flex: 1; text-transform: uppercase;">
+                                <input type="text" id="newPartyNameDb" placeholder="Add New Customer..." required style="flex: 1; text-transform: uppercase;">
                                 <button type="submit" class="btn-primary">➕ Add</button>
                             </form>
                             <div style="max-height: 300px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px;">
@@ -837,7 +849,6 @@
         const theme = localStorage.getItem('zhTheme') || 'light';
         setAppTheme(theme);
         loadPreferences();
-        
         loadUsers();
         loadParties();
 
@@ -846,9 +857,9 @@
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appContainer').classList.add('active');
             loadJobs();
-            // Primes form elements without wiping data
-            if (itemCounter === 0) addItemBlock(); 
-            updateCartonWorkflow();
+            
+            // Restores draft or starts blank without erasing what browser cached
+            loadDraft(); 
             switchPage('dashboard');
         }
     });
@@ -934,11 +945,11 @@
             sessionStorage.setItem('zhActiveUser', user);
             localStorage.setItem('zhLogged', 'true');
             localStorage.setItem('zhActiveUser', user);
+            
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appContainer').classList.add('active');
             loadJobs(); 
-            if (itemCounter === 0) addItemBlock();
-            updateCartonWorkflow();
+            loadDraft();
             switchPage('dashboard');
             showToast(`Welcome back, ${user}`, 'success');
         } else {
@@ -987,12 +998,12 @@
             db.ref('zhParties').on('value', snap => {
                 const data = snap.val();
                 if (data) { appParties = data; } else { savePartiesData(appParties); }
-                populatePartyDropdown(); renderPartiesTable();
+                renderPartiesTable();
             });
         } else {
             const stored = localStorage.getItem('zhParties');
             if (stored) appParties = JSON.parse(stored);
-            populatePartyDropdown(); renderPartiesTable();
+            renderPartiesTable();
         }
     }
 
@@ -1002,13 +1013,44 @@
         if (usingFirebase && db) db.ref('zhParties').set(parties);
     }
 
-    function populatePartyDropdown() {
-        const list = document.getElementById('partyDatalist');
-        if(list) {
-            const frag = document.createDocumentFragment();
-            appParties.forEach(p => { const opt = document.createElement('option'); opt.value = p; frag.appendChild(opt); });
-            list.innerHTML = ''; list.appendChild(frag);
+    // CUSTOM DROPDOWN SEARCH LOGIC
+    function showPartyDropdown() {
+        document.getElementById('partyDropdownList').classList.add('show');
+        filterParties();
+    }
+    function hidePartyDropdown() {
+        document.getElementById('partyDropdownList').classList.remove('show');
+    }
+    function filterParties() {
+        const input = document.getElementById('partyName').value.toUpperCase();
+        const list = document.getElementById('partyDropdownList');
+        list.innerHTML = '';
+        
+        let filtered = appParties.filter(p => p.includes(input));
+        if (input && !filtered.includes(input)) {
+            filtered.push(`➕ Add "${input}" as New Customer`);
         }
+        
+        filtered.forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'dropdown-item';
+            div.textContent = p;
+            div.onmousedown = (e) => {
+                e.preventDefault();
+                if(p.startsWith('➕ Add')) {
+                    const newParty = input;
+                    appParties.push(newParty);
+                    savePartiesData(appParties);
+                    document.getElementById('partyName').value = newParty;
+                    showToast("New Customer Added to Database", "success");
+                } else {
+                    document.getElementById('partyName').value = p;
+                }
+                hidePartyDropdown();
+                saveDraft();
+            };
+            list.appendChild(div);
+        });
     }
 
     function renderPartiesTable() {
@@ -1025,7 +1067,7 @@
 
     function handleAddParty(e) {
         e.preventDefault();
-        const input = document.getElementById('newPartyName');
+        const input = document.getElementById('newPartyNameDb');
         const newName = input.value.trim().toUpperCase();
         if (appParties.includes(newName)) { showToast("Party already exists!", "error"); return; }
         appParties.push(newName); savePartiesData(appParties); input.value = '';
@@ -1083,7 +1125,7 @@
 
         const images = printArea.getElementsByTagName('img');
         if (images.length === 0) { 
-            setTimeout(doPrint, 200); 
+            setTimeout(doPrint, 100); 
         } else {
             let loadedCount = 0;
             for (let img of images) {
@@ -1092,11 +1134,11 @@
                 } else {
                     img.onload = img.onerror = () => {
                         loadedCount++;
-                        if (loadedCount === images.length) setTimeout(doPrint, 150);
+                        if (loadedCount === images.length) setTimeout(doPrint, 100);
                     };
                 }
             }
-            if (loadedCount === images.length) setTimeout(doPrint, 150);
+            if (loadedCount === images.length) setTimeout(doPrint, 100);
             setTimeout(doPrint, 800); // Failsafe override
         }
     }
@@ -1123,7 +1165,8 @@
                 let grammage = parseFloat(grammageMatch[0]);
                 let multiplier = (i % 2 !== 0) ? 1.325 : 1.0;
                 let weight = (area * grammage / 1000 / 1550) * qty * multiplier;
-                let key = `${rollSize}" ${spec}`;
+                // SORTING TRICK: [PaperName] - [RollSize]"
+                let key = `${spec} - ${rollSize}"`;
                 results[key] = (results[key] || 0) + weight;
             }
         }
@@ -1181,6 +1224,33 @@
         }
         container.innerHTML = html;
         calculateAllJobs();
+    }
+
+    function copyPreviousItem(currentIndex) {
+        if (currentIndex === 0) return;
+        
+        const prevBlock = document.getElementById(`itemBlock_${currentIndex - 1}`);
+        const currentBlock = document.getElementById(`itemBlock_${currentIndex}`);
+        
+        if (!prevBlock || !currentBlock) return;
+        
+        const prevPly = prevBlock.querySelector('.item-ply').value;
+        currentBlock.querySelector('.item-ply').value = prevPly;
+        
+        // Trigger generation of inputs
+        handlePlyChange(currentBlock.querySelector('.item-ply'));
+        
+        // Copy the specific paper values
+        setTimeout(() => {
+            const prevInputs = prevBlock.querySelectorAll('.ply-layer-input');
+            const currentInputs = currentBlock.querySelectorAll('.ply-layer-input');
+            
+            for(let i = 0; i < prevInputs.length; i++) {
+                if(currentInputs[i]) currentInputs[i].value = prevInputs[i].value;
+            }
+            calculateAllJobs();
+            showToast("Specifications Copied", "success");
+        }, 50);
     }
 
     function calculateAllJobs() {
@@ -1244,7 +1314,7 @@
                     const rollObj = buildRollsSummaryObj(specStr, clRounded, qty);
                     let itemRText = `${itemName}:\n`; let addedR = false;
                     for(let key in rollObj) {
-                        let rKey = `[RS: ${finalRS}" | CL: ${clRounded.toFixed(2)}"] ${key}`;
+                        let rKey = `${key} | [RS: ${finalRS}" - CL: ${clRounded.toFixed(2)}"]`;
                         globalRollObj[rKey] = (globalRollObj[rKey] || 0) + rollObj[key];
                         itemRText += `  • [RS: ${finalRS}"] ${key} = ${(Math.round(rollObj[key] * 10) / 10).toFixed(1)} Rolls\n`;
                         addedR = true;
@@ -1260,6 +1330,7 @@
             }
         });
 
+        // Sorted outputs
         if(Object.keys(globalPaperObj).length > 0) {
             let finalPaperText = blocks.length > 1 ? perItemPaperText + "------------------\nTOTAL REQUIREMENT:\n" : "";
             for(let key of Object.keys(globalPaperObj).sort()) { finalPaperText += `${key} = ${Math.ceil(globalPaperObj[key])} KGs\n`; }
@@ -1271,6 +1342,92 @@
             for(let key of Object.keys(globalRollObj).sort()) { finalRollText += `• ${key} = ${(Math.round(globalRollObj[key] * 10) / 10).toFixed(1)} Rolls\n`; }
             globalRollText = finalRollText; document.getElementById('calcRollsSummary').textContent = globalRollText;
         } else { globalRollText = "-"; document.getElementById('calcRollsSummary').textContent = "-"; }
+        
+        saveDraft();
+    }
+
+    // ===== DRAFTS (AUTO-SAVE) =====
+    function saveDraft() {
+        if(editingJobId) return; // Do not auto-save over an existing job
+        
+        let itemsArray = [];
+        const blocks = document.querySelectorAll('.item-block');
+        blocks.forEach(block => {
+            const plyInputs = Array.from(block.querySelectorAll('.ply-layer-input')).map(inp => inp.value);
+            itemsArray.push({
+                itemName: block.querySelector('.item-name').value,
+                ply: block.querySelector('.item-ply').value,
+                quantity: block.querySelector('.item-qty').value,
+                detailNotes: block.querySelector('.item-notes').value,
+                l: block.querySelector('.item-l').value,
+                w: block.querySelector('.item-w').value,
+                h: block.querySelector('.item-h').value,
+                unit: block.querySelector('.item-unit').value,
+                manualRS: block.querySelector('.item-manual-rs').value,
+                plyInputs: plyInputs
+            });
+        });
+
+        const draft = {
+            date: document.getElementById('poDate').value,
+            targetDeliveryDate: document.getElementById('targetDeliveryDate').value,
+            partyName: document.getElementById('partyName').value,
+            poNumber: document.getElementById('poNumber').value,
+            cartonType: document.getElementById('cartonType').value,
+            laminationVarnish: document.getElementById('laminationVarnish').value,
+            items: itemsArray
+        };
+        localStorage.setItem('zhDraft', JSON.stringify(draft));
+    }
+
+    function loadDraft() {
+        const draftStr = localStorage.getItem('zhDraft');
+        if (!draftStr) {
+            if (itemCounter === 0) addItemBlock();
+            updateCartonWorkflow();
+            return;
+        }
+        
+        const draft = JSON.parse(draftStr);
+        document.getElementById('poDate').value = draft.date || '';
+        document.getElementById('targetDeliveryDate').value = draft.targetDeliveryDate || '';
+        document.getElementById('partyName').value = draft.partyName || '';
+        document.getElementById('poNumber').value = draft.poNumber || '';
+        document.getElementById('cartonType').value = draft.cartonType || '';
+        updateCartonWorkflow();
+        if (draft.laminationVarnish) document.getElementById('laminationVarnish').value = draft.laminationVarnish;
+
+        document.getElementById('itemsContainer').innerHTML = '';
+        itemCounter = 0;
+        
+        if(draft.items && draft.items.length > 0) {
+            draft.items.forEach(i => {
+                addItemBlock();
+                const block = document.getElementById(`itemBlock_${itemCounter - 1}`);
+                block.querySelector('.item-name').value = i.itemName || 'Carton';
+                block.querySelector('.item-ply').value = i.ply || '';
+                
+                handlePlyChange(block.querySelector('.item-ply')); 
+                
+                block.querySelector('.item-qty').value = i.quantity || '';
+                block.querySelector('.item-notes').value = i.detailNotes || '';
+                block.querySelector('.item-l').value = i.l || '';
+                block.querySelector('.item-w').value = i.w || '';
+                block.querySelector('.item-h').value = i.h || '';
+                if(i.unit) block.querySelector('.item-unit').value = i.unit;
+                block.querySelector('.item-manual-rs').value = i.manualRS || '';
+                
+                setTimeout(() => {
+                    const inputs = block.querySelectorAll('.ply-layer-input');
+                    if(i.plyInputs) {
+                        inputs.forEach((inp, idx) => { if(i.plyInputs[idx]) inp.value = i.plyInputs[idx]; });
+                    }
+                    calculateAllJobs();
+                }, 50);
+            });
+        } else {
+            addItemBlock();
+        }
     }
 
     // ===== WORKFLOW & PO GENERATION =====
@@ -1286,7 +1443,7 @@
                 <div class="form-row">
                     <div class="form-group-wrapper">
                         <label class="required">Item Name</label>
-                        <select class="item-name" required>
+                        <select class="item-name" required onchange="saveDraft()">
                             <option value="">Select Item</option>
                             <option value="Carton">Carton</option>
                             <option value="Stiffener">Stiffener</option>
@@ -1307,7 +1464,7 @@
                     </div>
                     <div class="form-group-wrapper">
                         <label>Detail / Notes</label>
-                        <input type="text" class="item-notes" placeholder="Additional info...">
+                        <input type="text" class="item-notes" placeholder="Additional info..." oninput="saveDraft()">
                     </div>
                 </div>
                 <div class="form-row">
@@ -1325,7 +1482,10 @@
                 </div>
                 <div class="form-row ply-inputs-row" style="margin-bottom:0;">
                     <div class="form-group-wrapper" style="grid-column: 1 / -1; background: var(--bg-tertiary); padding: 1rem; border-radius: 10px; border: 1px dashed var(--border);">
-                        <label class="required">Paper Specifications</label>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <label class="required">Paper Specifications</label>
+                            ${index > 0 ? `<button type="button" class="btn-secondary btn-small" onclick="copyPreviousItem(${index})" style="box-shadow:none; padding:4px 8px; font-size:0.75rem;">🔄 Copy Above</button>` : ''}
+                        </div>
                         <div class="ply-inputs-container" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 5px;">
                             <span style="color: var(--text-secondary); font-size: 0.85rem;">Please select a Ply config first.</span>
                         </div>
@@ -1355,14 +1515,15 @@
             </div>
         `;
         document.getElementById('itemsContainer').insertAdjacentHTML('beforeend', html);
+        saveDraft();
     }
 
     function removeItemBlock(index) {
         const block = document.getElementById(`itemBlock_${index}`);
-        if(block) { block.remove(); calculateAllJobs(); }
+        if(block) { block.remove(); calculateAllJobs(); saveDraft(); }
     }
 
-    function startNewPO(silent = false) {
+    function startNewPO() {
         editingJobId = null;
         document.getElementById('poForm').reset();
         document.getElementById('jobNumber').value = '';
@@ -1371,7 +1532,7 @@
         itemCounter = 0; addItemBlock(); updateCartonWorkflow();
         document.getElementById('calcPaperSummary').textContent = '-';
         document.getElementById('calcRollsSummary').textContent = '-';
-        if (!silent) showToast("Form Reset & Cleared", 'success');
+        localStorage.removeItem('zhDraft');
     }
 
     function generateJobNumber() {
@@ -1400,30 +1561,45 @@
             offsetWrap.style.display = 'none';
             document.getElementById('laminationVarnish').required = false;
         }
+        
         let finishVal = document.getElementById('laminationVarnish').value;
         if (finishVal === 'Shine') finishVal = 'Shine Lamination';
         if (finishVal === 'Matt') finishVal = 'Matt Lamination';
-        const tasks = buildJobTasks({ cartonType: type, laminationVarnish: finishVal });
-        if (tasks.length > 0) {
-            preview.innerHTML = "<strong>Workflow Steps:</strong><br><br>" + tasks.map((t, i) => `<span class="workflow-step">${i+1}. ${t.label}</span>`).join('<span class="workflow-arrow">→</span>');
-        } else { preview.innerHTML = ''; }
+        
+        let defaultTasks = [];
+        if (type === 'Unprinted') {
+            defaultTasks = ['Reel Issue', 'Corrugation', 'Pasting', 'Rotary', 'Flexo', 'Glue (Gluing)', 'Pin', 'Drying/Bending', 'Dispatch'];
+        } else if (type === 'Flexo') {
+            defaultTasks = ['Reel Issue', 'Corrugation', 'Pasting', 'Rotary', 'Flexo', 'Flexo Printing', 'Glue (Gluing)', 'Pin', 'Drying/Bending', 'Dispatch'];
+        } else if (type === 'Offset') {
+            const finish = finishVal || 'Shine Lamination';
+            defaultTasks = ['Reel Issue', 'Offset Printing', finish, 'Corrugation', 'Pasting', 'Rotary', 'Flexo', 'Glue (Gluing)', 'Pin', 'Drying/Bending', 'Dispatch'];
+        }
+
+        if (defaultTasks.length > 0) {
+            const tasksHtml = defaultTasks.map(t => `
+                <label class="custom-cb-label">
+                    <input type="checkbox" class="workflow-checkbox" value="${t}" checked> ${t}
+                </label>
+            `).join('');
+            preview.innerHTML = tasksHtml;
+        } else {
+            preview.innerHTML = '';
+        }
+        saveDraft();
     }
 
-    function buildJobTasks(sel, previousTasks) {
-        let tasks = [];
-        if (!sel.cartonType) return tasks;
-        if (sel.cartonType === 'Unprinted') {
-            tasks = ['Reel Issue', 'Corrugation', 'Pasting', 'Rotary', 'Flexo', 'Glue (Gluing)', 'Pin', 'Drying/Bending', 'Dispatch'];
-        } else if (sel.cartonType === 'Flexo') {
-            tasks = ['Reel Issue', 'Corrugation', 'Pasting', 'Rotary', 'Flexo', 'Flexo Printing', 'Glue (Gluing)', 'Pin', 'Drying/Bending', 'Dispatch'];
-        } else if (sel.cartonType === 'Offset') {
-            const finish = sel.laminationVarnish || 'Shine Lamination';
-            tasks = ['Reel Issue', 'Offset Printing', finish, 'Corrugation', 'Pasting', 'Rotary', 'Flexo', 'Glue (Gluing)', 'Pin', 'Drying/Bending', 'Dispatch'];
-        }
-        let mapped = tasks.map((label, idx) => ({ id: `task_${idx}`, label: label, done: false }));
-        if (previousTasks && previousTasks.length) {
+    function buildJobTasks(existingTasks) {
+        // Read directly from the checked boxes in the DOM instead of defaulting
+        const checkboxes = document.querySelectorAll('.workflow-checkbox:checked');
+        let selectedTasks = Array.from(checkboxes).map(cb => cb.value);
+        
+        let mapped = selectedTasks.map((label, idx) => ({ id: `task_${idx}`, label: label, done: false }));
+        
+        // Retain completed status if editing
+        if (existingTasks && existingTasks.length) {
             mapped.forEach(t => {
-                const prev = previousTasks.find(p => p.label === t.label);
+                const prev = existingTasks.find(p => p.label === t.label);
                 if (prev) { t.done = !!prev.done; t.completedBy = prev.completedBy; t.completedAt = prev.completedAt; }
             });
         }
@@ -1478,7 +1654,10 @@
         if (itemsArray.length === 0) { showToast("Please add at least one item.", "error"); return; }
         if (missingSpecs) { showToast("Please complete the Paper Specifications for all items.", "error"); return; }
 
-        const sel = { cartonType: type, laminationVarnish: finishVal };
+        // Read dynamic checkboxes to build tasks array
+        const checkboxes = document.querySelectorAll('.workflow-checkbox:checked');
+        if (checkboxes.length === 0) { showToast("Please select at least one workflow step.", "error"); return; }
+
         const baseFields = {
             jobNumber: jobNo, date: document.getElementById('poDate').value, targetDeliveryDate: document.getElementById('targetDeliveryDate').value,
             party: partyInput, po: document.getElementById('poNumber').value, items: itemsArray,
@@ -1490,11 +1669,11 @@
             const idx = allJobs.findIndex(j => j.id === editingJobId);
             if (idx !== -1) {
                 const existing = allJobs[idx];
-                const tasks = buildJobTasks(sel, existing.tasks);
+                const tasks = buildJobTasks(existing.tasks);
                 allJobs[idx] = Object.assign({}, existing, baseFields, { tasks, status: tasks.every(t=>t.done) ? 'Completed' : 'Pending' });
             }
         } else {
-            const tasks = buildJobTasks(sel);
+            const tasks = buildJobTasks();
             allJobs.push(Object.assign({ id: Date.now() + Math.floor(Math.random() * 1000) }, baseFields, { tasks, status: 'Pending' }));
         }
 
@@ -1502,16 +1681,14 @@
         document.getElementById('jobNumber').value = jobNo;
         const savedId = editingJobId || allJobs[allJobs.length-1].id;
 
+        localStorage.removeItem('zhDraft'); // wipe draft on success
+
         if (action === 'print') {
-            startNewPO(true); 
+            startNewPO(); // Bypass animation for printing
             printJobCard(savedId); 
         } else {
-            const overlay = document.getElementById('successOverlay');
-            overlay.style.display = 'flex';
-            setTimeout(() => {
-                overlay.style.display = 'none';
-                startNewPO(true);
-            }, 1000); 
+            showToast("Job Card Saved", "success");
+            startNewPO();
         }
     }
 
@@ -1560,6 +1737,14 @@
         calculateAllJobs();
         switchPage('new-po');
         showToast("Editing Job Card " + job.jobNumber, "success");
+    }
+
+    function duplicateJob(id) {
+        editJob(id);
+        editingJobId = null; // Clear ID to force new save
+        document.getElementById('jobNumber').value = ''; // Force new job number generator
+        document.getElementById('poDate').valueAsDate = new Date();
+        showToast("Job Duplicated as New Draft", "success");
     }
 
     // ===== DASHBOARD CHARTS & JOB FILTERING =====
@@ -1711,7 +1896,22 @@
             const dimStr = job.items && job.items.length > 1 ? 'Multiple Sizes' : (job.items ? `${job.items[0].dimensions.L}×${job.items[0].dimensions.W}×${job.items[0].dimensions.H}` : `${job.dimensions.L}×${job.dimensions.W}×${job.dimensions.H}`);
             
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td class="cb-cell"><input type="checkbox" class="job-cb" value="${job.id}"></td><td>${job.date}</td><td><strong>${job.jobNumber}</strong><br><small style="color:var(--text-secondary)">PO: ${job.po}</small></td><td>${job.party}</td><td>${itemsStr}</td><td>${qtyTotal}</td><td>${dimStr}</td><td><span class="status-badge ${job.status === 'Completed' ? 'status-completed' : 'status-pending'}">${currentStage}</span></td><td style="white-space: nowrap;"><button class="btn-primary btn-small" onclick="viewJob(${job.id})">Open</button> <button class="btn-danger btn-small" onclick="deleteJob(${job.id})">Del</button></td>`;
+            tr.setAttribute('data-type', job.cartonType);
+            tr.innerHTML = `
+                <td class="cb-cell"><input type="checkbox" class="job-cb" value="${job.id}"></td>
+                <td>${job.date}</td>
+                <td><strong>${job.jobNumber}</strong><br><small style="color:var(--text-secondary)">PO: ${job.po}</small></td>
+                <td>${job.party}</td>
+                <td>${itemsStr}</td>
+                <td>${qtyTotal}</td>
+                <td>${dimStr}</td>
+                <td><span class="status-badge ${job.status === 'Completed' ? 'status-completed' : 'status-pending'}">${currentStage}</span></td>
+                <td style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn-primary btn-small" onclick="viewJob(${job.id})" title="View Flow">🔍 Flow</button> 
+                    <button class="btn-warning btn-small" onclick="editJob(${job.id})" title="Edit Job">✏️ Edit</button> 
+                    <button class="btn-secondary btn-small" onclick="duplicateJob(${job.id})" title="Duplicate Job">📄 Dup</button> 
+                    <button class="btn-danger btn-small" onclick="deleteJob(${job.id})" title="Delete Job">🗑️ Del</button>
+                </td>`;
             frag.appendChild(tr);
         });
         tbody.innerHTML = ''; tbody.appendChild(frag);
@@ -1768,6 +1968,7 @@
 
             const card = document.createElement('div');
             card.className = 'status-card';
+            card.setAttribute('data-type', job.cartonType);
             card.innerHTML = `
                 <div class="status-card-header">
                     <div>
@@ -1884,6 +2085,7 @@
             const qtyTotal = job.items ? job.items.reduce((s, i) => s + (parseInt(i.quantity)||0), 0) : job.quantity;
 
             const tr = document.createElement('tr');
+            tr.setAttribute('data-type', job.cartonType);
             if (task.done) tr.style.opacity = '0.6';
 
             tr.innerHTML = `
@@ -1909,7 +2111,7 @@
 
     function advanceJobTask(event, jobId, taskId) { 
         const row = event.target.closest('tr');
-        if(row) row.style.display = 'none';
+        if(row) row.style.display = 'none'; // Instant snappy feedback
         toggleTask(jobId, taskId, true); 
     }
 
@@ -2076,7 +2278,7 @@
         triggerPrint(html);
     }
 
-    function printSelectedConsolidated() {
+    function printSelectedConsolidated(printType) {
         const selectedIds = Array.from(document.querySelectorAll('.job-cb:checked')).map(cb => parseInt(cb.value));
         if (selectedIds.length === 0) { showToast('Please select at least one job.', 'error'); return; }
         const jobs = allJobs.filter(j => selectedIds.includes(j.id));
@@ -2119,55 +2321,97 @@
         const parties = Array.from(new Set(jobs.map(j => j.party))).join(', ');
         const pos = Array.from(new Set(jobs.map(j => j.po))).join(', ');
 
-        const html = `
-            <div class="a4-print-layout">
-                <div class="print-sec-1">
-                    <div class="print-header">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <img src="Logo.jpeg" alt="Zafar Habib Logo" class="print-logo-main" onerror="this.style.display='none'">
-                            <div><div class="print-company">Zafar Habib Packages (Pvt) Ltd</div><div class="print-title">CONSOLIDATED BATCH CARD</div></div>
+        let printTemplate = '';
+
+        if (printType === 'paper') {
+            printTemplate = `
+                <div class="a4-print-layout">
+                    <div class="print-sec-1" style="height: auto; border: none;">
+                        <div class="print-header">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <img src="Logo.jpeg" alt="Zafar Habib Logo" class="print-logo-main" onerror="this.style.display='none'">
+                                <div><div class="print-company">Zafar Habib Packages (Pvt) Ltd</div><div class="print-title">BATCH MATERIAL SLIP</div></div>
+                            </div>
+                            <div style="text-align: right;"><div class="print-job-no" style="font-size:12pt;">PAPER ONLY</div><div class="print-date">Date: ${new Date().toLocaleDateString()}</div></div>
                         </div>
-                        <div style="text-align: right;"><div class="print-job-no" style="font-size:12pt;">BATCH PRINT</div><div class="print-date">Date: ${new Date().toLocaleDateString()}</div></div>
-                    </div>
-                    <div class="print-grid-4" style="margin-bottom: 4px;">
-                        <div class="print-field" style="grid-column: span 2;"><strong>Customer(s):</strong> <span>${parties}</span></div>
-                        <div class="print-field"><strong>PO Number(s):</strong> <span>${pos}</span></div>
-                        <div class="print-field"><strong>Total Master Qty:</strong> <span>${totalQty}</span></div>
-                    </div>
-                    <div style="font-size: 8pt; font-weight: bold; margin-bottom: 2px;">All Items in Batch:</div>
-                    <table class="print-table" style="margin-top:0;">
-                        <thead><tr><th>Job #</th><th>Item</th><th>Size</th><th>Qty</th><th>Roll Size</th><th>Cut Length</th></tr></thead>
-                        <tbody>${jobRowsHtml}</tbody>
-                    </table>
-                </div>
-                <div class="print-bottom-wrap clearfix">
-                    <div class="print-sec-2">
-                        <div class="print-header-small">
-                            <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">MATERIAL ISSUE SLIP</div></div>
-                            <div style="text-align: right; font-weight: bold; font-size:10pt;">CONSOLIDATED</div>
-                        </div>
-                        <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos} <br><strong>Total Batch Qty:</strong> ${totalQty}</div>
-                        <table class="print-table" style="margin-bottom: auto;">
-                            <tr><th colspan="2">Paper Requirement Breakdown</th></tr>
+                        <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos}</div>
+                        <table class="print-table" style="margin-bottom: 20px;">
+                            <tr><th colspan="2">Consolidated Paper Requirement Breakdown</th></tr>
                             ${htmlContentPaper || '<tr><td colspan="2" style="text-align:center;">No paper required</td></tr>'}
                         </table>
                         <div class="print-signatures"><div class="sig-line">Issued By</div><div class="sig-line">Received By</div></div>
                     </div>
-                    <div class="print-sec-3">
-                        <div class="print-header-small">
-                            <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">CORRUGATION WORK ORDER</div></div>
-                            <div style="text-align: right; font-weight: bold; font-size:10pt;">CONSOLIDATED</div>
+                </div>`;
+        } else if (printType === 'rolls') {
+            printTemplate = `
+                <div class="a4-print-layout">
+                    <div class="print-sec-1" style="height: auto; border: none;">
+                        <div class="print-header">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <img src="Logo.jpeg" alt="Zafar Habib Logo" class="print-logo-main" onerror="this.style.display='none'">
+                                <div><div class="print-company">Zafar Habib Packages (Pvt) Ltd</div><div class="print-title">BATCH CORRUGATION W.O.</div></div>
+                            </div>
+                            <div style="text-align: right;"><div class="print-job-no" style="font-size:12pt;">ROLLS ONLY</div><div class="print-date">Date: ${new Date().toLocaleDateString()}</div></div>
                         </div>
-                        <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos} <br><strong>Total Batch Qty:</strong> ${totalQty}</div>
-                        <table class="print-table" style="margin-bottom: auto;">
-                            <tr><th colspan="2">Paired Roll Setup Breakdown</th></tr>
+                        <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos}</div>
+                        <table class="print-table" style="margin-bottom: 20px;">
+                            <tr><th colspan="2">Consolidated Paired Roll Setup Breakdown</th></tr>
                             ${htmlContentRolls || '<tr><td colspan="2" style="text-align:center;">No rolls required</td></tr>'}
                         </table>
                         <div class="print-signatures"><div class="sig-line">Operator</div><div class="sig-line">QC Check</div></div>
                     </div>
-                </div>
-            </div>`;
-        triggerPrint(html);
+                </div>`;
+        } else {
+            printTemplate = `
+                <div class="a4-print-layout">
+                    <div class="print-sec-1">
+                        <div class="print-header">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <img src="Logo.jpeg" alt="Zafar Habib Logo" class="print-logo-main" onerror="this.style.display='none'">
+                                <div><div class="print-company">Zafar Habib Packages (Pvt) Ltd</div><div class="print-title">CONSOLIDATED BATCH CARD</div></div>
+                            </div>
+                            <div style="text-align: right;"><div class="print-job-no" style="font-size:12pt;">BATCH PRINT</div><div class="print-date">Date: ${new Date().toLocaleDateString()}</div></div>
+                        </div>
+                        <div class="print-grid-4" style="margin-bottom: 4px;">
+                            <div class="print-field" style="grid-column: span 2;"><strong>Customer(s):</strong> <span>${parties}</span></div>
+                            <div class="print-field"><strong>PO Number(s):</strong> <span>${pos}</span></div>
+                            <div class="print-field"><strong>Total Master Qty:</strong> <span>${totalQty}</span></div>
+                        </div>
+                        <div style="font-size: 8pt; font-weight: bold; margin-bottom: 2px;">All Items in Batch:</div>
+                        <table class="print-table" style="margin-top:0;">
+                            <thead><tr><th>Job #</th><th>Item</th><th>Size</th><th>Qty</th><th>Roll Size</th><th>Cut Length</th></tr></thead>
+                            <tbody>${jobRowsHtml}</tbody>
+                        </table>
+                    </div>
+                    <div class="print-bottom-wrap clearfix">
+                        <div class="print-sec-2">
+                            <div class="print-header-small">
+                                <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">MATERIAL ISSUE SLIP</div></div>
+                                <div style="text-align: right; font-weight: bold; font-size:10pt;">CONSOLIDATED</div>
+                            </div>
+                            <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos} <br><strong>Total Batch Qty:</strong> ${totalQty}</div>
+                            <table class="print-table" style="margin-bottom: auto;">
+                                <tr><th colspan="2">Paper Requirement Breakdown</th></tr>
+                                ${htmlContentPaper || '<tr><td colspan="2" style="text-align:center;">No paper required</td></tr>'}
+                            </table>
+                            <div class="print-signatures"><div class="sig-line">Issued By</div><div class="sig-line">Received By</div></div>
+                        </div>
+                        <div class="print-sec-3">
+                            <div class="print-header-small">
+                                <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">CORRUGATION WORK ORDER</div></div>
+                                <div style="text-align: right; font-weight: bold; font-size:10pt;">CONSOLIDATED</div>
+                            </div>
+                            <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos} <br><strong>Total Batch Qty:</strong> ${totalQty}</div>
+                            <table class="print-table" style="margin-bottom: auto;">
+                                <tr><th colspan="2">Paired Roll Setup Breakdown</th></tr>
+                                ${htmlContentRolls || '<tr><td colspan="2" style="text-align:center;">No rolls required</td></tr>'}
+                            </table>
+                            <div class="print-signatures"><div class="sig-line">Operator</div><div class="sig-line">QC Check</div></div>
+                        </div>
+                    </div>
+                </div>`;
+        }
+        triggerPrint(printTemplate);
     }
 </script>
 </body>
