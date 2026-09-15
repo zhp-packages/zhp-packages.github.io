@@ -66,6 +66,7 @@
     @keyframes popIn { from { opacity: 0; transform: scale(.92) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
     @keyframes slideInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
     @keyframes slideOutRight { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(30px); } }
+    @keyframes successPop { 0% { transform: scale(0.5); opacity: 0; } 60% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
 
     /* Logo & Brand */
     .logo-mark { display: block; width: auto; height: 48px; object-fit: contain; background: #ffffff; padding: 4px 8px; border-radius: 8px; box-shadow: var(--shadow-sm); transition: transform .4s var(--ease); will-change: transform; }
@@ -217,7 +218,7 @@
     [data-theme="dark"] .stage-badge { background: rgba(255,255,255,0.1); }
 
     /* Status Board Horizontal Timeline */
-    .status-timeline { display: flex; gap: 6px; margin-top: 15px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: thin; align-items: center; }
+    .status-timeline { display: flex; gap: 6px; margin-top: 15px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: thin; align-items: center; scroll-behavior: smooth;}
     .status-timeline::-webkit-scrollbar { height: 6px; }
     .status-timeline::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
     .status-timeline-step { font-size: 0.65rem; font-weight: 700; padding: 4px 8px; border-radius: 10px; background: var(--bg-tertiary); color: var(--text-secondary); white-space: nowrap; border: 1px solid var(--border); }
@@ -240,6 +241,12 @@
     .progress-circle { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
     .progress-circle-inner { width: 38px; height: 38px; border-radius: 50%; background: var(--bg-primary); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; color: var(--text-primary); }
 
+    /* Success Overlay Animation */
+    .success-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+    .success-box { background: var(--bg-primary); padding: 3rem; border-radius: var(--radius-lg); text-align: center; box-shadow: var(--shadow-lg); animation: successPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    .success-icon { font-size: 5rem; margin-bottom: 1rem; display: block; color: var(--success); }
+    .success-text { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); font-family: var(--font-display); }
+
     /* Toast Notification System */
     .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; pointer-events: none;}
     .toast { padding: 14px 24px; border-radius: 12px; font-weight: 800; font-size: 0.95rem; color: #fff; background: var(--primary); box-shadow: var(--shadow-lg); animation: slideInRight 0.4s var(--ease) forwards; display: flex; align-items: center; gap: 10px; }
@@ -257,7 +264,7 @@
     
     .chart-box { background: var(--bg-primary); padding: 2rem; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow); transition: transform 0.4s var(--ease); display: flex; flex-direction: column;}
     .chart-box:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
-
+    
     /* Settings Page */
     .theme-card { border: 2px solid var(--border); border-radius: 12px; padding: 1rem; cursor: pointer; transition: all .4s var(--ease); display: flex; flex-direction: column; gap: 10px; background: var(--bg-primary);}
     .theme-card:hover { border-color: var(--primary-accent); transform: translateY(-4px); box-shadow: var(--shadow-sm); }
@@ -277,7 +284,7 @@
     .print-info-block strong { color: #222; }
 
     /* =========================================
-       PRINT STYLES - Fixed Heights, No Overlap
+       PRINT STYLES - Safe Non-Overlapping Engine
        ========================================= */
     .print-only { display: none; }
     
@@ -291,12 +298,10 @@
 
         .a4-print-layout { display: block; width: 100%; box-sizing: border-box; background: #fff; font-family: sans-serif; overflow: hidden; height: 287mm;}
 
-        /* Locking the heights guarantees the bottom never gets pushed off page or overlapped */
-        .print-sec-1 { border-bottom: 2px dashed #000; padding-bottom: 5mm; margin-bottom: 5mm; display: block; width: 100%; height: 130mm; overflow: hidden;}
-        
+        /* Exact 50/50 Split for A4 constraints */
+        .print-sec-1 { border-bottom: 2px dashed #000; padding-bottom: 5mm; margin-bottom: 5mm; display: block; width: 100%; height: 140mm; overflow: hidden;}
         .print-bottom-wrap { display: block; width: 100%; height: 140mm; overflow: hidden; }
-        .print-sec-2 { width: 50%; padding-right: 5mm; border-right: 2px dashed #000; box-sizing: border-box; float: left; height: 100%;}
-        .print-sec-3 { width: 50%; padding-left: 5mm; box-sizing: border-box; float: right; height: 100%;}
+        .print-sec-2 { width: 100%; box-sizing: border-box; }
 
         .print-header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 12px; align-items: flex-end; }
         .print-title { font-size: 16pt; font-weight: 800; text-transform: uppercase; margin-bottom: 2px; color: #000;}
@@ -313,7 +318,7 @@
         .print-table tr { page-break-inside: avoid; page-break-after: auto; }
         .print-table thead { display: table-header-group; }
 
-        .print-signatures { display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; }
+        .print-signatures { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px; }
         .sig-line { border-top: 1px solid #000; width: 45%; text-align: center; font-size: 9pt; font-weight: bold; padding-top: 4px; color: #000; }
 
         .print-logo-main { height: 40px; width: auto; object-fit: contain; }
@@ -326,6 +331,14 @@
 <!-- TOAST NOTIFICATION CONTAINER -->
 <div id="toastContainer" class="toast-container"></div>
 
+<!-- SUCCESS OVERLAY (For saving) -->
+<div class="success-overlay" id="successOverlay">
+    <div class="success-box">
+        <span class="success-icon">✓</span>
+        <div class="success-text">Success!</div>
+    </div>
+</div>
+
 <!-- LOGIN SCREEN -->
 <div class="login-screen" id="loginScreen">
     <div class="login-box">
@@ -334,7 +347,7 @@
             <h1>Zafar Habib Packages</h1>
             <p>Production &amp; PO Management</p>
         </div>
-        <div class="login-error" id="loginError">⚠️ Invalid Username or Password</div>
+        <div class="login-error" id="loginError">⚠ Invalid Username or Password</div>
         <form id="loginForm" onsubmit="handleLogin(event)">
             <div class="form-group-wrapper" style="margin-bottom: 1.5rem; text-align: left;">
                 <label>User Account</label>
@@ -363,20 +376,20 @@
                 </div>
             </div>
             <div class="navbar-right">
-                <button class="theme-toggle" onclick="switchPage('settings')">⚙️ Settings</button>
-                <button class="logout-btn" onclick="handleLogout()">🚪 Logout</button>
+                <button class="theme-toggle" onclick="switchPage('settings')">⛭ Settings</button>
+                <button class="logout-btn" onclick="handleLogout()">⎋ Logout</button>
             </div>
         </nav>
 
         <!-- MAIN CONTENT -->
         <div class="main-content">
             <div class="nav-tabs">
-                <button class="nav-tab active" data-page="dashboard" onclick="switchPage('dashboard')">📊 Dashboard</button>
-                <button class="nav-tab" data-page="new-po" onclick="switchPage('new-po')">➕ New Job Card</button>
-                <button class="nav-tab" data-page="jobs" onclick="switchPage('jobs'); clearJobFilters('jobs');">📋 Detailed Job View</button>
-                <button class="nav-tab" data-page="production-board" onclick="switchPage('production-board')">🎬 Production Board</button>
-                <button class="nav-tab" data-page="status-board" onclick="switchPage('status-board')">🟢 Status Board</button>
-                <button class="nav-tab" data-page="settings" onclick="switchPage('settings')" style="margin-left: auto;">⚙️ Settings</button>
+                <button class="nav-tab active" data-page="dashboard" onclick="switchPage('dashboard')">◱ Dashboard</button>
+                <button class="nav-tab" data-page="new-po" onclick="switchPage('new-po')">＋ New Job Card</button>
+                <button class="nav-tab" data-page="jobs" onclick="switchPage('jobs'); clearJobFilters('jobs');">☰ Detailed Job View</button>
+                <button class="nav-tab" data-page="production-board" onclick="switchPage('production-board')">⛭ Production Board</button>
+                <button class="nav-tab" data-page="status-board" onclick="switchPage('status-board')">◉ Status Board</button>
+                <button class="nav-tab" data-page="settings" onclick="switchPage('settings')" style="margin-left: auto;">⛭ Settings</button>
             </div>
 
             <!-- DASHBOARD -->
@@ -448,7 +461,7 @@
                         <form id="poForm" onsubmit="event.preventDefault();">
                             <!-- ORDER INFO -->
                             <div class="form-section">
-                                <div class="form-section-title"><span>📅</span> Master Order Information</div>
+                                <div class="form-section-title"><span>🗓</span> Master Order Information</div>
                                 <div class="form-row">
                                     <div class="form-group-wrapper">
                                         <label>Job Number (Auto-Generated)</label>
@@ -478,18 +491,18 @@
 
                             <!-- MULTI-ITEM CONTAINER -->
                             <div class="form-section">
-                                <div class="form-section-title"><span>📦</span> Product Specifications</div>
+                                <div class="form-section-title"><span>🗃</span> Product Specifications</div>
                                 
                                 <div id="itemsContainer"></div>
 
                                 <div style="text-align: right; margin-top: 1rem;">
-                                    <button type="button" class="btn-secondary" onclick="addItemBlock()">➕ Add Another Item</button>
+                                    <button type="button" class="btn-secondary" onclick="addItemBlock()">＋ Add Another Item</button>
                                 </div>
                             </div>
 
                             <!-- WORKFLOW & SUMMARY -->
                             <div class="form-section">
-                                <div class="form-section-title"><span>⚙️</span> Master Production Workflow</div>
+                                <div class="form-section-title"><span>⛭</span> Master Production Workflow</div>
                                 <div class="form-row">
                                     <div class="form-group-wrapper">
                                         <label class="required">Workflow Process</label>
@@ -512,7 +525,7 @@
                                 <div id="workflowPreview" class="custom-checkbox-grid" style="margin-top: 1.5rem;"></div>
 
                                 <!-- AUTO CALCULATED GLOBAL PAPER & ROLLS -->
-                                <h3 style="margin-top: 2.5rem; margin-bottom: 1.5rem; color: var(--text-primary); font-family: var(--font-display);">📊 Global Job Requirements</h3>
+                                <h3 style="margin-top: 2.5rem; margin-bottom: 1.5rem; color: var(--text-primary); font-family: var(--font-display);">▤ Global Job Requirements</h3>
                                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
                                     <div style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: 12px; border: 2px solid var(--border);">
                                         <strong style="color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 10px; display: block;">COMBINED MATERIAL ISSUE SLIP (PAPER)</strong>
@@ -526,9 +539,9 @@
                             </div>
 
                             <div class="button-group">
-                                <button type="button" class="btn-success" onclick="submitForm('save')" style="font-size: 1.05rem; padding: 1rem 2rem;">💾 Just Save</button>
-                                <button type="button" class="btn-print" onclick="submitForm('print')" style="font-size: 1.05rem; padding: 1rem 2rem;">🖨️ Save &amp; Print Job Card</button>
-                                <button type="button" class="btn-danger btn-small" onclick="startNewPO(false)" style="margin-left: auto;">🔄 Clear Form</button>
+                                <button type="button" class="btn-success" onclick="submitForm('save')" style="font-size: 1.05rem; padding: 1rem 2rem;">🖫 Just Save</button>
+                                <button type="button" class="btn-print" onclick="submitForm('print')" style="font-size: 1.05rem; padding: 1rem 2rem;">🖨 Save &amp; Print Job Card</button>
+                                <button type="button" class="btn-danger btn-small" onclick="startNewPO(false)" style="margin-left: auto;">⟳ Clear Form</button>
                             </div>
                         </form>
                     </div>
@@ -540,11 +553,11 @@
                 <div class="table-container">
                     <div class="table-header">
                         <div class="table-header-top">
-                            <h3>📋 Detailed Job View <span id="jobsFilterLabel" style="font-size: 0.95rem; font-weight: normal; color: var(--text-secondary); margin-left: 10px; background: var(--bg-primary); padding: 4px 10px; border-radius: 12px;"></span></h3>
+                            <h3>☰ Detailed Job View <span id="jobsFilterLabel" style="font-size: 0.95rem; font-weight: normal; color: var(--text-secondary); margin-left: 10px; background: var(--bg-primary); padding: 4px 10px; border-radius: 12px;"></span></h3>
                             <div style="display:flex; gap:10px;">
-                                <button class="btn-print btn-small" onclick="printSelectedConsolidated('paper')" style="background:var(--primary-accent);">🖨️ Print Batch Paper</button>
-                                <button class="btn-print btn-small" onclick="printSelectedConsolidated('rolls')" style="background:var(--warning);">🖨️ Print Batch Rolls</button>
-                                <button class="btn-print btn-small" onclick="printSelectedConsolidated('full')">🖨️ Print Master Batch</button>
+                                <button class="btn-print btn-small" onclick="printSelectedConsolidated('paper')" style="background:var(--primary-accent);">🖨 Print Batch Paper</button>
+                                <button class="btn-print btn-small" onclick="printSelectedConsolidated('rolls')" style="background:var(--warning);">🖨 Print Batch Rolls</button>
+                                <button class="btn-print btn-small" onclick="printSelectedConsolidated('full')">🖨 Print Master Batch</button>
                             </div>
                         </div>
                         <div class="filter-bar">
@@ -584,7 +597,7 @@
             <div id="production-board" class="page">
                 <div class="page-heading">
                     <div>
-                        <h2>🎬 Production Board</h2>
+                        <h2>⛭ Production Board</h2>
                         <p>Track jobs through each active manufacturing step.</p>
                     </div>
                 </div>
@@ -593,8 +606,8 @@
                     <input type="text" id="pbFilterPO" placeholder="Filter by PO or Job #..." oninput="renderProdBoardTable()">
                     <input type="text" id="pbFilterParty" placeholder="Filter by Customer..." oninput="renderProdBoardTable()">
                     <select id="pbViewMode" onchange="renderProdBoardTable()" style="margin-left:auto; background:var(--primary-soft); color:var(--primary-light); font-weight:800;">
-                        <option value="pending">⏳ Current &amp; Incoming Jobs</option>
-                        <option value="completed">✅ Completed in this Step</option>
+                        <option value="pending">⏱ Current &amp; Incoming Jobs</option>
+                        <option value="completed">✓ Completed in this Step</option>
                     </select>
                     <button class="btn-secondary" onclick="clearJobFilters('pb')">Reset Filters</button>
                 </div>
@@ -631,7 +644,7 @@
             <div id="status-board" class="page">
                 <div class="page-heading">
                     <div>
-                        <h2>🟢 Status Board</h2>
+                        <h2>◉ Status Board</h2>
                         <p>Live percentage tracking and pipeline visibility for all jobs.</p>
                     </div>
                 </div>
@@ -656,7 +669,7 @@
             <div id="settings" class="page">
                 <div class="page-heading">
                     <div>
-                        <h2>⚙️ Application Settings</h2>
+                        <h2>⚙ Application Settings</h2>
                         <p>Manage preferences, users, customers, and visual themes.</p>
                     </div>
                 </div>
@@ -689,23 +702,23 @@
                         <div class="form-body" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                             <div class="theme-card" onclick="setAppTheme('light')">
                                 <div class="theme-colors"><div class="tc-1" style="background:#0f172a"></div><div class="tc-2" style="background:#3b82f6"></div><div class="tc-3" style="background:#f8fafc"></div></div>
-                                <strong>☀️ Clean Light</strong>
+                                <strong>☼ Clean Light</strong>
                             </div>
                             <div class="theme-card" onclick="setAppTheme('dark')">
                                 <div class="theme-colors"><div class="tc-1" style="background:#1e293b"></div><div class="tc-2" style="background:#3b82f6"></div><div class="tc-3" style="background:#0f172a"></div></div>
-                                <strong>🌙 Slate Dark</strong>
+                                <strong>☾ Slate Dark</strong>
                             </div>
                             <div class="theme-card" onclick="setAppTheme('midnight')">
                                 <div class="theme-colors"><div class="tc-1" style="background:#082f49"></div><div class="tc-2" style="background:#0ea5e9"></div><div class="tc-3" style="background:#020617"></div></div>
-                                <strong>🌌 Midnight Ocean</strong>
+                                <strong>✧ Midnight Ocean</strong>
                             </div>
                             <div class="theme-card" onclick="setAppTheme('forest')">
                                 <div class="theme-colors"><div class="tc-1" style="background:#064e3b"></div><div class="tc-2" style="background:#10b981"></div><div class="tc-3" style="background:#052e16"></div></div>
-                                <strong>🌲 Emerald Forest</strong>
+                                <strong>↟ Emerald Forest</strong>
                             </div>
                             <div class="theme-card" onclick="setAppTheme('sunset')">
                                 <div class="theme-colors"><div class="tc-1" style="background:#7c2d12"></div><div class="tc-2" style="background:#f97316"></div><div class="tc-3" style="background:#18181b"></div></div>
-                                <strong>🌅 Sunset Orange</strong>
+                                <strong>☀ Sunset Orange</strong>
                             </div>
                         </div>
                     </div>
@@ -718,7 +731,7 @@
                         <div class="form-body">
                             <form onsubmit="handleAddParty(event)" style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
                                 <input type="text" id="newPartyNameDb" placeholder="Add New Customer..." required style="flex: 1; text-transform: uppercase;">
-                                <button type="submit" class="btn-primary">➕ Add</button>
+                                <button type="submit" class="btn-primary">＋ Add</button>
                             </form>
                             <div style="max-height: 300px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px;">
                                 <table style="width: 100%; border-collapse: collapse;">
@@ -737,7 +750,7 @@
                             <form onsubmit="handleAddUser(event)" style="display: flex; gap: 1rem; margin-bottom: 2rem;">
                                 <input type="text" id="newUserName" placeholder="New Username" required style="flex: 1;">
                                 <input type="text" id="newUserPass" placeholder="Password" required style="flex: 1;">
-                                <button type="submit" class="btn-success">➕ Add</button>
+                                <button type="submit" class="btn-success">＋ Add</button>
                             </form>
                             <table style="width: 100%; border-collapse: collapse;">
                                 <thead><tr><th style="padding: 10px; border-bottom: 2px solid var(--border); background: transparent;">User</th><th style="padding: 10px; border-bottom: 2px solid var(--border); background: transparent;">Pass</th><th style="padding: 10px; border-bottom: 2px solid var(--border); width: 60px; background: transparent;">Action</th></tr></thead>
@@ -752,8 +765,8 @@
                             <h2 style="font-size: 1.2rem;">Data Management</h2>
                         </div>
                         <div class="form-body" style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                            <button class="btn-primary" onclick="exportData()" style="flex: 1; min-width: 250px;">📥 Backup Database (Download JSON)</button>
-                            <button class="btn-danger" onclick="clearAllJobsData()" style="flex: 1; min-width: 250px;">⚠️ Wipe All Job Data</button>
+                            <button class="btn-primary" onclick="exportData()" style="flex: 1; min-width: 250px;">🖫 Backup Database (Download JSON)</button>
+                            <button class="btn-danger" onclick="clearAllJobsData()" style="flex: 1; min-width: 250px;">⚠ Wipe All Job Data</button>
                         </div>
                     </div>
 
@@ -768,17 +781,17 @@
 <div class="modal" id="jobModal" onclick="if (event.target === this) closeModal('jobModal')">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>📄 Job Details &amp; Workflow Audit</h2>
-            <button class="modal-close" onclick="closeModal('jobModal')">×</button>
+            <h2>⎘ Job Details &amp; Workflow Audit</h2>
+            <button class="modal-close" onclick="closeModal('jobModal')">✕</button>
         </div>
         <div class="modal-body">
             <div id="jobDetail"></div>
             
-            <h3 style="margin-top:2rem; font-weight:800; color:var(--text-primary);">⚙️ Complete Production Timeline</h3>
+            <h3 style="margin-top:2rem; font-weight:800; color:var(--text-primary);">⛭ Complete Production Timeline</h3>
             <div class="timeline-container" id="jobChecklist"></div>
             
             <div style="margin-top: 2rem; display: flex; justify-content:flex-end;">
-                <button class="btn-print" onclick="printJobCard(currentModalJobId)">🖨️ Print A4 Job Card</button>
+                <button class="btn-print" onclick="printJobCard(currentModalJobId)">🖨 Print A4 Job Card</button>
             </div>
         </div>
     </div>
@@ -869,7 +882,7 @@
         let container = document.getElementById('toastContainer');
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
-        toast.innerHTML = (type === 'success' ? '✅ ' : '⚠️ ') + msg;
+        toast.innerHTML = (type === 'success' ? '✓ ' : '⚠ ') + msg;
         container.appendChild(toast);
         
         setTimeout(() => { toast.classList.add('hide'); }, 3000);
@@ -986,7 +999,7 @@
         const frag = document.createDocumentFragment();
         appUsers.forEach((user, i) => {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td style="padding: 10px; border-bottom: 1px solid var(--border);"><strong>${user.u}</strong></td><td style="padding: 10px; border-bottom: 1px solid var(--border); font-family: monospace;">${user.p}</td><td style="padding: 10px; border-bottom: 1px solid var(--border);"><button type="button" class="btn-danger" style="padding: 4px 8px; font-size:0.75rem; border-radius:6px; box-shadow:none;" onclick="removeUser(${i})">Del</button></td>`;
+            tr.innerHTML = `<td style="padding: 10px; border-bottom: 1px solid var(--border);"><strong>${user.u}</strong></td><td style="padding: 10px; border-bottom: 1px solid var(--border); font-family: monospace;">${user.p}</td><td style="padding: 10px; border-bottom: 1px solid var(--border);"><button type="button" class="btn-danger" style="padding: 4px 8px; font-size:0.75rem; border-radius:6px; box-shadow:none;" onclick="removeUser(${i})">✕ Del</button></td>`;
             frag.appendChild(tr);
         });
         tbody.innerHTML = ''; tbody.appendChild(frag);
@@ -998,12 +1011,12 @@
             db.ref('zhParties').on('value', snap => {
                 const data = snap.val();
                 if (data) { appParties = data; } else { savePartiesData(appParties); }
-                renderPartiesTable();
+                populatePartyDropdown(); renderPartiesTable();
             });
         } else {
             const stored = localStorage.getItem('zhParties');
             if (stored) appParties = JSON.parse(stored);
-            renderPartiesTable();
+            populatePartyDropdown(); renderPartiesTable();
         }
     }
 
@@ -1028,7 +1041,7 @@
         
         let filtered = appParties.filter(p => p.includes(input));
         if (input && !filtered.includes(input)) {
-            filtered.push(`➕ Add "${input}" as New Customer`);
+            filtered.push(`＋ Add "${input}" as New Customer`);
         }
         
         filtered.forEach(p => {
@@ -1037,7 +1050,7 @@
             div.textContent = p;
             div.onmousedown = (e) => {
                 e.preventDefault();
-                if(p.startsWith('➕ Add')) {
+                if(p.startsWith('＋ Add')) {
                     const newParty = input;
                     appParties.push(newParty);
                     savePartiesData(appParties);
@@ -1059,7 +1072,7 @@
         const frag = document.createDocumentFragment();
         appParties.forEach((party, i) => {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td style="padding: 10px; border-bottom: 1px solid var(--border); font-weight: bold;">${party}</td><td style="padding: 10px; border-bottom: 1px solid var(--border); text-align: right; width: 120px;"><button type="button" class="btn-secondary" style="padding: 4px 8px; font-size:0.75rem; border-radius:6px; box-shadow:none; margin-right:5px;" onclick="editParty(${i})">Edit</button><button type="button" class="btn-danger" style="padding: 4px 8px; font-size:0.75rem; border-radius:6px; box-shadow:none;" onclick="removeParty(${i})">Del</button></td>`;
+            tr.innerHTML = `<td style="padding: 10px; border-bottom: 1px solid var(--border); font-weight: bold;">${party}</td><td style="padding: 10px; border-bottom: 1px solid var(--border); text-align: right; width: 120px;"><button type="button" class="btn-secondary" style="padding: 4px 8px; font-size:0.75rem; border-radius:6px; box-shadow:none; margin-right:5px;" onclick="editParty(${i})">✎ Edit</button><button type="button" class="btn-danger" style="padding: 4px 8px; font-size:0.75rem; border-radius:6px; box-shadow:none;" onclick="removeParty(${i})">✕ Del</button></td>`;
             frag.appendChild(tr);
         });
         tbody.innerHTML = ''; tbody.appendChild(frag);
@@ -1143,6 +1156,14 @@
         }
     }
 
+    function getPrintTotalPaper(text) {
+        if(!text) return '';
+        if(text.includes('TOTAL REQUIREMENT:\n')) {
+            return "TOTAL REQUIREMENT:\n" + text.split('TOTAL REQUIREMENT:\n')[1];
+        }
+        return text;
+    }
+
     // ===== MULTI-ITEM CALCULATIONS =====
     let globalPaperText = "-"; 
     let globalRollText = "-";
@@ -1165,7 +1186,6 @@
                 let grammage = parseFloat(grammageMatch[0]);
                 let multiplier = (i % 2 !== 0) ? 1.325 : 1.0;
                 let weight = (area * grammage / 1000 / 1550) * qty * multiplier;
-                // SORTING TRICK: [PaperName] - [RollSize]"
                 let key = `${spec} - ${rollSize}"`;
                 results[key] = (results[key] || 0) + weight;
             }
@@ -1237,10 +1257,8 @@
         const prevPly = prevBlock.querySelector('.item-ply').value;
         currentBlock.querySelector('.item-ply').value = prevPly;
         
-        // Trigger generation of inputs
         handlePlyChange(currentBlock.querySelector('.item-ply'));
         
-        // Copy the specific paper values
         setTimeout(() => {
             const prevInputs = prevBlock.querySelectorAll('.ply-layer-input');
             const currentInputs = currentBlock.querySelectorAll('.ply-layer-input');
@@ -1314,9 +1332,9 @@
                     const rollObj = buildRollsSummaryObj(specStr, clRounded, qty);
                     let itemRText = `${itemName}:\n`; let addedR = false;
                     for(let key in rollObj) {
-                        let rKey = `${key} | [RS: ${finalRS}" - CL: ${clRounded.toFixed(2)}"]`;
+                        let rKey = `${key} (${finalRS}/${clRounded.toFixed(2)})`;
                         globalRollObj[rKey] = (globalRollObj[rKey] || 0) + rollObj[key];
-                        itemRText += `  • [RS: ${finalRS}"] ${key} = ${(Math.round(rollObj[key] * 10) / 10).toFixed(1)} Rolls\n`;
+                        itemRText += `  • ${key.padEnd(20, ' ')} (${finalRS}/${clRounded.toFixed(2)})`.padEnd(45, ' ') + `${Number(rollObj[key]).toFixed(1)} Rolls\n`;
                         addedR = true;
                     }
                     if(addedR) perItemRollText += itemRText + '\n';
@@ -1332,14 +1350,17 @@
 
         // Sorted outputs
         if(Object.keys(globalPaperObj).length > 0) {
-            let finalPaperText = blocks.length > 1 ? perItemPaperText + "------------------\nTOTAL REQUIREMENT:\n" : "";
+            let finalPaperText = blocks.length > 1 ? perItemPaperText + "------------------\nTOTAL REQUIREMENT:\n" : "TOTAL REQUIREMENT:\n";
             for(let key of Object.keys(globalPaperObj).sort()) { finalPaperText += `${key} = ${Math.ceil(globalPaperObj[key])} KGs\n`; }
             globalPaperText = finalPaperText; document.getElementById('calcPaperSummary').textContent = globalPaperText;
         } else { globalPaperText = "-"; document.getElementById('calcPaperSummary').textContent = "-"; }
 
         if(Object.keys(globalRollObj).length > 0) {
-            let finalRollText = blocks.length > 1 ? perItemRollText + "------------------\nTOTAL REQUIREMENT:\n" : "";
-            for(let key of Object.keys(globalRollObj).sort()) { finalRollText += `• ${key} = ${(Math.round(globalRollObj[key] * 10) / 10).toFixed(1)} Rolls\n`; }
+            let finalRollText = blocks.length > 1 ? perItemRollText + "------------------\nTOTAL REQUIREMENT:\n" : "TOTAL REQUIREMENT:\n";
+            for(let key of Object.keys(globalRollObj).sort()) { 
+                let paddedKey = key.padEnd(35, ' ');
+                finalRollText += `${paddedKey} ${Number(globalRollObj[key]).toFixed(1)} Rolls\n`; 
+            }
             globalRollText = finalRollText; document.getElementById('calcRollsSummary').textContent = globalRollText;
         } else { globalRollText = "-"; document.getElementById('calcRollsSummary').textContent = "-"; }
         
@@ -1348,7 +1369,7 @@
 
     // ===== DRAFTS (AUTO-SAVE) =====
     function saveDraft() {
-        if(editingJobId) return; // Do not auto-save over an existing job
+        if(editingJobId) return; 
         
         let itemsArray = [];
         const blocks = document.querySelectorAll('.item-block');
@@ -1437,8 +1458,8 @@
         const html = `
             <div class="item-block" id="itemBlock_${index}" style="background: var(--bg-primary); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 2px solid var(--border); box-shadow: var(--shadow-sm); animation: popIn .3s var(--ease);">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.5rem;">
-                    <strong style="color:var(--primary-accent); font-size:1.1rem; text-transform: uppercase; letter-spacing:0.05em;">📦 Item Details</strong>
-                    ${index > 0 ? `<button type="button" class="btn-danger btn-small" onclick="removeItemBlock(${index})" style="box-shadow:none;">🗑️ Remove Item</button>` : ''}
+                    <strong style="color:var(--primary-accent); font-size:1.1rem; text-transform: uppercase; letter-spacing:0.05em;">🗃 Item Details</strong>
+                    ${index > 0 ? `<button type="button" class="btn-danger btn-small" onclick="removeItemBlock(${index})" style="box-shadow:none;">✕ Remove Item</button>` : ''}
                 </div>
                 <div class="form-row">
                     <div class="form-group-wrapper">
@@ -1484,7 +1505,7 @@
                     <div class="form-group-wrapper" style="grid-column: 1 / -1; background: var(--bg-tertiary); padding: 1rem; border-radius: 10px; border: 1px dashed var(--border);">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <label class="required">Paper Specifications</label>
-                            ${index > 0 ? `<button type="button" class="btn-secondary btn-small" onclick="copyPreviousItem(${index})" style="box-shadow:none; padding:4px 8px; font-size:0.75rem;">🔄 Copy Above</button>` : ''}
+                            ${index > 0 ? `<button type="button" class="btn-secondary btn-small" onclick="copyPreviousItem(${index})" style="box-shadow:none; padding:4px 8px; font-size:0.75rem;">⟳ Copy Above</button>` : ''}
                         </div>
                         <div class="ply-inputs-container" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 5px;">
                             <span style="color: var(--text-secondary); font-size: 0.85rem;">Please select a Ply config first.</span>
@@ -1523,7 +1544,7 @@
         if(block) { block.remove(); calculateAllJobs(); saveDraft(); }
     }
 
-    function startNewPO() {
+    function startNewPO(silent = false) {
         editingJobId = null;
         document.getElementById('poForm').reset();
         document.getElementById('jobNumber').value = '';
@@ -1590,13 +1611,11 @@
     }
 
     function buildJobTasks(existingTasks) {
-        // Read directly from the checked boxes in the DOM instead of defaulting
         const checkboxes = document.querySelectorAll('.workflow-checkbox:checked');
         let selectedTasks = Array.from(checkboxes).map(cb => cb.value);
         
         let mapped = selectedTasks.map((label, idx) => ({ id: `task_${idx}`, label: label, done: false }));
         
-        // Retain completed status if editing
         if (existingTasks && existingTasks.length) {
             mapped.forEach(t => {
                 const prev = existingTasks.find(p => p.label === t.label);
@@ -1654,7 +1673,6 @@
         if (itemsArray.length === 0) { showToast("Please add at least one item.", "error"); return; }
         if (missingSpecs) { showToast("Please complete the Paper Specifications for all items.", "error"); return; }
 
-        // Read dynamic checkboxes to build tasks array
         const checkboxes = document.querySelectorAll('.workflow-checkbox:checked');
         if (checkboxes.length === 0) { showToast("Please select at least one workflow step.", "error"); return; }
 
@@ -1681,14 +1699,20 @@
         document.getElementById('jobNumber').value = jobNo;
         const savedId = editingJobId || allJobs[allJobs.length-1].id;
 
-        localStorage.removeItem('zhDraft'); // wipe draft on success
+        localStorage.removeItem('zhDraft'); 
 
         if (action === 'print') {
-            startNewPO(); // Bypass animation for printing
+            startNewPO(true); 
             printJobCard(savedId); 
         } else {
-            showToast("Job Card Saved", "success");
-            startNewPO();
+            const overlay = document.getElementById('successOverlay');
+            const successText = overlay.querySelector('.success-text');
+            if(successText) successText.textContent = "Success!";
+            overlay.style.display = 'flex';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                startNewPO(true);
+            }, 1000); 
         }
     }
 
@@ -1741,8 +1765,8 @@
 
     function duplicateJob(id) {
         editJob(id);
-        editingJobId = null; // Clear ID to force new save
-        document.getElementById('jobNumber').value = ''; // Force new job number generator
+        editingJobId = null; 
+        document.getElementById('jobNumber').value = ''; 
         document.getElementById('poDate').valueAsDate = new Date();
         showToast("Job Duplicated as New Draft", "success");
     }
@@ -1907,10 +1931,10 @@
                 <td>${dimStr}</td>
                 <td><span class="status-badge ${job.status === 'Completed' ? 'status-completed' : 'status-pending'}">${currentStage}</span></td>
                 <td style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button class="btn-primary btn-small" onclick="viewJob(${job.id})" title="View Flow">🔍 Flow</button> 
-                    <button class="btn-warning btn-small" onclick="editJob(${job.id})" title="Edit Job">✏️ Edit</button> 
-                    <button class="btn-secondary btn-small" onclick="duplicateJob(${job.id})" title="Duplicate Job">📄 Dup</button> 
-                    <button class="btn-danger btn-small" onclick="deleteJob(${job.id})" title="Delete Job">🗑️ Del</button>
+                    <button class="btn-primary btn-small" onclick="viewJob(${job.id})" title="View Flow">⌕ Flow</button> 
+                    <button class="btn-warning btn-small" onclick="editJob(${job.id})" title="Edit Job">✎ Edit</button> 
+                    <button class="btn-secondary btn-small" onclick="duplicateJob(${job.id})" title="Duplicate Job">⎘ Dup</button> 
+                    <button class="btn-danger btn-small" onclick="deleteJob(${job.id})" title="Delete Job">✕ Del</button>
                 </td>`;
             frag.appendChild(tr);
         });
@@ -1961,8 +1985,8 @@
             const timelineHtml = (job.tasks || []).map(t => {
                 let cls = 'status-timeline-step';
                 let icon = '';
-                if (t.done) { cls += ' done'; icon = '✅ '; } 
-                else if (!foundCurrent) { cls += ' current'; icon = '⏳ '; foundCurrent = true; }
+                if (t.done) { cls += ' done'; icon = '✓ '; } 
+                else if (!foundCurrent) { cls += ' current'; icon = '⏱ '; foundCurrent = true; }
                 return `<div class="${cls}">${icon}${t.label}</div>`;
             }).join(`<span class="timeline-arrow">→</span>`);
 
@@ -1981,7 +2005,7 @@
                     <div>
                         <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase;">Current State</div>
                         <div class="sc-stage">${currentStage}</div>
-                        <button class="btn-secondary btn-small" onclick="viewJob(${job.id})" style="margin-top: 10px; font-size: 0.7rem; padding: 4px 8px; box-shadow:none;">🔍 View Flow</button>
+                        <button class="btn-secondary btn-small" onclick="viewJob(${job.id})" style="margin-top: 10px; font-size: 0.7rem; padding: 4px 8px; box-shadow:none;">⌕ View Flow</button>
                     </div>
                     <div class="progress-circle" style="background: conic-gradient(var(--success) ${pct}%, var(--border) 0);">
                         <div class="progress-circle-inner">${pct}%</div>
@@ -1994,6 +2018,17 @@
 
         container.innerHTML = '';
         container.appendChild(frag);
+
+        // Center the active timeline step automatically
+        setTimeout(() => {
+            container.querySelectorAll('.status-timeline').forEach(timeline => {
+                const currentStep = timeline.querySelector('.current');
+                if(currentStep) {
+                    const scrollLeft = currentStep.offsetLeft - (timeline.clientWidth / 2) + (currentStep.clientWidth / 2);
+                    timeline.scrollLeft = scrollLeft;
+                }
+            });
+        }, 100);
     }
 
     // ===== PRODUCTION BOARD =====
@@ -2065,7 +2100,7 @@
             if (task.done) {
                 statusHtml = `
                     <div>
-                        <span style="color: var(--success); font-weight: 800; font-size: 0.85rem;">✅ Completed</span>
+                        <span style="color: var(--success); font-weight: 800; font-size: 0.85rem;">✓ Completed</span>
                         <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">By: ${task.completedBy}<br>${task.completedAt}</div>
                     </div>`;
             } else {
@@ -2075,9 +2110,9 @@
                     if(!job.tasks[i].done) { ready = false; blocker = job.tasks[i].label; break; }
                 }
                 if (ready) {
-                    statusHtml = `<button class="btn-success btn-small" onclick="advanceJobTask(event, ${job.id}, '${task.id}')">✅ Complete Step</button>`;
+                    statusHtml = `<button class="btn-success btn-small" onclick="advanceJobTask(event, ${job.id}, '${task.id}')">✓ Complete Step</button>`;
                 } else {
-                    statusHtml = `<span style="color: var(--warning); font-weight: 700; font-size: 0.8rem;">⏳ Waiting on:<br>${blocker}</span>`;
+                    statusHtml = `<span style="color: var(--warning); font-weight: 700; font-size: 0.8rem;">⏱ Waiting on:<br>${blocker}</span>`;
                 }
             }
 
@@ -2097,9 +2132,9 @@
                 <td>${qtyTotal}</td>
                 <td style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                     ${statusHtml}
-                    <button class="btn-secondary btn-small" onclick="viewJob(${job.id})" style="box-shadow:none;">🔍 Flow</button>
-                    <button class="btn-warning btn-small" onclick="editJob(${job.id})" style="box-shadow:none; background:var(--warning); color:#fff;">✏️ Edit</button>
-                    <button class="btn-danger btn-small" onclick="deleteJob(${job.id})" style="box-shadow:none;">🗑️ Del</button>
+                    <button class="btn-secondary btn-small" onclick="viewJob(${job.id})" style="box-shadow:none;">⌕ Flow</button>
+                    <button class="btn-warning btn-small" onclick="editJob(${job.id})" style="box-shadow:none; background:var(--warning); color:#fff;">✎ Edit</button>
+                    <button class="btn-danger btn-small" onclick="deleteJob(${job.id})" style="box-shadow:none;">✕ Del</button>
                 </td>
             `;
             frag.appendChild(tr);
@@ -2111,7 +2146,7 @@
 
     function advanceJobTask(event, jobId, taskId) { 
         const row = event.target.closest('tr');
-        if(row) row.style.display = 'none'; // Instant snappy feedback
+        if(row) row.style.display = 'none'; // Instant visual feedback
         toggleTask(jobId, taskId, true); 
     }
 
@@ -2139,7 +2174,7 @@
                 <div class="detail-item"><strong>Target Delivery</strong><span>${job.targetDeliveryDate}</span></div>
                 <div class="detail-item"><strong>Process</strong><span>${job.cartonType}</span></div>
             </div>
-            <h3 style="margin-top:1rem; font-weight:800; color:var(--text-primary);">📦 Sub-Items in this Job</h3>
+            <h3 style="margin-top:1rem; font-weight:800; color:var(--text-primary);">🗃 Sub-Items in this Job</h3>
             ${itemsHtml}
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
                 <div class="detail-item"><strong>COMBINED MATERIAL ISSUE SLIP</strong><pre style="font-family: var(--font-mono); font-size: 0.9rem; margin-top:0.4rem;">${job.paperSummaryText}</pre></div>
@@ -2150,7 +2185,7 @@
         document.getElementById('jobChecklist').innerHTML = (job.tasks || []).map(t => {
             let metaHtml = '';
             if(t.done && t.completedBy) {
-                metaHtml = `<div class="timeline-user-badge">✅ ${t.completedBy} on ${t.completedAt}</div>`;
+                metaHtml = `<div class="timeline-user-badge">✓ ${t.completedBy} on ${t.completedAt}</div>`;
             }
             return `
             <div class="timeline-item ${t.done ? 'done' : ''}">
@@ -2214,6 +2249,15 @@
     }
 
     // ===== PRINTING SECTION =====
+    
+    function getPrintTotalPaper(text) {
+        if(!text) return '';
+        if(text.includes('TOTAL REQUIREMENT:\n')) {
+            return "TOTAL REQUIREMENT:\n" + text.split('TOTAL REQUIREMENT:\n')[1];
+        }
+        return text;
+    }
+
     function printJobCard(id) {
         const job = allJobs.find(j => j.id === id); if (!job) return;
         const jobItems = job.items ? job.items : [job];
@@ -2243,7 +2287,7 @@
                     </table>
                 </div>
                 <div class="print-bottom-wrap">
-                    <div class="print-sec-2">
+                    <div class="print-sec-2" style="width: 100%; border-right: none;">
                         <div class="print-header-small">
                             <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">MATERIAL ISSUE SLIP</div></div>
                             <div style="text-align: right;"><div style="font-weight: bold; font-size: 11pt;">${job.jobNumber}</div><div style="font-size: 8pt;">Date: ${job.date}</div></div>
@@ -2251,27 +2295,15 @@
                         <div class="print-info-block"><strong>Customer:</strong> ${job.party} <br><strong>PO Number:</strong> ${job.po} &nbsp;|&nbsp; <strong>Target:</strong> ${job.targetDeliveryDate} <br><strong>Total Quantity:</strong> ${totalQty}</div>
                         <table class="print-table" style="margin-bottom: auto;">
                             <tr><th>Paper Requirements (Type/GSM)</th><th>Total KGs</th></tr>
-                            ${job.paperSummaryText.split('\n').map(line => {
-                                if(!line.trim()) return ''; if(line.includes(':') && !line.includes('=')) return `<tr><td colspan="2" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">${line}</td></tr>`; if(line.includes('TOTAL REQUIREMENT')) return `<tr><td colspan="2" style="background:#e2e8f0 !important; font-weight:900; font-size:9pt; padding:6px 4px; text-align:center;">${line}</td></tr>`; if(line.includes('---')) return '';
-                                const pts = line.split('='); if(pts.length === 2) return `<tr><td>${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`; return `<tr><td colspan="2">${line}</td></tr>`;
+                            ${getPrintTotalPaper(job.paperSummaryText).split('\n').map(line => {
+                                if(!line.trim() || line.includes('---')) return ''; 
+                                if(line.includes('TOTAL REQUIREMENT')) return `<tr><td colspan="2" style="background:#e2e8f0 !important; font-weight:900; font-size:9pt; padding:6px 4px; text-align:center;">${line}</td></tr>`; 
+                                const pts = line.split('='); 
+                                if(pts.length === 2) return `<tr><td>${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`; 
+                                return `<tr><td colspan="2">${line}</td></tr>`;
                             }).join('')}
                         </table>
                         <div class="print-signatures"><div class="sig-line">Issued By</div><div class="sig-line">Received By</div></div>
-                    </div>
-                    <div class="print-sec-3">
-                        <div class="print-header-small">
-                            <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">CORRUGATION WORK ORDER</div></div>
-                            <div style="text-align: right;"><div style="font-weight: bold; font-size: 11pt;">${job.jobNumber}</div><div style="font-size: 8pt;">Date: ${job.date}</div></div>
-                        </div>
-                        <div class="print-info-block"><strong>Customer:</strong> ${job.party} <br><strong>PO Number:</strong> ${job.po} &nbsp;|&nbsp; <strong>Target:</strong> ${job.targetDeliveryDate} <br><strong>Process:</strong> ${job.cartonType} &nbsp;|&nbsp; <strong>Total Cuts:</strong> ${totalQty}</div>
-                        <table class="print-table" style="margin-bottom: auto;">
-                            <tr><th>Paired Roll Setup (Size & Layers)</th><th style="text-align:right;">Total Rolls</th></tr>
-                            ${job.rollsSummaryText.split('\n').map(line => {
-                                if(!line.trim()) return ''; if(line.includes(':') && !line.includes('=')) return `<tr><td colspan="2" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">${line}</td></tr>`; if(line.includes('TOTAL REQUIREMENT')) return `<tr><td colspan="2" style="background:#e2e8f0 !important; font-weight:900; font-size:9pt; padding:6px 4px; text-align:center;">${line}</td></tr>`; if(line.includes('---')) return '';
-                                const pts = line.split('='); if(pts.length === 2) return `<tr><td>${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`; return `<tr><td colspan="2">${line}</td></tr>`;
-                            }).join('')}
-                        </table>
-                        <div class="print-signatures"><div class="sig-line">Operator</div><div class="sig-line">QC Check</div></div>
                     </div>
                 </div>
             </div>`;
@@ -2296,7 +2328,7 @@
             });
             
             htmlContentPaper += `<tr><td colspan="2" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">JOB: ${job.jobNumber} (${job.party})</td></tr>`;
-            job.paperSummaryText.split('\n').forEach(line => {
+            getPrintTotalPaper(job.paperSummaryText).split('\n').forEach(line => {
                 if(!line.trim() || line.includes('TOTAL REQUIREMENT') || line.includes('---')) return;
                 if(line.includes(':') && !line.includes('=')) {
                     htmlContentPaper += `<tr><td colspan="2" style="font-weight:bold; padding-top:4px;">${line}</td></tr>`;
@@ -2307,7 +2339,7 @@
             });
 
             htmlContentRolls += `<tr><td colspan="2" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">JOB: ${job.jobNumber} (${job.party})</td></tr>`;
-            job.rollsSummaryText.split('\n').forEach(line => {
+            getPrintTotalPaper(job.rollsSummaryText).split('\n').forEach(line => {
                 if(!line.trim() || line.includes('TOTAL REQUIREMENT') || line.includes('---')) return;
                 if(line.includes(':') && !line.includes('=')) {
                     htmlContentRolls += `<tr><td colspan="2" style="font-weight:bold; padding-top:4px;">${line}</td></tr>`;
@@ -2384,7 +2416,7 @@
                         </table>
                     </div>
                     <div class="print-bottom-wrap clearfix">
-                        <div class="print-sec-2">
+                        <div class="print-sec-2" style="width: 100%; border-right: none;">
                             <div class="print-header-small">
                                 <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">MATERIAL ISSUE SLIP</div></div>
                                 <div style="text-align: right; font-weight: bold; font-size:10pt;">CONSOLIDATED</div>
@@ -2395,18 +2427,6 @@
                                 ${htmlContentPaper || '<tr><td colspan="2" style="text-align:center;">No paper required</td></tr>'}
                             </table>
                             <div class="print-signatures"><div class="sig-line">Issued By</div><div class="sig-line">Received By</div></div>
-                        </div>
-                        <div class="print-sec-3">
-                            <div class="print-header-small">
-                                <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">CORRUGATION WORK ORDER</div></div>
-                                <div style="text-align: right; font-weight: bold; font-size:10pt;">CONSOLIDATED</div>
-                            </div>
-                            <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos} <br><strong>Total Batch Qty:</strong> ${totalQty}</div>
-                            <table class="print-table" style="margin-bottom: auto;">
-                                <tr><th colspan="2">Paired Roll Setup Breakdown</th></tr>
-                                ${htmlContentRolls || '<tr><td colspan="2" style="text-align:center;">No rolls required</td></tr>'}
-                            </table>
-                            <div class="print-signatures"><div class="sig-line">Operator</div><div class="sig-line">QC Check</div></div>
                         </div>
                     </div>
                 </div>`;
