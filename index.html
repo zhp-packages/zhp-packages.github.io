@@ -111,7 +111,7 @@
     /* Prominent Dashboard Tabs */
     .metric-card { background: var(--bg-primary); padding: 2.5rem 2rem; border-radius: var(--radius-lg); border: 2px solid var(--border); border-bottom-width: 6px; box-shadow: var(--shadow-sm); transition: all .4s var(--ease); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; position: relative; overflow: hidden; }
     .metric-card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 15px 30px -10px rgba(0,0,0,0.15); border-color: inherit; }
-    .metric-card::after { content: '📊'; position: absolute; right: -10px; bottom: -20px; font-size: 8rem; opacity: 0.03; transition: all .5s var(--ease); pointer-events: none; }
+    .metric-card::after { content: '◱'; position: absolute; right: -10px; bottom: -20px; font-size: 8rem; opacity: 0.03; transition: all .5s var(--ease); pointer-events: none; }
     .metric-card:hover::after { transform: scale(1.1) rotate(-5deg); opacity: 0.08; }
     .metric-label { font-size: 1rem; color: var(--text-secondary); margin-bottom: 0.5rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; z-index: 1;}
     .metric-value { font-size: 4rem; font-weight: 900; font-family: var(--font-mono); line-height: 1; z-index: 1;}
@@ -571,7 +571,6 @@
                             <div style="display:flex; gap:10px;">
                                 <button class="btn-print btn-small" onclick="printSelectedConsolidated('paper')" style="background:var(--primary-accent);">🖨 Print Batch Paper</button>
                                 <button class="btn-print btn-small" onclick="printSelectedConsolidated('rolls')" style="background:var(--warning);">🖨 Print Batch Rolls</button>
-                                <button class="btn-print btn-small" onclick="printSelectedConsolidated('full')">🖨 Print Master Batch</button>
                             </div>
                         </div>
                         <div class="filter-bar">
@@ -884,8 +883,6 @@
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appContainer').classList.add('active');
             loadJobs();
-            
-            // Restores draft or starts blank without erasing what browser cached
             loadDraft(); 
             switchPage('dashboard');
         }
@@ -1040,14 +1037,9 @@
         if (usingFirebase && db) db.ref('zhParties').set(parties);
     }
 
-    // CUSTOM DROPDOWN SEARCH LOGIC
-    function showPartyDropdown() {
-        document.getElementById('partyDropdownList').classList.add('show');
-        filterParties();
-    }
-    function hidePartyDropdown() {
-        document.getElementById('partyDropdownList').classList.remove('show');
-    }
+    function showPartyDropdown() { document.getElementById('partyDropdownList').classList.add('show'); filterParties(); }
+    function hidePartyDropdown() { document.getElementById('partyDropdownList').classList.remove('show'); }
+    
     function filterParties() {
         const input = document.getElementById('partyName').value.toUpperCase();
         const list = document.getElementById('partyDropdownList');
@@ -1069,7 +1061,7 @@
                     appParties.push(newParty);
                     savePartiesData(appParties);
                     document.getElementById('partyName').value = newParty;
-                    showToast("New Customer Added to Database", "success");
+                    showToast("New Customer Added", "success");
                 } else {
                     document.getElementById('partyName').value = p;
                 }
@@ -1299,7 +1291,9 @@
             const H = parseFloat(block.querySelector('.item-h').value) || 0;
             const unit = block.querySelector('.item-unit').value;
             const qty = parseFloat(block.querySelector('.item-qty').value) || 0;
+            
             const manualRS = block.querySelector('.item-manual-rs').value;
+            const manualCL = block.querySelector('.item-manual-cl').value;
 
             const plyInputs = Array.from(block.querySelectorAll('.ply-layer-input')).map(inp => inp.value.trim().toUpperCase());
             const specStr = (plyInputs.length > 0 && plyInputs.every(v => v !== '')) ? plyInputs.join('+') : '';
@@ -1325,12 +1319,13 @@
                 else if (decCL <= 0.75) clRounded = baseCL + 0.75;
                 else clRounded = baseCL + 1.00;
 
-                const area = finalRS * clRounded;
+                const finalCL = manualCL ? parseFloat(manualCL) : clRounded;
+                const area = finalRS * finalCL;
 
                 block.querySelector('.calc-rs-actual').textContent = `Actual: ${rsActual.toFixed(2)}"`;
                 block.querySelector('.calc-rs').textContent = finalRS + '"';
                 block.querySelector('.calc-cl-actual').textContent = `Actual: ${clActual.toFixed(2)}"`;
-                block.querySelector('.calc-cl').textContent = clRounded.toFixed(2) + '"';
+                block.querySelector('.calc-cl').textContent = finalCL.toFixed(2) + '"';
                 block.querySelector('.calc-area').textContent = area.toFixed(2);
 
                 if (specStr && qty > 0) {
@@ -1343,12 +1338,12 @@
                     }
                     if(addedP) perItemPaperText += itemPText + '\n';
                     
-                    const rollObj = buildRollsSummaryObj(specStr, clRounded, qty);
+                    const rollObj = buildRollsSummaryObj(specStr, finalCL, qty);
                     let itemRText = `${itemName}:\n`; let addedR = false;
                     for(let key in rollObj) {
-                        let rKey = `${key} (${finalRS}/${clRounded.toFixed(2)})`;
+                        let rKey = `${key} (${finalRS}/${finalCL.toFixed(2)})`;
                         globalRollObj[rKey] = (globalRollObj[rKey] || 0) + rollObj[key];
-                        itemRText += `  • ${key.padEnd(20, ' ')} (${finalRS}/${clRounded.toFixed(2)})`.padEnd(45, ' ') + `${Number(rollObj[key]).toFixed(1)} Rolls\n`;
+                        itemRText += `  • ${key.padEnd(20, ' ')} (${finalRS}/${finalCL.toFixed(2)})`.padEnd(45, ' ') + `${Number(rollObj[key]).toFixed(1)} Rolls\n`;
                         addedR = true;
                     }
                     if(addedR) perItemRollText += itemRText + '\n';
@@ -1362,7 +1357,6 @@
             }
         });
 
-        // Sorted outputs
         if(Object.keys(globalPaperObj).length > 0) {
             let finalPaperText = blocks.length > 1 ? perItemPaperText + "------------------\nTOTAL REQUIREMENT:\n" : "TOTAL REQUIREMENT:\n";
             for(let key of Object.keys(globalPaperObj).sort()) { finalPaperText += `${key} = ${Math.ceil(globalPaperObj[key])} KGs\n`; }
@@ -1399,6 +1393,7 @@
                 h: block.querySelector('.item-h').value,
                 unit: block.querySelector('.item-unit').value,
                 manualRS: block.querySelector('.item-manual-rs').value,
+                manualCL: block.querySelector('.item-manual-cl').value,
                 plyInputs: plyInputs
             });
         });
@@ -1451,6 +1446,7 @@
                 block.querySelector('.item-h').value = i.h || '';
                 if(i.unit) block.querySelector('.item-unit').value = i.unit;
                 block.querySelector('.item-manual-rs').value = i.manualRS || '';
+                block.querySelector('.item-manual-cl').value = i.manualCL || '';
                 
                 setTimeout(() => {
                     const inputs = block.querySelectorAll('.ply-layer-input');
@@ -1541,6 +1537,10 @@
                         <div class="calc-label">Cut Length</div>
                         <div class="calc-value calc-cl">-</div>
                         <div class="calc-sub-value calc-cl-actual">Actual: -</div>
+                        <div style="display: flex; gap: 5px; margin-top: 8px;">
+                            <input type="number" class="item-manual-cl" placeholder="Override" step="0.01" style="padding: 0.4rem; border-radius: 6px;">
+                            <button type="button" class="btn-secondary btn-small" onclick="calculateAllJobs()" style="padding: 0.4rem 0.8rem; box-shadow: none;">Apply</button>
+                        </div>
                     </div>
                     <div class="calc-box" style="padding: 1.2rem; background: var(--bg-tertiary);">
                         <div class="calc-label">Area (Sq. In)</div>
@@ -1675,7 +1675,6 @@
             const specVal = block.querySelector('.item-spec').value;
             if(!specVal) missingSpecs = true;
             
-            // Generate Sub-job Number if multiple items
             let subJob = jobNo;
             if (blocks.length > 1) {
                 subJob = `${jobNo}-${String.fromCharCode(65 + idx)}`;
@@ -1689,7 +1688,7 @@
                 detailNotes: block.querySelector('.item-notes').value,
                 dimensions: { L: block.querySelector('.item-l').value, W: block.querySelector('.item-w').value, H: block.querySelector('.item-h').value, unit: block.querySelector('.item-unit').value },
                 calc: { RS: block.querySelector('.calc-rs').textContent, CL: block.querySelector('.calc-cl').textContent, Area: block.querySelector('.calc-area').textContent },
-                specString: specVal, manualRS: block.querySelector('.item-manual-rs').value
+                specString: specVal, manualRS: block.querySelector('.item-manual-rs').value, manualCL: block.querySelector('.item-manual-cl').value
             });
         });
 
@@ -1729,6 +1728,8 @@
             printJobCard(savedId); 
         } else {
             const overlay = document.getElementById('successOverlay');
+            const successText = overlay.querySelector('.success-text');
+            if(successText) successText.textContent = "Success!";
             overlay.style.display = 'flex';
             setTimeout(() => {
                 overlay.style.display = 'none';
@@ -1771,6 +1772,7 @@
                 block.querySelector('.item-unit').value = i.dimensions.unit || 'INCH';
             }
             if (i.manualRS) block.querySelector('.item-manual-rs').value = i.manualRS;
+            if (i.manualCL) block.querySelector('.item-manual-cl').value = i.manualCL;
             
             if (i.specString) {
                 const specs = i.specString.split('+');
@@ -2167,7 +2169,7 @@
 
     function advanceJobTask(event, jobId, taskId) { 
         const row = event.target.closest('tr');
-        if(row) row.style.display = 'none'; // Instant visual feedback
+        if(row) row.style.display = 'none'; 
         toggleTask(jobId, taskId, true); 
     }
 
