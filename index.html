@@ -85,25 +85,36 @@
     .login-error { background: rgba(220, 38, 38, 0.1); color: var(--danger); padding: 0.8rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1.5rem; display: none; border: 1px solid rgba(220, 38, 38, 0.3); }
     .login-error.show { display: block; animation: popIn 0.3s var(--ease); }
 
-    /* App Structure */
+    /* App Structure & Navigation Island */
     .app-container { display: none; min-height: 100vh; animation: fadeIn .6s var(--ease) both; flex-direction: column; }
     .app-container.active { display: flex; }
     .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
     
     .navbar { background: var(--bg-primary); border-bottom: 1px solid var(--border); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm); position: sticky; top: 0; z-index: 301; transition: all .4s var(--ease); }
-    .navbar-left, .navbar-right { display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap;}
+    .navbar-left { flex: 1; display: flex; align-items: center; }
+    .navbar-center { display: flex; justify-content: center; }
+    .navbar-right { flex: 1; display: flex; align-items: center; justify-content: flex-end; gap: 1rem; }
 
-    /* Nav Tabs */
-    .nav-tabs { display: flex; gap: .5rem; margin-bottom: 2rem; border-bottom: 2px solid var(--border); flex-wrap: wrap; }
-    .nav-tab { padding: .85rem 1.5rem; background: transparent; border: none; border-bottom: 3px solid transparent; color: var(--text-secondary); cursor: pointer; font-weight: 700; font-size: .9rem; transition: all .3s var(--ease); margin-bottom: -2px; border-radius: 8px 8px 0 0; }
+    /* Nav Tabs Centered */
+    .nav-tabs { display: flex; gap: .5rem; flex-wrap: wrap; }
+    .nav-tab { padding: .75rem 1.25rem; background: transparent; border: 2px solid transparent; color: var(--text-secondary); cursor: pointer; font-weight: 700; font-size: .9rem; transition: all .3s var(--ease); border-radius: 10px; }
     .nav-tab:hover { color: var(--primary-accent); background: var(--bg-tertiary); }
-    .nav-tab.active { color: var(--primary-accent); border-bottom-color: var(--primary-accent); background: var(--bg-tertiary); }
+    .nav-tab.active { color: var(--primary-accent); border: 2px solid var(--primary-accent); background: var(--primary-soft); box-shadow: var(--shadow-sm); }
+    
     .page { display: none; animation: fadeIn .4s var(--ease); }
     .page.active { display: block; }
     .main-content { padding: 2rem; overflow-y: auto; max-width: 1800px; width: 100%; margin: 0 auto; flex: 1; }
     .page-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
     .page-heading h2 { font-weight: 800; font-size: 1.8rem; color: var(--text-primary); letter-spacing: -0.02em;}
     .page-heading p { color: var(--text-secondary); font-size: .95rem; margin-top: .4rem; }
+
+    /* Prominent Dashboard Tabs */
+    .metric-card { background: var(--bg-primary); padding: 2.5rem 2rem; border-radius: var(--radius-lg); border: 2px solid var(--border); border-bottom-width: 6px; box-shadow: var(--shadow-sm); transition: all .4s var(--ease); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; position: relative; overflow: hidden; }
+    .metric-card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 15px 30px -10px rgba(0,0,0,0.15); border-color: inherit; }
+    .metric-card::after { content: '📊'; position: absolute; right: -10px; bottom: -20px; font-size: 8rem; opacity: 0.03; transition: all .5s var(--ease); pointer-events: none; }
+    .metric-card:hover::after { transform: scale(1.1) rotate(-5deg); opacity: 0.08; }
+    .metric-label { font-size: 1rem; color: var(--text-secondary); margin-bottom: 0.5rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; z-index: 1;}
+    .metric-value { font-size: 4rem; font-weight: 900; font-family: var(--font-mono); line-height: 1; z-index: 1;}
 
     /* Custom Dropdown Search */
     .searchable-dropdown { position: relative; width: 100%; }
@@ -206,6 +217,8 @@
     .status-completed { background: rgba(16, 185, 129, 0.1); color: #047857; border: 1px solid rgba(16, 185, 129, 0.3); }
     [data-theme="dark"] .status-pending { color: #fcd34d; }
     [data-theme="dark"] .status-completed { color: #6ee7b7; }
+    .cb-cell { width: 50px; text-align: center; }
+    .cb-cell input { width: 18px; height: 18px; accent-color: var(--primary-accent); cursor: pointer; }
 
     /* Production Board Tabs */
     .stage-tabs-container { background: var(--bg-primary); padding: 1.5rem; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 1.5rem; }
@@ -213,9 +226,8 @@
     .stage-tab { padding: 0.6rem 1.2rem; border-radius: 30px; border: 2px solid var(--border); background: var(--bg-tertiary); color: var(--text-secondary); font-weight: 800; font-size: 0.85rem; transition: all 0.3s var(--ease); display: flex; align-items: center; gap: 8px; cursor: pointer; white-space: nowrap; flex-grow: 1; justify-content: center; max-width: 200px;}
     .stage-tab:hover { background: var(--bg-primary); color: var(--primary-accent); border-color: var(--primary-accent); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
     .stage-tab.active { background: var(--primary-accent); color: #fff; border-color: var(--primary-accent); box-shadow: 0 8px 20px rgba(59,130,246,0.3); transform: translateY(-2px); }
-    .stage-badge { background: rgba(0,0,0,0.1); padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 900; color: inherit; transition: all .3s;}
-    .stage-tab.active .stage-badge { background: rgba(255,255,255,0.25); color: #fff; }
-    [data-theme="dark"] .stage-badge { background: rgba(255,255,255,0.1); }
+    .stage-badge { background: var(--danger); padding: 4px 10px; border-radius: 20px; font-size: 0.95rem; font-weight: 900; color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: all .3s;}
+    .stage-tab.active .stage-badge { background: #fff; color: var(--primary-accent); }
 
     /* Status Board Horizontal Timeline */
     .status-timeline { display: flex; gap: 6px; margin-top: 15px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: thin; align-items: center; scroll-behavior: smooth;}
@@ -284,7 +296,7 @@
     .print-info-block strong { color: #222; }
 
     /* =========================================
-       PRINT STYLES - Safe Non-Overlapping Engine
+       PRINT STYLES - Exact 50/50 Halves
        ========================================= */
     .print-only { display: none; }
     
@@ -375,6 +387,15 @@
                     <div class="brand-wordmark">Zafar Habib <span class="brand-accent">Packages</span><small>Production &amp; PO Management</small></div>
                 </div>
             </div>
+            <div class="navbar-center">
+                <div class="nav-tabs">
+                    <button class="nav-tab active" data-page="dashboard" onclick="switchPage('dashboard')">◱ Dashboard</button>
+                    <button class="nav-tab" data-page="new-po" onclick="switchPage('new-po')">＋ New Job Card</button>
+                    <button class="nav-tab" data-page="jobs" onclick="switchPage('jobs'); clearJobFilters('jobs');">☰ Detailed Job View</button>
+                    <button class="nav-tab" data-page="production-board" onclick="switchPage('production-board')">⛭ Production Board</button>
+                    <button class="nav-tab" data-page="status-board" onclick="switchPage('status-board')">◉ Status Board</button>
+                </div>
+            </div>
             <div class="navbar-right">
                 <button class="theme-toggle" onclick="switchPage('settings')">⛭ Settings</button>
                 <button class="logout-btn" onclick="handleLogout()">⎋ Logout</button>
@@ -383,15 +404,6 @@
 
         <!-- MAIN CONTENT -->
         <div class="main-content">
-            <div class="nav-tabs">
-                <button class="nav-tab active" data-page="dashboard" onclick="switchPage('dashboard')">◱ Dashboard</button>
-                <button class="nav-tab" data-page="new-po" onclick="switchPage('new-po')">＋ New Job Card</button>
-                <button class="nav-tab" data-page="jobs" onclick="switchPage('jobs'); clearJobFilters('jobs');">☰ Detailed Job View</button>
-                <button class="nav-tab" data-page="production-board" onclick="switchPage('production-board')">⛭ Production Board</button>
-                <button class="nav-tab" data-page="status-board" onclick="switchPage('status-board')">◉ Status Board</button>
-                <button class="nav-tab" data-page="settings" onclick="switchPage('settings')" style="margin-left: auto;">⛭ Settings</button>
-            </div>
-
             <!-- DASHBOARD -->
             <div id="dashboard" class="page active">
                 <div class="page-heading">
@@ -493,7 +505,9 @@
                             <div class="form-section">
                                 <div class="form-section-title"><span>🗃</span> Product Specifications</div>
                                 
-                                <div id="itemsContainer"></div>
+                                <div id="itemsContainer">
+                                    <!-- Dynamic Items Injected Here -->
+                                </div>
 
                                 <div style="text-align: right; margin-top: 1rem;">
                                     <button type="button" class="btn-secondary" onclick="addItemBlock()">＋ Add Another Item</button>
@@ -562,7 +576,7 @@
                         </div>
                         <div class="filter-bar">
                             <input type="text" id="filterPO" placeholder="Filter by PO Number..." oninput="applyFilters()">
-                            <input type="text" id="filterParty" placeholder="Filter by Customer..." oninput="applyFilters()">
+                            <input type="text" id="filterParty" list="partyDatalist" placeholder="Filter by Customer..." oninput="applyFilters()">
                             <input type="text" id="filterItem" placeholder="Filter by Item Name..." oninput="applyFilters()">
                             <select id="filterStage" onchange="applyFilters()">
                                 <option value="">All Stages</option>
@@ -578,7 +592,7 @@
                                 <tr>
                                     <th class="cb-cell"><input type="checkbox" id="selectAllJobs" onchange="toggleSelectAll()"></th>
                                     <th>Date</th>
-                                    <th>Job #</th>
+                                    <th>Job/Sub #</th>
                                     <th>Customer</th>
                                     <th>Items (Grouped)</th>
                                     <th>Total Qty</th>
@@ -604,7 +618,7 @@
 
                 <div class="filter-bar" style="margin-bottom: 2rem;">
                     <input type="text" id="pbFilterPO" placeholder="Filter by PO or Job #..." oninput="renderProdBoardTable()">
-                    <input type="text" id="pbFilterParty" placeholder="Filter by Customer..." oninput="renderProdBoardTable()">
+                    <input type="text" id="pbFilterParty" list="partyDatalist" placeholder="Filter by Customer..." oninput="renderProdBoardTable()">
                     <select id="pbViewMode" onchange="renderProdBoardTable()" style="margin-left:auto; background:var(--primary-soft); color:var(--primary-light); font-weight:800;">
                         <option value="pending">⏱ Current &amp; Incoming Jobs</option>
                         <option value="completed">✓ Completed in this Step</option>
@@ -651,7 +665,7 @@
                 
                 <div class="filter-bar" style="margin-bottom: 2rem;">
                     <input type="text" id="sbFilterPO" placeholder="Filter by PO or Job #..." oninput="applySBFilters()">
-                    <input type="text" id="sbFilterParty" placeholder="Filter by Customer..." oninput="applySBFilters()">
+                    <input type="text" id="sbFilterParty" list="partyDatalist" placeholder="Filter by Customer..." oninput="applySBFilters()">
                     <select id="sbFilterStage" onchange="applySBFilters()">
                         <option value="">All Stages</option>
                         <option value="Pending">Pending / In Production</option>
@@ -669,7 +683,7 @@
             <div id="settings" class="page">
                 <div class="page-heading">
                     <div>
-                        <h2>⚙ Application Settings</h2>
+                        <h2>⛭ Application Settings</h2>
                         <p>Manage preferences, users, customers, and visual themes.</p>
                     </div>
                 </div>
@@ -1554,6 +1568,7 @@
         document.getElementById('calcPaperSummary').textContent = '-';
         document.getElementById('calcRollsSummary').textContent = '-';
         localStorage.removeItem('zhDraft');
+        if (!silent) showToast("Form Reset & Cleared", 'success');
     }
 
     function generateJobNumber() {
@@ -1656,10 +1671,18 @@
 
         let itemsArray = []; let missingSpecs = false;
         const blocks = document.querySelectorAll('.item-block');
-        blocks.forEach(block => {
+        blocks.forEach((block, idx) => {
             const specVal = block.querySelector('.item-spec').value;
             if(!specVal) missingSpecs = true;
+            
+            // Generate Sub-job Number if multiple items
+            let subJob = jobNo;
+            if (blocks.length > 1) {
+                subJob = `${jobNo}-${String.fromCharCode(65 + idx)}`;
+            }
+
             itemsArray.push({
+                subJobNumber: subJob,
                 itemName: block.querySelector('.item-name').value,
                 ply: block.querySelector('.item-ply').value,
                 quantity: parseFloat(block.querySelector('.item-qty').value) || 0,
@@ -1706,8 +1729,6 @@
             printJobCard(savedId); 
         } else {
             const overlay = document.getElementById('successOverlay');
-            const successText = overlay.querySelector('.success-text');
-            if(successText) successText.textContent = "Success!";
             overlay.style.display = 'flex';
             setTimeout(() => {
                 overlay.style.display = 'none';
@@ -2159,15 +2180,15 @@
         const jobItems = job.items ? job.items : [job];
         let itemsHtml = `
             <table class="print-table" style="width:100%; margin-bottom: 2rem;">
-                <thead><tr><th>Item Name</th><th>Ply</th><th>Size</th><th>Quantity</th><th>Roll Size</th><th>Cut Length</th></tr></thead>
+                <thead><tr><th>Item/Sub #</th><th>Ply</th><th>Size</th><th>Quantity</th><th>Roll Size</th><th>Cut Length</th></tr></thead>
                 <tbody>
-                    ${jobItems.map(i => `<tr><td>${i.itemName}</td><td>${i.ply}</td><td>${i.dimensions.L}×${i.dimensions.W}×${i.dimensions.H} ${i.dimensions.unit}</td><td>${i.quantity}</td><td>${i.calc.RS}</td><td>${i.calc.CL}</td></tr>`).join('')}
+                    ${jobItems.map(i => `<tr><td><strong>${i.subJobNumber || job.jobNumber}</strong><br><small>${i.itemName}</small></td><td>${i.ply}</td><td>${i.dimensions.L}×${i.dimensions.W}×${i.dimensions.H} ${i.dimensions.unit}</td><td>${i.quantity}</td><td>${i.calc.RS}</td><td>${i.calc.CL}</td></tr>`).join('')}
                 </tbody>
             </table>`;
 
         const html = `
             <div class="detail-grid">
-                <div class="detail-item"><strong>Job Number</strong><span>${job.jobNumber}</span></div>
+                <div class="detail-item"><strong>Master Job Number</strong><span>${job.jobNumber}</span></div>
                 <div class="detail-item"><strong>Customer / Party</strong><span>${job.party}</span></div>
                 <div class="detail-item"><strong>PO Number</strong><span>${job.po}</span></div>
                 <div class="detail-item"><strong>Date</strong><span>${job.date}</span></div>
@@ -2249,21 +2270,12 @@
     }
 
     // ===== PRINTING SECTION =====
-    
-    function getPrintTotalPaper(text) {
-        if(!text) return '';
-        if(text.includes('TOTAL REQUIREMENT:\n')) {
-            return "TOTAL REQUIREMENT:\n" + text.split('TOTAL REQUIREMENT:\n')[1];
-        }
-        return text;
-    }
-
     function printJobCard(id) {
         const job = allJobs.find(j => j.id === id); if (!job) return;
         const jobItems = job.items ? job.items : [job];
         let totalQty = jobItems.reduce((s, i) => s + (parseInt(i.quantity)||0), 0);
 
-        const jobRows = jobItems.map(i => `<tr><td style="padding:4px 6px;">${i.itemName}</td><td style="padding:4px 6px;">${i.dimensions.L}×${i.dimensions.W}×${i.dimensions.H}</td><td style="padding:4px 6px;">${i.quantity}</td><td style="padding:4px 6px;">${i.calc.RS}</td><td style="padding:4px 6px;">${i.calc.CL}</td><td style="padding:4px 6px;">${i.specString}</td></tr>`).join('');
+        const jobRows = jobItems.map(i => `<tr><td style="padding:4px 6px;"><strong>${i.subJobNumber || job.jobNumber}</strong><br><small>${i.itemName}</small></td><td style="padding:4px 6px;">${i.dimensions.L}×${i.dimensions.W}×${i.dimensions.H}</td><td style="padding:4px 6px;">${i.quantity}</td><td style="padding:4px 6px;">${i.calc.RS}</td><td style="padding:4px 6px;">${i.calc.CL}</td><td style="padding:4px 6px;">${i.specString}</td></tr>`).join('');
 
         const html = `
             <div class="a4-print-layout">
@@ -2282,7 +2294,7 @@
                     </div>
                     <div style="font-size: 8pt; font-weight: bold; margin-bottom: 2px;">Sub-Items in this Job:</div>
                     <table class="print-table" style="margin-top:0;">
-                        <thead><tr><th>Item Name</th><th>Dimensions</th><th>Qty</th><th>Roll Size</th><th>Cut Length</th><th>Paper Specs</th></tr></thead>
+                        <thead><tr><th>Item (Job #)</th><th>Dimensions</th><th>Qty</th><th>Roll Size</th><th>Cut Length</th><th>Paper Specs</th></tr></thead>
                         <tbody>${jobRows}</tbody>
                     </table>
                 </div>
@@ -2324,7 +2336,7 @@
             const jobItems = job.items ? job.items : [job];
             jobItems.forEach(i => {
                 totalQty += parseInt(i.quantity) || 0;
-                jobRowsHtml += `<tr><td style="padding:2px 4px;">${job.jobNumber}</td><td style="padding:2px 4px;">${i.itemName}</td><td style="padding:2px 4px;">${i.dimensions.L}×${i.dimensions.W}×${i.dimensions.H}</td><td style="padding:2px 4px;">${i.quantity}</td><td style="padding:2px 4px;">${i.calc.RS}"</td><td style="padding:2px 4px;">${i.calc.CL}"</td></tr>`;
+                jobRowsHtml += `<tr><td style="padding:2px 4px;">${i.subJobNumber || job.jobNumber}</td><td style="padding:2px 4px;">${i.itemName}</td><td style="padding:2px 4px;">${i.dimensions.L}×${i.dimensions.W}×${i.dimensions.H}</td><td style="padding:2px 4px;">${i.quantity}</td><td style="padding:2px 4px;">${i.calc.RS}"</td><td style="padding:2px 4px;">${i.calc.CL}"</td></tr>`;
             });
             
             htmlContentPaper += `<tr><td colspan="2" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">JOB: ${job.jobNumber} (${job.party})</td></tr>`;
@@ -2411,12 +2423,12 @@
                         </div>
                         <div style="font-size: 8pt; font-weight: bold; margin-bottom: 2px;">All Items in Batch:</div>
                         <table class="print-table" style="margin-top:0;">
-                            <thead><tr><th>Job #</th><th>Item</th><th>Size</th><th>Qty</th><th>Roll Size</th><th>Cut Length</th></tr></thead>
+                            <thead><tr><th>Job / Sub #</th><th>Item</th><th>Size</th><th>Qty</th><th>Roll Size</th><th>Cut Length</th></tr></thead>
                             <tbody>${jobRowsHtml}</tbody>
                         </table>
                     </div>
                     <div class="print-bottom-wrap clearfix">
-                        <div class="print-sec-2" style="width: 100%; border-right: none;">
+                        <div class="print-sec-2">
                             <div class="print-header-small">
                                 <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">MATERIAL ISSUE SLIP</div></div>
                                 <div style="text-align: right; font-weight: bold; font-size:10pt;">CONSOLIDATED</div>
@@ -2427,6 +2439,18 @@
                                 ${htmlContentPaper || '<tr><td colspan="2" style="text-align:center;">No paper required</td></tr>'}
                             </table>
                             <div class="print-signatures"><div class="sig-line">Issued By</div><div class="sig-line">Received By</div></div>
+                        </div>
+                        <div class="print-sec-3">
+                            <div class="print-header-small">
+                                <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">CORRUGATION WORK ORDER</div></div>
+                                <div style="text-align: right; font-weight: bold; font-size:10pt;">CONSOLIDATED</div>
+                            </div>
+                            <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos} <br><strong>Total Batch Qty:</strong> ${totalQty}</div>
+                            <table class="print-table" style="margin-bottom: auto;">
+                                <tr><th colspan="2">Paired Roll Setup Breakdown</th></tr>
+                                ${htmlContentRolls || '<tr><td colspan="2" style="text-align:center;">No rolls required</td></tr>'}
+                            </table>
+                            <div class="print-signatures"><div class="sig-line">Operator</div><div class="sig-line">QC Check</div></div>
                         </div>
                     </div>
                 </div>`;
