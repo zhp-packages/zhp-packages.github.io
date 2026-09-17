@@ -2288,7 +2288,7 @@
         let totalQty = jobItems.reduce((s, i) => s + (parseInt(i.quantity)||0), 0);
 
         const jobRows = jobItems.map(i => `<tr><td style="padding:4px 6px;"><strong>${i.subJobNumber || job.jobNumber}</strong><br><small>${i.itemName}</small></td><td style="padding:4px 6px;">${i.dimensions.L}×${i.dimensions.W}×${i.dimensions.H}</td><td style="padding:4px 6px;">${i.quantity}</td><td style="padding:4px 6px;">${i.calc.RS}</td><td style="padding:4px 6px;">${i.calc.CL}</td><td style="padding:4px 6px;">${i.specString}</td></tr>`).join('');
-        const jobSteps = job.tasks ? job.tasks.map(t => t.label).join(' → ') : '';
+        const jobSteps = job.tasks ? job.tasks.map(t => `<span style="display:inline-block; width:12px; height:12px; border:1px solid #000; margin-right:4px; vertical-align:-2px;"></span>${t.label}`).join(' &nbsp;&nbsp;➔&nbsp;&nbsp; ') : '';
 
         const html = `
             <div class="a4-print-layout">
