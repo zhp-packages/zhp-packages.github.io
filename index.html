@@ -319,6 +319,9 @@
         .print-header-small { display: flex; justify-content: space-between; border-bottom: 1.5px solid #000; padding-bottom: 4px; margin-bottom: 8px; align-items: flex-end;}
         .print-title-small { font-size: 12pt; font-weight: 800; text-transform: uppercase; color: #000; }
 
+        /* Custom print grid block */
+        .print-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; font-size: 10pt; }
+
         .print-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 8pt; page-break-inside: auto; }
         .print-table th, .print-table td { border: 1px solid #000; padding: 4px; text-align: left; color: #000; }
         .print-table th { background: #e0e0e0 !important; -webkit-print-color-adjust: exact; font-weight: 800; text-transform: uppercase; color: #000; }
@@ -385,7 +388,7 @@
             <div class="navbar-center">
                 <div class="nav-tabs">
                     <button class="nav-tab active" data-page="dashboard" onclick="switchPage('dashboard')">◱ Dashboard</button>
-                    <button class="nav-tab" data-page="new-po" onclick="switchPage('new-po')">＋ New Job Card</button>
+                    <button class="nav-tab" data-page="new-po" onclick="switchPage('new-po')">＋ New Job Order</button>
                     <button class="nav-tab" data-page="jobs" onclick="switchPage('jobs'); clearJobFilters('jobs');">☰ Detailed Job View</button>
                     <button class="nav-tab" data-page="production-board" onclick="switchPage('production-board')">⛭ Production Board</button>
                     <button class="nav-tab" data-page="status-board" onclick="switchPage('status-board')">◉ Status Board</button>
@@ -461,8 +464,8 @@
             <div id="new-po" class="page">
                 <div class="form-container">
                     <div class="form-header">
-                        <h2>Create New Job Card</h2>
-                        <p>Generate a Master Job Card. Add multiple items to tie them directly to this PO.</p>
+                        <h2>Create New Job Order</h2>
+                        <p>Generate a Master Job Order. Add multiple items to tie them directly to this PO.</p>
                     </div>
                     <div class="form-body">
                         <form id="poForm" onsubmit="event.preventDefault();">
@@ -472,7 +475,7 @@
                                 <div class="form-row">
                                     <div class="form-group-wrapper">
                                         <label>Job Number (Auto-Generated)</label>
-                                        <input type="text" id="jobNumber" readonly placeholder="JC-YYYYMMDD-XXX" style="font-family: var(--font-mono); font-weight: 900; font-size: 1.1rem; color: var(--primary-accent);">
+                                        <input type="text" id="jobNumber" readonly placeholder="JO170926-001" style="font-family: var(--font-mono); font-weight: 900; font-size: 1.1rem; color: var(--primary-accent);">
                                     </div>
                                     <div class="form-group-wrapper">
                                         <label class="required">Date</label>
@@ -490,7 +493,7 @@
                                         </div>
                                     </div>
                                     <div class="form-group-wrapper">
-                                        <label class="required">PO Number</label>
+                                        <label class="required">Customer PO</label>
                                         <input type="text" id="poNumber" placeholder="e.g., PO-001" required oninput="saveDraft()">
                                     </div>
                                 </div>
@@ -537,11 +540,11 @@
                                 <h3 style="margin-top: 2.5rem; margin-bottom: 1.5rem; color: var(--text-primary); font-family: var(--font-display);">▤ Global Job Requirements</h3>
                                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
                                     <div style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: 12px; border: 2px solid var(--border);">
-                                        <strong style="color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 10px; display: block;">COMBINED MATERIAL ISSUE SLIP (PAPER)</strong>
+                                        <strong style="color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 10px; display: block;">COMBINED STORE DEMAND (PAPER)</strong>
                                         <pre id="calcPaperSummary" style="font-family: var(--font-mono); font-size: 0.95rem; white-space: pre-wrap; line-height: 1.6; font-weight: 700;">-</pre>
                                     </div>
                                     <div style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: 12px; border: 2px solid var(--border);">
-                                        <strong style="color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 10px; display: block;">COMBINED CORRUGATION W.O. (ROLLS)</strong>
+                                        <strong style="color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 10px; display: block;">COMBINED STORE DEMAND (ROLLS)</strong>
                                         <pre id="calcRollsSummary" style="font-family: var(--font-mono); font-size: 0.95rem; white-space: pre-wrap; line-height: 1.6; font-weight: 700;">-</pre>
                                     </div>
                                 </div>
@@ -549,7 +552,7 @@
 
                             <div class="button-group">
                                 <button type="button" class="btn-success" onclick="submitForm('save')" style="font-size: 1.05rem; padding: 1rem 2rem;">🖫 Just Save</button>
-                                <button type="button" class="btn-print" onclick="submitForm('print')" style="font-size: 1.05rem; padding: 1rem 2rem;">🖨 Save &amp; Print Job Card</button>
+                                <button type="button" class="btn-print" onclick="submitForm('print')" style="font-size: 1.05rem; padding: 1rem 2rem;">🖨 Save &amp; Print Job Order</button>
                                 <button type="button" class="btn-danger btn-small" onclick="startNewPO(false)" style="margin-left: auto;">⟳ Clear Form</button>
                             </div>
                         </form>
@@ -570,7 +573,7 @@
                             </div>
                         </div>
                         <div class="filter-bar">
-                            <input type="text" id="filterPO" placeholder="Filter by PO Number..." oninput="applyFilters()">
+                            <input type="text" id="filterPO" placeholder="Filter by Customer PO..." oninput="applyFilters()">
                             <input type="text" id="filterParty" list="partyDatalist" placeholder="Filter by Customer..." oninput="applyFilters()">
                             <input type="text" id="filterItem" placeholder="Filter by Item Name..." oninput="applyFilters()">
                             <select id="filterStage" onchange="applyFilters()">
@@ -612,7 +615,7 @@
                 </div>
 
                 <div class="filter-bar" style="margin-bottom: 2rem;">
-                    <input type="text" id="pbFilterPO" placeholder="Filter by PO or Job #..." oninput="renderProdBoardTable()">
+                    <input type="text" id="pbFilterPO" placeholder="Filter by Customer PO or Job #..." oninput="renderProdBoardTable()">
                     <input type="text" id="pbFilterParty" list="partyDatalist" placeholder="Filter by Customer..." oninput="renderProdBoardTable()">
                     <select id="pbViewMode" onchange="renderProdBoardTable()" style="margin-left:auto; background:var(--primary-soft); color:var(--primary-light); font-weight:800;">
                         <option value="pending">⏱ Current &amp; Incoming Jobs</option>
@@ -636,7 +639,7 @@
                                 <tr>
                                     <th>Date</th>
                                     <th>Job #</th>
-                                    <th>PO #</th>
+                                    <th>Customer PO</th>
                                     <th>Customer</th>
                                     <th>Items</th>
                                     <th>Total Qty</th>
@@ -659,7 +662,7 @@
                 </div>
                 
                 <div class="filter-bar" style="margin-bottom: 2rem;">
-                    <input type="text" id="sbFilterPO" placeholder="Filter by PO or Job #..." oninput="applySBFilters()">
+                    <input type="text" id="sbFilterPO" placeholder="Filter by Customer PO or Job #..." oninput="applySBFilters()">
                     <input type="text" id="sbFilterParty" list="partyDatalist" placeholder="Filter by Customer..." oninput="applySBFilters()">
                     <select id="sbFilterStage" onchange="applySBFilters()">
                         <option value="">All Stages</option>
@@ -800,7 +803,7 @@
             <div class="timeline-container" id="jobChecklist"></div>
             
             <div style="margin-top: 2rem; display: flex; justify-content:flex-end;">
-                <button class="btn-print" onclick="printJobCard(currentModalJobId)">🖨 Print A4 Job Card</button>
+                <button class="btn-print" onclick="printJobCard(currentModalJobId)">🖨 Print A4 Job Order</button>
             </div>
         </div>
     </div>
@@ -1342,12 +1345,10 @@
                     const rollObj = buildRollsSummaryObj(specStr, finalCL, qty);
                     let itemRText = `${itemName}:\n`; let addedR = false;
                     for(let key in rollObj) {
-                        // New exact format requested by user: HPK200+HPK200    (22/73)    108.3 Rolls
                         let rKey = `${key}    (${finalRS}/${finalCL.toFixed(2)})`;
                         globalRollObj[rKey] = (globalRollObj[rKey] || 0) + rollObj[key];
-                        // Also format the display block
                         let paddedKey = key.padEnd(25, ' ');
-                        itemRText += `  • ${paddedKey}(${finalRS}/${finalCL.toFixed(2)})`.padEnd(50, ' ') + `${Number(rollObj[key]).toFixed(1)} Rolls\n`;
+                        itemRText += `  • ${paddedKey}(${finalRS}/${finalCL.toFixed(2)})`.padEnd(50, ' ') + `= ${Math.ceil(rollObj[key])} Rolls\n`;
                         addedR = true;
                     }
                     if(addedR) perItemRollText += itemRText + '\n';
@@ -1377,7 +1378,7 @@
                 let paddedPaper = actualPaper.padEnd(25, ' ');
                 let paddedSizes = sizes.padEnd(20, ' ');
                 
-                finalRollText += `${paddedPaper}${paddedSizes} ${Number(globalRollObj[key]).toFixed(1)} Rolls\n`; 
+                finalRollText += `${paddedPaper}${paddedSizes} = ${Math.ceil(globalRollObj[key])} Rolls\n`; 
             }
             globalRollText = finalRollText; document.getElementById('calcRollsSummary').textContent = globalRollText;
         } else { globalRollText = "-"; document.getElementById('calcRollsSummary').textContent = "-"; }
@@ -1583,17 +1584,20 @@
 
     function generateJobNumber() {
         const today = new Date();
-        const dStr = today.getFullYear() + String(today.getMonth() + 1).padStart(2, '0') + String(today.getDate()).padStart(2, '0');
-        const todaysJobs = allJobs.filter(j => j.jobNumber && j.jobNumber.includes(dStr));
+        const dd = String(today.getDate()).padStart(2, '0');
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const yy = String(today.getFullYear()).slice(-2);
+        const prefix = `JO${dd}${mm}${yy}`;
+        const todaysJobs = allJobs.filter(j => j.jobNumber && j.jobNumber.startsWith(prefix));
         let maxSeq = 0;
         todaysJobs.forEach(j => {
             const parts = j.jobNumber.split('-');
-            if(parts.length === 3) {
-                const seq = parseInt(parts[2]);
+            if(parts.length === 2) {
+                const seq = parseInt(parts[1]);
                 if(seq > maxSeq) maxSeq = seq;
             }
         });
-        return `JC-${dStr}-${String(maxSeq + 1).padStart(3, '0')}`;
+        return `${prefix}-${String(maxSeq + 1).padStart(3, '0')}`;
     }
 
     function updateCartonWorkflow() {
@@ -1687,7 +1691,7 @@
             
             let subJob = jobNo;
             if (blocks.length > 1) {
-                subJob = `${jobNo}-${String.fromCharCode(65 + idx)}`;
+                subJob = `${jobNo}(${String.fromCharCode(65 + idx)})`;
             }
 
             itemsArray.push({
@@ -1708,11 +1712,14 @@
         const checkboxes = document.querySelectorAll('.workflow-checkbox:checked');
         if (checkboxes.length === 0) { showToast("Please select at least one workflow step.", "error"); return; }
 
+        const saveTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
         const baseFields = {
             jobNumber: jobNo, date: document.getElementById('poDate').value, targetDeliveryDate: document.getElementById('targetDeliveryDate').value,
             party: partyInput, po: document.getElementById('poNumber').value, items: itemsArray,
             itemName: itemsArray.map(i => i.itemName).join(', '), quantity: itemsArray.reduce((acc, i) => acc + i.quantity, 0), dimensions: itemsArray[0].dimensions, 
-            paperSummaryText: globalPaperText, rollsSummaryText: globalRollText, cartonType: type, laminationVarnish: type === 'Offset' ? finishVal : ''
+            paperSummaryText: globalPaperText, rollsSummaryText: globalRollText, cartonType: type, laminationVarnish: type === 'Offset' ? finishVal : '',
+            savedTime: saveTime
         };
 
         if (editingJobId) {
@@ -1793,7 +1800,7 @@
         
         calculateAllJobs();
         switchPage('new-po');
-        showToast("Editing Job Card " + job.jobNumber, "success");
+        showToast("Editing Job Order " + job.jobNumber, "success");
     }
 
     function duplicateJob(id) {
@@ -1957,7 +1964,7 @@
             tr.innerHTML = `
                 <td class="cb-cell"><input type="checkbox" class="job-cb" value="${job.id}"></td>
                 <td>${job.date}</td>
-                <td><strong>${job.jobNumber}</strong><br><small style="color:var(--text-secondary)">PO: ${job.po}</small></td>
+                <td><strong>${job.jobNumber}</strong><br><small style="color:var(--text-secondary)">Customer PO: ${job.po}</small></td>
                 <td>${job.party}</td>
                 <td>${itemsStr}</td>
                 <td>${qtyTotal}</td>
@@ -2194,15 +2201,15 @@
             <table class="print-table" style="width:100%; margin-bottom: 2rem;">
                 <thead><tr><th>Item/Sub #</th><th>Ply</th><th>Size</th><th>Quantity</th><th>Roll Size</th><th>Cut Length</th></tr></thead>
                 <tbody>
-                    ${jobItems.map(i => `<tr><td><strong>${i.subJobNumber || job.jobNumber}</strong><br><small>${i.itemName}</small></td><td>${i.ply}</td><td>${i.dimensions.L}×${i.dimensions.W}×${i.dimensions.H} ${i.dimensions.unit}</td><td>${i.quantity}</td><td>${i.calc.RS}</td><td>${i.calc.CL}</td></tr>`).join('')}
+                    ${jobItems.map(i => `<tr><td><strong>${i.subJobNumber \vert{}\vert{} job.jobNumber}</strong><br><small>${i.itemName}</small></td><td>${i.ply}</td><td>${i.dimensions.L}×${i.dimensions.W}×${i.dimensions.H} ${i.dimensions.unit}</td><td>${i.quantity}</td><td>${i.calc.RS}</td><td>${i.calc.CL}</td></tr>`).join('')}
                 </tbody>
             </table>`;
 
         const html = `
             <div class="detail-grid">
-                <div class="detail-item"><strong>Master Job Number</strong><span>${job.jobNumber}</span></div>
+                <div class="detail-item"><strong>Master Job Order Number</strong><span>${job.jobNumber}</span></div>
                 <div class="detail-item"><strong>Customer / Party</strong><span>${job.party}</span></div>
-                <div class="detail-item"><strong>PO Number</strong><span>${job.po}</span></div>
+                <div class="detail-item"><strong>Customer PO</strong><span>${job.po}</span></div>
                 <div class="detail-item"><strong>Date</strong><span>${job.date}</span></div>
                 <div class="detail-item"><strong>Target Delivery</strong><span>${job.targetDeliveryDate}</span></div>
                 <div class="detail-item"><strong>Process</strong><span>${job.cartonType}</span></div>
@@ -2210,8 +2217,8 @@
             <h3 style="margin-top:1rem; font-weight:800; color:var(--text-primary);">🗃 Sub-Items in this Job</h3>
             ${itemsHtml}
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
-                <div class="detail-item"><strong>COMBINED MATERIAL ISSUE SLIP</strong><pre style="font-family: var(--font-mono); font-size: 0.9rem; margin-top:0.4rem;">${job.paperSummaryText}</pre></div>
-                <div class="detail-item"><strong>COMBINED CORRUGATION WORK ORDER</strong><pre style="font-family: var(--font-mono); font-size: 0.9rem; margin-top:0.4rem;">${job.rollsSummaryText}</pre></div>
+                <div class="detail-item"><strong>COMBINED STORE DEMAND (PAPER)</strong><pre style="font-family: var(--font-mono); font-size: 0.9rem; margin-top:0.4rem;">${job.paperSummaryText}</pre></div>
+                <div class="detail-item"><strong>COMBINED STORE DEMAND (ROLLS)</strong><pre style="font-family: var(--font-mono); font-size: 0.9rem; margin-top:0.4rem;">${job.rollsSummaryText}</pre></div>
             </div>`;
         document.getElementById('jobDetail').innerHTML = html;
 
@@ -2272,7 +2279,7 @@
     function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
 
     function deleteJob(id) {
-        if(confirm('Delete this Job Card completely?')) {
+        if(confirm('Delete this Job Order completely?')) {
             allJobs = allJobs.filter(j => j.id !== id); saveAllJobsData(allJobs);
             renderJobsTable(); loadDashboard();
             if (document.getElementById('production-board').classList.contains('active')) { renderStageTabs(); renderProdBoardTable(); }
@@ -2296,14 +2303,15 @@
                     <div class="print-header">
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <img src="Logo.jpeg" alt="Zafar Habib Logo" class="print-logo-main" onerror="this.style.display='none'">
-                            <div><div class="print-company">Zafar Habib Packages (Pvt) Ltd</div><div class="print-title">Master Job Card</div></div>
+                            <div><div class="print-company">Zafar Habib Packages (Pvt) Ltd</div><div class="print-title">Job Order</div></div>
                         </div>
-                        <div style="text-align: right;"><div class="print-job-no">${job.jobNumber}</div><div class="print-date">Date: ${job.date}</div></div>
+                        <div style="text-align: right;"><div class="print-job-no">${job.jobNumber}</div><div class="print-date">Date: ${job.date} ${job.savedTime ? '| ' + job.savedTime : ''}</div></div>
                     </div>
                     <div class="print-grid-4" style="margin-bottom: 8px;">
                         <div class="print-field" style="grid-column: span 2;"><strong>Customer Name:</strong> <span>${job.party}</span></div>
-                        <div class="print-field"><strong>PO Number:</strong> <span>${job.po}</span></div>
-                        <div class="print-field"><strong>Total Master Qty:</strong> <span>${totalQty}</span></div>
+                        <div class="print-field"><strong>Customer PO:</strong> <span>${job.po}</span></div>
+                        <div class="print-field"><strong>Total QTY:</strong> <span>${totalQty}</span></div>
+                        <div class="print-field" style="grid-column: span 2;"><strong>Target Date:</strong> <span>${job.targetDeliveryDate}</span></div>
                     </div>
                     ${jobSteps ? `<div style="text-align: center; margin: 10px 0; padding: 6px; border: 1.5px solid #000; background: #f8fafc !important; font-size: 9pt; font-weight: 700; border-radius: 4px; -webkit-print-color-adjust: exact;"><strong>PRODUCTION WORKFLOW:</strong> ${jobSteps}</div>` : ''}
                     <div style="font-size: 8pt; font-weight: bold; margin-bottom: 2px;">Sub-Items in this Job:</div>
@@ -2315,37 +2323,43 @@
                 <div class="print-bottom-wrap clearfix">
                     <div class="print-sec-2">
                         <div class="print-header-small">
-                            <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">MATERIAL ISSUE SLIP</div></div>
+                            <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">STORE DEMAND</div></div>
                             <div style="text-align: right;"><div style="font-weight: bold; font-size: 11pt;">${job.jobNumber}</div><div style="font-size: 8pt;">Date: ${job.date}</div></div>
                         </div>
-                        <div class="print-info-block"><strong>Customer:</strong> ${job.party} <br><strong>PO Number:</strong> ${job.po} &nbsp;|&nbsp; <strong>Target:</strong> ${job.targetDeliveryDate} <br><strong>Total Quantity:</strong> ${totalQty}</div>
+                        <div class="print-info-block"><strong>Customer:</strong> ${job.party} <br><strong>Customer PO:</strong> ${job.po} &nbsp;|&nbsp; <strong>Target:</strong> ${job.targetDeliveryDate} <br><strong>Total QTY:</strong> ${totalQty}</div>
                         <table class="print-table" style="margin-bottom: auto;">
-                            <tr><th>Paper Requirements (Type/GSM)</th><th>Total KGs</th></tr>
-                            ${getPrintTotalPaper(job.paperSummaryText).split('\n').map(line => {
-                                if(!line.trim() || line.includes('---')) return ''; 
-                                if(line.includes('TOTAL REQUIREMENT')) return `<tr><td colspan="2" style="background:#e2e8f0 !important; font-weight:900; font-size:9pt; padding:6px 4px; text-align:center;">${line}</td></tr>`; 
-                                const pts = line.split('='); 
-                                if(pts.length === 2) return `<tr><td>${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`; 
-                                return `<tr><td colspan="2">${line}</td></tr>`;
-                            }).join('')}
+                            <tr><th>Paper Reel issue</th><th>Total KGs</th></tr>
+                            ${(() => {
+                                let pCount = 1;
+                                return getPrintTotalPaper(job.paperSummaryText).split('\n').map(line => {
+                                    if(!line.trim() || line.includes('---')) return ''; 
+                                    if(line.includes('TOTAL REQUIREMENT')) return `<tr><td colspan="2" style="background:#e2e8f0 !important; font-weight:900; font-size:9pt; padding:6px 4px; text-align:center;">${line}</td></tr>`; 
+                                    const pts = line.split('='); 
+                                    if(pts.length === 2) return `<tr><td>${pCount++}.${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`; 
+                                    return `<tr><td colspan="2">${line}</td></tr>`;
+                                }).join('');
+                            })()}
                         </table>
                         <div class="print-signatures"><div class="sig-line">Issued By</div><div class="sig-line">Received By</div></div>
                     </div>
                     <div class="print-sec-3">
                         <div class="print-header-small">
-                            <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">CORRUGATION W.O.</div></div>
+                            <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">STORE DEMAND</div></div>
                             <div style="text-align: right;"><div style="font-weight: bold; font-size: 11pt;">${job.jobNumber}</div><div style="font-size: 8pt;">Date: ${job.date}</div></div>
                         </div>
-                        <div class="print-info-block"><strong>Customer:</strong> ${job.party} <br><strong>PO Number:</strong> ${job.po} &nbsp;|&nbsp; <strong>Target:</strong> ${job.targetDeliveryDate} <br><strong>Process:</strong> ${job.cartonType} &nbsp;|&nbsp; <strong>Total Cuts:</strong> ${totalQty}</div>
+                        <div class="print-info-block"><strong>Customer:</strong> ${job.party} <br><strong>Customer PO:</strong> ${job.po} &nbsp;|&nbsp; <strong>Target:</strong> ${job.targetDeliveryDate} <br><strong>Process:</strong> ${job.cartonType} &nbsp;|&nbsp; <strong>Total Cuts:</strong> ${totalQty}</div>
                         <table class="print-table" style="margin-bottom: auto;">
                             <tr><th>Paired Roll Setup (Size & Layers)</th><th style="text-align:right;">Total Rolls</th></tr>
-                            ${getPrintTotalPaper(job.rollsSummaryText).split('\n').map(line => {
-                                if(!line.trim() || line.includes('---')) return ''; 
-                                if(line.includes('TOTAL REQUIREMENT')) return `<tr><td colspan="2" style="background:#e2e8f0 !important; font-weight:900; font-size:9pt; padding:6px 4px; text-align:center;">${line}</td></tr>`; 
-                                const pts = line.split('='); 
-                                if(pts.length === 2) return `<tr><td>${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`; 
-                                return `<tr><td colspan="2">${line}</td></tr>`;
-                            }).join('')}
+                            ${(() => {
+                                let rCount = 1;
+                                return getPrintTotalPaper(job.rollsSummaryText).split('\n').map(line => {
+                                    if(!line.trim() || line.includes('---')) return ''; 
+                                    if(line.includes('TOTAL REQUIREMENT')) return `<tr><td colspan="2" style="background:#e2e8f0 !important; font-weight:900; font-size:9pt; padding:6px 4px; text-align:center;">${line}</td></tr>`; 
+                                    const pts = line.split('='); 
+                                    if(pts.length === 2) return `<tr><td>${rCount++}.${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`; 
+                                    return `<tr><td colspan="2">${line}</td></tr>`;
+                                }).join('');
+                            })()}
                         </table>
                         <div class="print-signatures"><div class="sig-line">Operator</div><div class="sig-line">QC Check</div></div>
                     </div>
@@ -2363,6 +2377,9 @@
         let htmlContentRolls = '';
         let totalQty = 0; 
         let jobRowsHtml = '';
+        
+        let pCountBatch = 1;
+        let rCountBatch = 1;
 
         jobs.forEach(job => {
             const jobItems = job.items ? job.items : [job];
@@ -2378,7 +2395,7 @@
                     htmlContentPaper += `<tr><td colspan="2" style="font-weight:bold; padding-top:4px;">${line}</td></tr>`;
                 } else {
                     const pts = line.split('=');
-                    if(pts.length === 2) htmlContentPaper += `<tr><td>${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`;
+                    if(pts.length === 2) htmlContentPaper += `<tr><td>${pCountBatch++}. ${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`;
                 }
             });
 
@@ -2389,7 +2406,7 @@
                     htmlContentRolls += `<tr><td colspan="2" style="font-weight:bold; padding-top:4px;">${line}</td></tr>`;
                 } else {
                     const pts = line.split('=');
-                    if(pts.length === 2) htmlContentRolls += `<tr><td>${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`;
+                    if(pts.length === 2) htmlContentRolls += `<tr><td>${rCountBatch++}. ${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`;
                 }
             });
         });
@@ -2406,13 +2423,13 @@
                         <div class="print-header">
                             <div style="display: flex; align-items: center; gap: 12px;">
                                 <img src="Logo.jpeg" alt="Zafar Habib Logo" class="print-logo-main" onerror="this.style.display='none'">
-                                <div><div class="print-company">Zafar Habib Packages (Pvt) Ltd</div><div class="print-title">BATCH MATERIAL SLIP</div></div>
+                                <div><div class="print-company">Zafar Habib Packages (Pvt) Ltd</div><div class="print-title">BATCH STORE DEMAND</div></div>
                             </div>
                             <div style="text-align: right;"><div class="print-job-no" style="font-size:12pt;">PAPER ONLY</div><div class="print-date">Date: ${new Date().toLocaleDateString()}</div></div>
                         </div>
-                        <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos}</div>
+                        <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>Customer POs:</strong> ${pos}</div>
                         <table class="print-table" style="margin-bottom: 20px;">
-                            <tr><th colspan="2">Consolidated Paper Requirement Breakdown</th></tr>
+                            <tr><th colspan="2">Consolidated Paper Reel issue</th></tr>
                             ${htmlContentPaper || '<tr><td colspan="2" style="text-align:center;">No paper required</td></tr>'}
                         </table>
                         <div class="print-signatures"><div class="sig-line">Issued By</div><div class="sig-line">Received By</div></div>
@@ -2425,11 +2442,11 @@
                         <div class="print-header">
                             <div style="display: flex; align-items: center; gap: 12px;">
                                 <img src="Logo.jpeg" alt="Zafar Habib Logo" class="print-logo-main" onerror="this.style.display='none'">
-                                <div><div class="print-company">Zafar Habib Packages (Pvt) Ltd</div><div class="print-title">BATCH CORRUGATION W.O.</div></div>
+                                <div><div class="print-company">Zafar Habib Packages (Pvt) Ltd</div><div class="print-title">BATCH STORE DEMAND</div></div>
                             </div>
                             <div style="text-align: right;"><div class="print-job-no" style="font-size:12pt;">ROLLS ONLY</div><div class="print-date">Date: ${new Date().toLocaleDateString()}</div></div>
                         </div>
-                        <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos}</div>
+                        <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>Customer POs:</strong> ${pos}</div>
                         <table class="print-table" style="margin-bottom: 20px;">
                             <tr><th colspan="2">Consolidated Paired Roll Setup Breakdown</th></tr>
                             ${htmlContentRolls || '<tr><td colspan="2" style="text-align:center;">No rolls required</td></tr>'}
@@ -2444,14 +2461,14 @@
                         <div class="print-header">
                             <div style="display: flex; align-items: center; gap: 12px;">
                                 <img src="Logo.jpeg" alt="Zafar Habib Logo" class="print-logo-main" onerror="this.style.display='none'">
-                                <div><div class="print-company">Zafar Habib Packages (Pvt) Ltd</div><div class="print-title">CONSOLIDATED BATCH CARD</div></div>
+                                <div><div class="print-company">Zafar Habib Packages (Pvt) Ltd</div><div class="print-title">CONSOLIDATED JOB ORDER</div></div>
                             </div>
                             <div style="text-align: right;"><div class="print-job-no" style="font-size:12pt;">BATCH PRINT</div><div class="print-date">Date: ${new Date().toLocaleDateString()}</div></div>
                         </div>
                         <div class="print-grid-4" style="margin-bottom: 4px;">
                             <div class="print-field" style="grid-column: span 2;"><strong>Customer(s):</strong> <span>${parties}</span></div>
-                            <div class="print-field"><strong>PO Number(s):</strong> <span>${pos}</span></div>
-                            <div class="print-field"><strong>Total Master Qty:</strong> <span>${totalQty}</span></div>
+                            <div class="print-field"><strong>Customer PO(s):</strong> <span>${pos}</span></div>
+                            <div class="print-field"><strong>Total QTY:</strong> <span>${totalQty}</span></div>
                         </div>
                         <div style="font-size: 8pt; font-weight: bold; margin-bottom: 2px;">All Items in Batch:</div>
                         <table class="print-table" style="margin-top:0;">
@@ -2462,22 +2479,22 @@
                     <div class="print-bottom-wrap clearfix">
                         <div class="print-sec-2">
                             <div class="print-header-small">
-                                <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">MATERIAL ISSUE SLIP</div></div>
+                                <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">STORE DEMAND</div></div>
                                 <div style="text-align: right; font-weight: bold; font-size:10pt;">CONSOLIDATED</div>
                             </div>
-                            <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos} <br><strong>Total Batch Qty:</strong> ${totalQty}</div>
+                            <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>Customer POs:</strong> ${pos} <br><strong>Total QTY:</strong> ${totalQty}</div>
                             <table class="print-table" style="margin-bottom: auto;">
-                                <tr><th colspan="2">Paper Requirement Breakdown</th></tr>
+                                <tr><th colspan="2">Paper Reel issue</th></tr>
                                 ${htmlContentPaper || '<tr><td colspan="2" style="text-align:center;">No paper required</td></tr>'}
                             </table>
                             <div class="print-signatures"><div class="sig-line">Issued By</div><div class="sig-line">Received By</div></div>
                         </div>
                         <div class="print-sec-3">
                             <div class="print-header-small">
-                                <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">CORRUGATION WORK ORDER</div></div>
+                                <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">STORE DEMAND</div></div>
                                 <div style="text-align: right; font-weight: bold; font-size:10pt;">CONSOLIDATED</div>
                             </div>
-                            <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos} <br><strong>Total Batch Qty:</strong> ${totalQty}</div>
+                            <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>Customer POs:</strong> ${pos} <br><strong>Total QTY:</strong> ${totalQty}</div>
                             <table class="print-table" style="margin-bottom: auto;">
                                 <tr><th colspan="2">Paired Roll Setup Breakdown</th></tr>
                                 ${htmlContentRolls || '<tr><td colspan="2" style="text-align:center;">No rolls required</td></tr>'}
@@ -2492,4 +2509,3 @@
 </script>
 </body>
 </html>
-      
