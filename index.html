@@ -228,7 +228,6 @@
     .stage-tab.active { background: var(--primary-accent); color: #fff; border-color: var(--primary-accent); box-shadow: 0 8px 20px rgba(59,130,246,0.3); transform: translateY(-2px); }
     .stage-badge { background: var(--danger); padding: 4px 10px; border-radius: 20px; font-size: 0.95rem; font-weight: 900; color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: all .3s;}
     .stage-tab.active .stage-badge { background: #fff; color: var(--primary-accent); }
-    [data-theme="dark"] .stage-badge { background: rgba(255,255,255,0.1); }
 
     /* Status Board Horizontal Timeline */
     .status-timeline { display: flex; gap: 6px; margin-top: 15px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: thin; align-items: center; scroll-behavior: smooth;}
@@ -253,12 +252,6 @@
     .sc-stage { font-size: 0.85rem; font-weight: 800; text-transform: uppercase; color: var(--text-primary); margin-top: 5px;}
     .progress-circle { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
     .progress-circle-inner { width: 38px; height: 38px; border-radius: 50%; background: var(--bg-primary); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; color: var(--text-primary); }
-
-    /* Success Overlay Animation */
-    .success-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-    .success-box { background: var(--bg-primary); padding: 3rem; border-radius: var(--radius-lg); text-align: center; box-shadow: var(--shadow-lg); animation: successPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-    .success-icon { font-size: 5rem; margin-bottom: 1rem; display: block; color: var(--success); }
-    .success-text { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); font-family: var(--font-display); }
 
     /* Toast Notification System */
     .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; pointer-events: none;}
@@ -479,7 +472,7 @@
                                 <div class="form-row">
                                     <div class="form-group-wrapper">
                                         <label>Job Number (Auto-Generated)</label>
-                                        <input type="text" id="jobNumber" readonly placeholder="JO-DDMMYY-XXX" style="font-family: var(--font-mono); font-weight: 900; font-size: 1.1rem; color: var(--primary-accent);">
+                                        <input type="text" id="jobNumber" readonly placeholder="JC-YYYYMMDD-XXX" style="font-family: var(--font-mono); font-weight: 900; font-size: 1.1rem; color: var(--primary-accent);">
                                     </div>
                                     <div class="form-group-wrapper">
                                         <label class="required">Date</label>
@@ -497,7 +490,7 @@
                                         </div>
                                     </div>
                                     <div class="form-group-wrapper">
-                                        <label class="required">Customer PO</label>
+                                        <label class="required">PO Number</label>
                                         <input type="text" id="poNumber" placeholder="e.g., PO-001" required oninput="saveDraft()">
                                     </div>
                                 </div>
@@ -544,11 +537,11 @@
                                 <h3 style="margin-top: 2.5rem; margin-bottom: 1.5rem; color: var(--text-primary); font-family: var(--font-display);">▤ Global Job Requirements</h3>
                                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
                                     <div style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: 12px; border: 2px solid var(--border);">
-                                        <strong style="color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 10px; display: block;">STORE DEMAND (PAPER)</strong>
+                                        <strong style="color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 10px; display: block;">COMBINED MATERIAL ISSUE SLIP (PAPER)</strong>
                                         <pre id="calcPaperSummary" style="font-family: var(--font-mono); font-size: 0.95rem; white-space: pre-wrap; line-height: 1.6; font-weight: 700;">-</pre>
                                     </div>
                                     <div style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: 12px; border: 2px solid var(--border);">
-                                        <strong style="color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 10px; display: block;">CORRUGATION W.O. (ROLLS)</strong>
+                                        <strong style="color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 10px; display: block;">COMBINED CORRUGATION W.O. (ROLLS)</strong>
                                         <pre id="calcRollsSummary" style="font-family: var(--font-mono); font-size: 0.95rem; white-space: pre-wrap; line-height: 1.6; font-weight: 700;">-</pre>
                                     </div>
                                 </div>
@@ -597,7 +590,7 @@
                                     <th>Job/Sub #</th>
                                     <th>Customer</th>
                                     <th>Items (Grouped)</th>
-                                    <th>QTY</th>
+                                    <th>Total Qty</th>
                                     <th>Sizes</th>
                                     <th>Stage</th>
                                     <th>Actions</th>
@@ -643,10 +636,10 @@
                                 <tr>
                                     <th>Date</th>
                                     <th>Job #</th>
-                                    <th>Customer PO</th>
+                                    <th>PO #</th>
                                     <th>Customer</th>
                                     <th>Items</th>
-                                    <th>QTY</th>
+                                    <th>Total Qty</th>
                                     <th>Status &amp; Action</th>
                                 </tr>
                             </thead>
@@ -685,7 +678,7 @@
             <div id="settings" class="page">
                 <div class="page-heading">
                     <div>
-                        <h2>⚙ Application Settings</h2>
+                        <h2>⛭ Application Settings</h2>
                         <p>Manage preferences, users, customers, and visual themes.</p>
                     </div>
                 </div>
@@ -1349,10 +1342,12 @@
                     const rollObj = buildRollsSummaryObj(specStr, finalCL, qty);
                     let itemRText = `${itemName}:\n`; let addedR = false;
                     for(let key in rollObj) {
+                        // New exact format requested by user: HPK200+HPK200    (22/73)    108.3 Rolls
                         let rKey = `${key}    (${finalRS}/${finalCL.toFixed(2)})`;
                         globalRollObj[rKey] = (globalRollObj[rKey] || 0) + rollObj[key];
+                        // Also format the display block
                         let paddedKey = key.padEnd(25, ' ');
-                        itemRText += `  • ${paddedKey}(${finalRS}/${finalCL.toFixed(2)})`.padEnd(50, ' ') + `${Math.ceil(rollObj[key])} Rolls\n`;
+                        itemRText += `  • ${paddedKey}(${finalRS}/${finalCL.toFixed(2)})`.padEnd(50, ' ') + `${Number(rollObj[key]).toFixed(1)} Rolls\n`;
                         addedR = true;
                     }
                     if(addedR) perItemRollText += itemRText + '\n';
@@ -1366,29 +1361,23 @@
             }
         });
 
-        // Sorted outputs with numbering and rounding
+        // Sorted outputs
         if(Object.keys(globalPaperObj).length > 0) {
             let finalPaperText = blocks.length > 1 ? perItemPaperText + "------------------\nTOTAL REQUIREMENT:\n" : "TOTAL REQUIREMENT:\n";
-            let idx = 1;
-            for(let key of Object.keys(globalPaperObj).sort()) { 
-                finalPaperText += `${idx}. ${key} = ${Math.ceil(globalPaperObj[key])} KGs\n`; 
-                idx++;
-            }
+            for(let key of Object.keys(globalPaperObj).sort()) { finalPaperText += `${key} = ${Math.ceil(globalPaperObj[key])} KGs\n`; }
             globalPaperText = finalPaperText; document.getElementById('calcPaperSummary').textContent = globalPaperText;
         } else { globalPaperText = "-"; document.getElementById('calcPaperSummary').textContent = "-"; }
 
         if(Object.keys(globalRollObj).length > 0) {
             let finalRollText = blocks.length > 1 ? perItemRollText + "------------------\nTOTAL REQUIREMENT:\n" : "TOTAL REQUIREMENT:\n";
-            let idx = 1;
             for(let key of Object.keys(globalRollObj).sort()) { 
                 let exactKeySplit = key.split('    ');
                 let actualPaper = exactKeySplit[0] || '';
                 let sizes = exactKeySplit[1] || '';
-                let paddedPaper = (`${idx}. ` + actualPaper).padEnd(25, ' ');
+                let paddedPaper = actualPaper.padEnd(25, ' ');
                 let paddedSizes = sizes.padEnd(20, ' ');
                 
-                finalRollText += `${paddedPaper}${paddedSizes} ${Math.ceil(globalRollObj[key])} Rolls\n`; 
-                idx++;
+                finalRollText += `${paddedPaper}${paddedSizes} ${Number(globalRollObj[key]).toFixed(1)} Rolls\n`; 
             }
             globalRollText = finalRollText; document.getElementById('calcRollsSummary').textContent = globalRollText;
         } else { globalRollText = "-"; document.getElementById('calcRollsSummary').textContent = "-"; }
@@ -1483,21 +1472,6 @@
     }
 
     // ===== WORKFLOW & PO GENERATION =====
-    function generateJobNumber() {
-        const today = new Date();
-        const dStr = String(today.getDate()).padStart(2, '0') + String(today.getMonth() + 1).padStart(2, '0') + String(today.getFullYear()).slice(-2);
-        const todaysJobs = allJobs.filter(j => j.jobNumber && j.jobNumber.includes(dStr));
-        let maxSeq = 0;
-        todaysJobs.forEach(j => {
-            const parts = j.jobNumber.split('-');
-            if(parts.length === 2) {
-                const seq = parseInt(parts[1]);
-                if(seq > maxSeq) maxSeq = seq;
-            }
-        });
-        return `JO${dStr}-${String(maxSeq + 1).padStart(3, '0')}`;
-    }
-
     function addItemBlock() {
         const index = itemCounter++;
         const defaultUnit = localStorage.getItem('zhDefUnit') || 'INCH';
@@ -1607,6 +1581,21 @@
         if (!silent) showToast("Form Reset & Cleared", 'success');
     }
 
+    function generateJobNumber() {
+        const today = new Date();
+        const dStr = today.getFullYear() + String(today.getMonth() + 1).padStart(2, '0') + String(today.getDate()).padStart(2, '0');
+        const todaysJobs = allJobs.filter(j => j.jobNumber && j.jobNumber.includes(dStr));
+        let maxSeq = 0;
+        todaysJobs.forEach(j => {
+            const parts = j.jobNumber.split('-');
+            if(parts.length === 3) {
+                const seq = parseInt(parts[2]);
+                if(seq > maxSeq) maxSeq = seq;
+            }
+        });
+        return `JC-${dStr}-${String(maxSeq + 1).padStart(3, '0')}`;
+    }
+
     function updateCartonWorkflow() {
         const type = document.getElementById('cartonType').value;
         const offsetWrap = document.getElementById('offsetFinishingWrapper');
@@ -1698,7 +1687,7 @@
             
             let subJob = jobNo;
             if (blocks.length > 1) {
-                subJob = `${jobNo}(${String.fromCharCode(65 + idx)})`;
+                subJob = `${jobNo}-${String.fromCharCode(65 + idx)}`;
             }
 
             itemsArray.push({
@@ -1719,11 +1708,8 @@
         const checkboxes = document.querySelectorAll('.workflow-checkbox:checked');
         if (checkboxes.length === 0) { showToast("Please select at least one workflow step.", "error"); return; }
 
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-
         const baseFields = {
-            jobNumber: jobNo, date: document.getElementById('poDate').value, time: timeStr, targetDeliveryDate: document.getElementById('targetDeliveryDate').value,
+            jobNumber: jobNo, date: document.getElementById('poDate').value, targetDeliveryDate: document.getElementById('targetDeliveryDate').value,
             party: partyInput, po: document.getElementById('poNumber').value, items: itemsArray,
             itemName: itemsArray.map(i => i.itemName).join(', '), quantity: itemsArray.reduce((acc, i) => acc + i.quantity, 0), dimensions: itemsArray[0].dimensions, 
             paperSummaryText: globalPaperText, rollsSummaryText: globalRollText, cartonType: type, laminationVarnish: type === 'Offset' ? finishVal : ''
@@ -1971,7 +1957,7 @@
             tr.innerHTML = `
                 <td class="cb-cell"><input type="checkbox" class="job-cb" value="${job.id}"></td>
                 <td>${job.date}</td>
-                <td><strong>${job.jobNumber}</strong><br><small style="color:var(--text-secondary)">Customer PO: ${job.po}</small></td>
+                <td><strong>${job.jobNumber}</strong><br><small style="color:var(--text-secondary)">PO: ${job.po}</small></td>
                 <td>${job.party}</td>
                 <td>${itemsStr}</td>
                 <td>${qtyTotal}</td>
@@ -2044,7 +2030,7 @@
                 <div class="status-card-header">
                     <div>
                         <div class="sc-jobno">${job.jobNumber}</div>
-                        <div class="sc-party">${job.party} | Customer PO: ${job.po}</div>
+                        <div class="sc-party">${job.party} | PO: ${job.po}</div>
                     </div>
                     <div style="text-align: right; font-size: 0.75rem; color: var(--text-secondary); font-weight: 700;">Target: ${job.targetDeliveryDate}</div>
                 </div>
@@ -2193,7 +2179,7 @@
 
     function advanceJobTask(event, jobId, taskId) { 
         const row = event.target.closest('tr');
-        if(row) row.style.display = 'none'; 
+        if(row) row.style.display = 'none'; // Instant visual feedback
         toggleTask(jobId, taskId, true); 
     }
 
@@ -2208,15 +2194,15 @@
             <table class="print-table" style="width:100%; margin-bottom: 2rem;">
                 <thead><tr><th>Item/Sub #</th><th>Ply</th><th>Size</th><th>Quantity</th><th>Roll Size</th><th>Cut Length</th></tr></thead>
                 <tbody>
-                    ${jobItems.map(i => `<tr><td><strong>${i.subJobNumber \vert{}\vert{} job.jobNumber}</strong><br><small>${i.itemName}</small></td><td>${i.ply}</td><td>${i.dimensions.L}×${i.dimensions.W}×${i.dimensions.H} ${i.dimensions.unit}</td><td>${i.quantity}</td><td>${i.calc.RS}</td><td>${i.calc.CL}</td></tr>`).join('')}
+                    ${jobItems.map(i => `<tr><td><strong>${i.subJobNumber || job.jobNumber}</strong><br><small>${i.itemName}</small></td><td>${i.ply}</td><td>${i.dimensions.L}×${i.dimensions.W}×${i.dimensions.H} ${i.dimensions.unit}</td><td>${i.quantity}</td><td>${i.calc.RS}</td><td>${i.calc.CL}</td></tr>`).join('')}
                 </tbody>
             </table>`;
 
         const html = `
             <div class="detail-grid">
-                <div class="detail-item"><strong>Job Order</strong><span>${job.jobNumber}</span></div>
+                <div class="detail-item"><strong>Master Job Number</strong><span>${job.jobNumber}</span></div>
                 <div class="detail-item"><strong>Customer / Party</strong><span>${job.party}</span></div>
-                <div class="detail-item"><strong>Customer PO</strong><span>${job.po}</span></div>
+                <div class="detail-item"><strong>PO Number</strong><span>${job.po}</span></div>
                 <div class="detail-item"><strong>Date</strong><span>${job.date}</span></div>
                 <div class="detail-item"><strong>Target Delivery</strong><span>${job.targetDeliveryDate}</span></div>
                 <div class="detail-item"><strong>Process</strong><span>${job.cartonType}</span></div>
@@ -2224,7 +2210,7 @@
             <h3 style="margin-top:1rem; font-weight:800; color:var(--text-primary);">🗃 Sub-Items in this Job</h3>
             ${itemsHtml}
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
-                <div class="detail-item"><strong>COMBINED STORE DEMAND</strong><pre style="font-family: var(--font-mono); font-size: 0.9rem; margin-top:0.4rem;">${job.paperSummaryText}</pre></div>
+                <div class="detail-item"><strong>COMBINED MATERIAL ISSUE SLIP</strong><pre style="font-family: var(--font-mono); font-size: 0.9rem; margin-top:0.4rem;">${job.paperSummaryText}</pre></div>
                 <div class="detail-item"><strong>COMBINED CORRUGATION WORK ORDER</strong><pre style="font-family: var(--font-mono); font-size: 0.9rem; margin-top:0.4rem;">${job.rollsSummaryText}</pre></div>
             </div>`;
         document.getElementById('jobDetail').innerHTML = html;
@@ -2286,7 +2272,7 @@
     function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
 
     function deleteJob(id) {
-        if(confirm('Delete this Job Order completely?')) {
+        if(confirm('Delete this Job Card completely?')) {
             allJobs = allJobs.filter(j => j.id !== id); saveAllJobsData(allJobs);
             renderJobsTable(); loadDashboard();
             if (document.getElementById('production-board').classList.contains('active')) { renderStageTabs(); renderProdBoardTable(); }
@@ -2310,15 +2296,14 @@
                     <div class="print-header">
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <img src="Logo.jpeg" alt="Zafar Habib Logo" class="print-logo-main" onerror="this.style.display='none'">
-                            <div><div class="print-company">Zafar Habib Packages (Pvt) Ltd</div><div class="print-title">JOB ORDER</div></div>
+                            <div><div class="print-company">Zafar Habib Packages (Pvt) Ltd</div><div class="print-title">Master Job Card</div></div>
                         </div>
-                        <div style="text-align: right;"><div class="print-job-no">${job.jobNumber}</div><div class="print-date">Date: ${job.date} <br>Time: ${job.time || ''}</div></div>
+                        <div style="text-align: right;"><div class="print-job-no">${job.jobNumber}</div><div class="print-date">Date: ${job.date}</div></div>
                     </div>
                     <div class="print-grid-4" style="margin-bottom: 8px;">
                         <div class="print-field" style="grid-column: span 2;"><strong>Customer Name:</strong> <span>${job.party}</span></div>
-                        <div class="print-field"><strong>Customer PO:</strong> <span>${job.po}</span></div>
-                        <div class="print-field"><strong>Target Date:</strong> <span>${job.targetDeliveryDate}</span></div>
-                        <div class="print-field"><strong>QTY:</strong> <span>${totalQty}</span></div>
+                        <div class="print-field"><strong>PO Number:</strong> <span>${job.po}</span></div>
+                        <div class="print-field"><strong>Total Master Qty:</strong> <span>${totalQty}</span></div>
                     </div>
                     ${jobSteps ? `<div style="text-align: center; margin: 10px 0; padding: 6px; border: 1.5px solid #000; background: #f8fafc !important; font-size: 9pt; font-weight: 700; border-radius: 4px; -webkit-print-color-adjust: exact;"><strong>PRODUCTION WORKFLOW:</strong> ${jobSteps}</div>` : ''}
                     <div style="font-size: 8pt; font-weight: bold; margin-bottom: 2px;">Sub-Items in this Job:</div>
@@ -2330,12 +2315,12 @@
                 <div class="print-bottom-wrap clearfix">
                     <div class="print-sec-2">
                         <div class="print-header-small">
-                            <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">STORE DEMAND</div></div>
+                            <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">MATERIAL ISSUE SLIP</div></div>
                             <div style="text-align: right;"><div style="font-weight: bold; font-size: 11pt;">${job.jobNumber}</div><div style="font-size: 8pt;">Date: ${job.date}</div></div>
                         </div>
-                        <div class="print-info-block"><strong>Customer:</strong> ${job.party} <br><strong>Customer PO:</strong> ${job.po} &nbsp;|&nbsp; <strong>Target:</strong> ${job.targetDeliveryDate} <br><strong>QTY:</strong> ${totalQty}</div>
+                        <div class="print-info-block"><strong>Customer:</strong> ${job.party} <br><strong>PO Number:</strong> ${job.po} &nbsp;|&nbsp; <strong>Target:</strong> ${job.targetDeliveryDate} <br><strong>Total Quantity:</strong> ${totalQty}</div>
                         <table class="print-table" style="margin-bottom: auto;">
-                            <tr><th>Paper Reel Issue</th><th>Total KGs</th></tr>
+                            <tr><th>Paper Requirements (Type/GSM)</th><th>Total KGs</th></tr>
                             ${getPrintTotalPaper(job.paperSummaryText).split('\n').map(line => {
                                 if(!line.trim() || line.includes('---')) return ''; 
                                 if(line.includes('TOTAL REQUIREMENT')) return `<tr><td colspan="2" style="background:#e2e8f0 !important; font-weight:900; font-size:9pt; padding:6px 4px; text-align:center;">${line}</td></tr>`; 
@@ -2351,7 +2336,7 @@
                             <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">CORRUGATION W.O.</div></div>
                             <div style="text-align: right;"><div style="font-weight: bold; font-size: 11pt;">${job.jobNumber}</div><div style="font-size: 8pt;">Date: ${job.date}</div></div>
                         </div>
-                        <div class="print-info-block"><strong>Customer:</strong> ${job.party} <br><strong>Customer PO:</strong> ${job.po} &nbsp;|&nbsp; <strong>Target:</strong> ${job.targetDeliveryDate} <br><strong>Process:</strong> ${job.cartonType} &nbsp;|&nbsp; <strong>Total Cuts:</strong> ${totalQty}</div>
+                        <div class="print-info-block"><strong>Customer:</strong> ${job.party} <br><strong>PO Number:</strong> ${job.po} &nbsp;|&nbsp; <strong>Target:</strong> ${job.targetDeliveryDate} <br><strong>Process:</strong> ${job.cartonType} &nbsp;|&nbsp; <strong>Total Cuts:</strong> ${totalQty}</div>
                         <table class="print-table" style="margin-bottom: auto;">
                             <tr><th>Paired Roll Setup (Size & Layers)</th><th style="text-align:right;">Total Rolls</th></tr>
                             ${getPrintTotalPaper(job.rollsSummaryText).split('\n').map(line => {
@@ -2421,13 +2406,13 @@
                         <div class="print-header">
                             <div style="display: flex; align-items: center; gap: 12px;">
                                 <img src="Logo.jpeg" alt="Zafar Habib Logo" class="print-logo-main" onerror="this.style.display='none'">
-                                <div><div class="print-company">Zafar Habib Packages (Pvt) Ltd</div><div class="print-title">BATCH STORE DEMAND</div></div>
+                                <div><div class="print-company">Zafar Habib Packages (Pvt) Ltd</div><div class="print-title">BATCH MATERIAL SLIP</div></div>
                             </div>
                             <div style="text-align: right;"><div class="print-job-no" style="font-size:12pt;">PAPER ONLY</div><div class="print-date">Date: ${new Date().toLocaleDateString()}</div></div>
                         </div>
-                        <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>Customer POs:</strong> ${pos}</div>
+                        <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos}</div>
                         <table class="print-table" style="margin-bottom: 20px;">
-                            <tr><th colspan="2">Consolidated Paper Reel Issue Breakdown</th></tr>
+                            <tr><th colspan="2">Consolidated Paper Requirement Breakdown</th></tr>
                             ${htmlContentPaper || '<tr><td colspan="2" style="text-align:center;">No paper required</td></tr>'}
                         </table>
                         <div class="print-signatures"><div class="sig-line">Issued By</div><div class="sig-line">Received By</div></div>
@@ -2444,7 +2429,7 @@
                             </div>
                             <div style="text-align: right;"><div class="print-job-no" style="font-size:12pt;">ROLLS ONLY</div><div class="print-date">Date: ${new Date().toLocaleDateString()}</div></div>
                         </div>
-                        <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>Customer POs:</strong> ${pos}</div>
+                        <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos}</div>
                         <table class="print-table" style="margin-bottom: 20px;">
                             <tr><th colspan="2">Consolidated Paired Roll Setup Breakdown</th></tr>
                             ${htmlContentRolls || '<tr><td colspan="2" style="text-align:center;">No rolls required</td></tr>'}
@@ -2465,8 +2450,8 @@
                         </div>
                         <div class="print-grid-4" style="margin-bottom: 4px;">
                             <div class="print-field" style="grid-column: span 2;"><strong>Customer(s):</strong> <span>${parties}</span></div>
-                            <div class="print-field"><strong>Customer PO(s):</strong> <span>${pos}</span></div>
-                            <div class="print-field"><strong>QTY:</strong> <span>${totalQty}</span></div>
+                            <div class="print-field"><strong>PO Number(s):</strong> <span>${pos}</span></div>
+                            <div class="print-field"><strong>Total Master Qty:</strong> <span>${totalQty}</span></div>
                         </div>
                         <div style="font-size: 8pt; font-weight: bold; margin-bottom: 2px;">All Items in Batch:</div>
                         <table class="print-table" style="margin-top:0;">
@@ -2477,12 +2462,12 @@
                     <div class="print-bottom-wrap clearfix">
                         <div class="print-sec-2">
                             <div class="print-header-small">
-                                <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">STORE DEMAND</div></div>
+                                <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">MATERIAL ISSUE SLIP</div></div>
                                 <div style="text-align: right; font-weight: bold; font-size:10pt;">CONSOLIDATED</div>
                             </div>
-                            <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>Customer POs:</strong> ${pos} <br><strong>Total QTY:</strong> ${totalQty}</div>
+                            <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos} <br><strong>Total Batch Qty:</strong> ${totalQty}</div>
                             <table class="print-table" style="margin-bottom: auto;">
-                                <tr><th colspan="2">Paper Reel Issue Breakdown</th></tr>
+                                <tr><th colspan="2">Paper Requirement Breakdown</th></tr>
                                 ${htmlContentPaper || '<tr><td colspan="2" style="text-align:center;">No paper required</td></tr>'}
                             </table>
                             <div class="print-signatures"><div class="sig-line">Issued By</div><div class="sig-line">Received By</div></div>
@@ -2492,7 +2477,7 @@
                                 <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">CORRUGATION WORK ORDER</div></div>
                                 <div style="text-align: right; font-weight: bold; font-size:10pt;">CONSOLIDATED</div>
                             </div>
-                            <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>Customer POs:</strong> ${pos} <br><strong>Total QTY:</strong> ${totalQty}</div>
+                            <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos} <br><strong>Total Batch Qty:</strong> ${totalQty}</div>
                             <table class="print-table" style="margin-bottom: auto;">
                                 <tr><th colspan="2">Paired Roll Setup Breakdown</th></tr>
                                 ${htmlContentRolls || '<tr><td colspan="2" style="text-align:center;">No rolls required</td></tr>'}
