@@ -1581,20 +1581,38 @@
         if (!silent) showToast("Form Reset & Cleared", 'success');
     }
 
-    function generateJobNumber() {
-        const today = new Date();
-        const dStr = today.getFullYear() + String(today.getMonth() + 1).padStart(2, '0') + String(today.getDate()).padStart(2, '0');
-        const todaysJobs = allJobs.filter(j => j.jobNumber && j.jobNumber.includes(dStr));
-        let maxSeq = 0;
-        todaysJobs.forEach(j => {
-            const parts = j.jobNumber.split('-');
-            if(parts.length === 3) {
-                const seq = parseInt(parts[2]);
-                if(seq > maxSeq) maxSeq = seq;
+function generateJobNumber() {
+    const today = new Date();
+
+    // Format date as DDMMYY
+    const dStr =
+        String(today.getDate()).padStart(2, '0') +
+        String(today.getMonth() + 1).padStart(2, '0') +
+        String(today.getFullYear()).slice(-2);
+
+    // Find today's jobs
+    const todaysJobs = allJobs.filter(j =>
+        j.jobNumber && j.jobNumber.includes(`JO-${dStr}-`)
+    );
+
+    let maxSeq = 0;
+
+    todaysJobs.forEach(j => {
+        const parts = j.jobNumber.split('-');
+
+        if (parts.length === 3) {
+            const seq = parseInt(parts[2], 10);
+            if (!isNaN(seq) && seq > maxSeq) {
+                maxSeq = seq;
             }
-        });
-        return `JO-${dStr}-${String(maxSeq + 1).padStart(3, '0')}`;
-    }
+        }
+    });
+
+    // Next sequence, 3 digits
+    const nextSeq = String(maxSeq + 1).padStart(3, '0');
+
+    return `JO-${dStr}-${nextSeq}`;
+}
 
     function updateCartonWorkflow() {
         const type = document.getElementById('cartonType').value;
