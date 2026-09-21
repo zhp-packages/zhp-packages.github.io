@@ -1324,7 +1324,292 @@
         for (let key in counts) { results[key] = baseRolls * counts[key]; }
         return results;
     }
+function addItemBlock() {
+    const container = document.getElementById('itemsContainer');
 
+    if (!container) {
+        console.error('itemsContainer not found');
+        return;
+    }
+
+    const index = itemCounter;
+    itemCounter++;
+
+    const block = document.createElement('div');
+    block.className = 'item-block';
+    block.id = `itemBlock_${index}`;
+
+    block.style.cssText = `
+        background: var(--bg-secondary);
+        border: 2px solid var(--border);
+        border-radius: 14px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow-sm);
+    `;
+
+    block.innerHTML = `
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:1.2rem;
+            gap:10px;
+            flex-wrap:wrap;
+        ">
+            <h3 style="
+                margin:0;
+                color:var(--primary-accent);
+                font-family:var(--font-display);
+                font-size:1rem;
+                font-weight:800;
+            ">
+                ITEM ${index + 1}
+            </h3>
+
+            <div style="display:flex; gap:8px;">
+                ${index > 0 ? `
+                    <button type="button"
+                        class="btn-secondary btn-small"
+                        onclick="copyPreviousItem(${index})">
+                        ⧉ Copy Previous
+                    </button>
+                ` : ''}
+
+                <button type="button"
+                    class="btn-danger btn-small"
+                    onclick="removeItemBlock(${index})">
+                    ✕ Remove
+                </button>
+            </div>
+        </div>
+
+        <div class="form-row">
+
+            <div class="form-group-wrapper">
+                <label class="required">Item Name</label>
+                <input
+                    type="text"
+                    class="item-name"
+                    value="Carton"
+                    placeholder="e.g. Display Box"
+                    required
+                    oninput="calculateAllJobs()"
+                >
+            </div>
+
+            <div class="form-group-wrapper">
+                <label class="required">Ply</label>
+                <select
+                    class="item-ply"
+                    required
+                    onchange="handlePlyChange(this)"
+                >
+                    <option value="">Select Ply</option>
+                    <option value="3Ply">3 Ply</option>
+                    <option value="5Ply">5 Ply</option>
+                    <option value="7Ply">7 Ply</option>
+                </select>
+            </div>
+
+            <div class="form-group-wrapper">
+                <label class="required">Quantity</label>
+                <input
+                    type="number"
+                    class="item-qty"
+                    min="1"
+                    placeholder="e.g. 1000"
+                    required
+                    oninput="calculateAllJobs()"
+                >
+            </div>
+
+        </div>
+
+        <div style="
+            margin-top:1rem;
+            padding:1rem;
+            background:var(--bg-primary);
+            border:1px solid var(--border);
+            border-radius:12px;
+        ">
+
+            <div style="
+                font-weight:800;
+                color:var(--text-primary);
+                margin-bottom:1rem;
+            ">
+                Dimensions
+            </div>
+
+            <div class="form-row">
+
+                <div class="form-group-wrapper">
+                    <label class="required">Length</label>
+                    <input
+                        type="number"
+                        step="0.01"
+                        class="item-l"
+                        placeholder="Length"
+                        required
+                        oninput="calculateAllJobs()"
+                    >
+                </div>
+
+                <div class="form-group-wrapper">
+                    <label class="required">Width</label>
+                    <input
+                        type="number"
+                        step="0.01"
+                        class="item-w"
+                        placeholder="Width"
+                        required
+                        oninput="calculateAllJobs()"
+                    >
+                </div>
+
+                <div class="form-group-wrapper">
+                    <label class="required">Height</label>
+                    <input
+                        type="number"
+                        step="0.01"
+                        class="item-h"
+                        placeholder="Height"
+                        required
+                        oninput="calculateAllJobs()"
+                    >
+                </div>
+
+                <div class="form-group-wrapper">
+                    <label>Unit</label>
+                    <select
+                        class="item-unit"
+                        onchange="calculateAllJobs()"
+                    >
+                        <option value="INCH">INCH</option>
+                        <option value="CM">CM</option>
+                        <option value="MM">MM</option>
+                    </select>
+                </div>
+
+            </div>
+        </div>
+
+        <div style="margin-top:1rem;">
+
+            <label>Paper / Corrugation Specifications</label>
+
+            <div
+                class="ply-inputs-container custom-checkbox-grid"
+                style="
+                    display:flex;
+                    flex-wrap:wrap;
+                    gap:10px;
+                    margin-top:10px;
+                "
+            >
+                <span style="
+                    color:var(--text-secondary);
+                    font-size:.85rem;
+                ">
+                    Please select a Ply config first.
+                </span>
+            </div>
+
+            <input
+                type="hidden"
+                class="item-spec"
+            >
+
+        </div>
+
+        <div class="form-row" style="margin-top:1rem;">
+
+            <div class="form-group-wrapper">
+                <label>Manual RS</label>
+                <input
+                    type="number"
+                    step="0.01"
+                    class="item-manual-rs"
+                    placeholder="Auto"
+                    oninput="calculateAllJobs()"
+                >
+            </div>
+
+            <div class="form-group-wrapper">
+                <label>Manual CL</label>
+                <input
+                    type="number"
+                    step="0.01"
+                    class="item-manual-cl"
+                    placeholder="Auto"
+                    oninput="calculateAllJobs()"
+                >
+            </div>
+
+        </div>
+
+        <div class="calc-grid" style="margin-top:1rem;">
+
+            <div class="calc-box">
+                <div class="calc-label">RS</div>
+                <div class="calc-value calc-rs">-</div>
+                <div class="calc-sub-value calc-rs-actual">
+                    Actual: -
+                </div>
+            </div>
+
+            <div class="calc-box">
+                <div class="calc-label">CL</div>
+                <div class="calc-value calc-cl">-</div>
+                <div class="calc-sub-value calc-cl-actual">
+                    Actual: -
+                </div>
+            </div>
+
+            <div class="calc-box">
+                <div class="calc-label">Area</div>
+                <div class="calc-value calc-area">-</div>
+                <div class="calc-sub-value">
+                    RS × CL
+                </div>
+            </div>
+
+        </div>
+
+        <div class="form-group-wrapper" style="margin-top:1rem;">
+            <label>Notes</label>
+            <input
+                type="text"
+                class="item-notes"
+                placeholder="Additional item notes..."
+                oninput="saveDraft()"
+            >
+        </div>
+    `;
+
+    container.appendChild(block);
+
+    calculateAllJobs();
+    saveDraft();
+}
+function removeItemBlock(index) {
+    const block = document.getElementById(`itemBlock_${index}`);
+
+    if (!block) return;
+
+    const blocks = document.querySelectorAll('.item-block');
+
+    if (blocks.length <= 1) {
+        showToast("At least one item is required.", "error");
+        return;
+    }
+
+    block.remove();
+
+    calculateAllJobs();
+    saveDraft();
+}
     function handlePlyChange(select) {
         const block = select.closest('.item-block');
         const container = block.querySelector('.ply-inputs-container');
