@@ -1536,7 +1536,7 @@
         localStorage.setItem('zhDraft', JSON.stringify(draft));
     }
 
-    function loadDraft() {
+function loadDraft() {
         const draftStr = localStorage.getItem('zhDraft');
         if (!draftStr) {
             if (itemCounter === 0) addItemBlock();
@@ -1544,7 +1544,16 @@
             return;
         }
         
-        const draft = JSON.parse(draftStr);
+        let draft;
+        try {
+            draft = JSON.parse(draftStr);
+        } catch (e) {
+            // If the old draft is corrupted, wipe it and start fresh!
+            localStorage.removeItem('zhDraft');
+            if (itemCounter === 0) addItemBlock();
+            updateCartonWorkflow();
+            return;
+        }
         document.getElementById('poDate').value = draft.date || '';
         document.getElementById('targetDeliveryDate').value = draft.targetDeliveryDate || '';
         document.getElementById('partyName').value = draft.partyName || '';
