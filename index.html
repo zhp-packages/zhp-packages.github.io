@@ -1863,7 +1863,64 @@
         }
         return mapped;
     }
+function loadJobs() {
 
+    try {
+        const stored = localStorage.getItem('zhJobs');
+
+        if (stored) {
+            const parsed = JSON.parse(stored);
+
+            if (Array.isArray(parsed)) {
+                allJobs = parsed;
+            }
+        }
+    } catch (e) {
+        console.error("Error loading local jobs:", e);
+    }
+
+    if (usingFirebase && db) {
+
+        db.ref('zhJobs').once('value').then(function(snapshot) {
+
+            const data = snapshot.val();
+
+            if (data) {
+                allJobs = Array.isArray(data)
+                    ? data
+                    : Object.values(data);
+
+                allJobs = allJobs.filter(Boolean);
+
+                localStorage.setItem(
+                    'zhJobs',
+                    JSON.stringify(allJobs)
+                );
+            }
+
+            renderJobsTable();
+            loadDashboard();
+            renderProdBoardTable();
+            renderStatusBoard();
+
+        }).catch(function(error) {
+
+            console.error("Firebase load error:", error);
+
+            renderJobsTable();
+            loadDashboard();
+            renderProdBoardTable();
+            renderStatusBoard();
+        });
+
+    } else {
+
+        renderJobsTable();
+        loadDashboard();
+        renderProdBoardTable();
+        renderStatusBoard();
+    }
+}
     function saveAllJobsData(jobsArray) {
         try { localStorage.setItem('zhJobs', JSON.stringify(jobsArray)); } catch(e){}
         if (usingFirebase && db) {
