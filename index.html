@@ -66,7 +66,6 @@
     @keyframes popIn { from { opacity: 0; transform: scale(.92) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
     @keyframes slideInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
     @keyframes slideOutRight { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(30px); } }
-    @keyframes successPop { 0% { transform: scale(0.5); opacity: 0; } 60% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
 
     /* Logo & Brand */
     .logo-mark { display: block; width: auto; height: 48px; object-fit: contain; background: #ffffff; padding: 4px 8px; border-radius: 8px; box-shadow: var(--shadow-sm); transition: transform .4s var(--ease); will-change: transform; }
@@ -139,7 +138,7 @@
     
     label { font-weight: 700; margin-bottom: .6rem; color: var(--text-secondary); font-size: .85rem; text-transform: uppercase; letter-spacing: 0.05em;}
     .required::after { content: " *"; color: var(--danger); }
-    input[type="text"], input[type="date"], input[type="number"], input[type="password"], select { width: 100%; padding: .9rem 1.1rem; border: 2px solid var(--border); border-radius: 10px; background: var(--bg-secondary); color: var(--text-primary); font-size: .95rem; font-family: inherit; transition: all .3s var(--ease); }
+    input[type="text"], input[type="date"], input[type="number"], input[type="password"], input[type="file"], select { width: 100%; padding: .9rem 1.1rem; border: 2px solid var(--border); border-radius: 10px; background: var(--bg-secondary); color: var(--text-primary); font-size: .95rem; font-family: inherit; transition: all .3s var(--ease); }
     input:focus, select:focus { outline: none; border-color: var(--primary-accent); background: var(--bg-primary); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); transform: translateY(-1px); }
     input:read-only { background-color: var(--bg-tertiary); cursor: not-allowed; opacity: 0.8; border-style: dashed;}
     
@@ -228,6 +227,7 @@
     .stage-tab.active { background: var(--primary-accent); color: #fff; border-color: var(--primary-accent); box-shadow: 0 8px 20px rgba(59,130,246,0.3); transform: translateY(-2px); }
     .stage-badge { background: var(--danger); padding: 4px 10px; border-radius: 20px; font-size: 0.95rem; font-weight: 900; color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: all .3s;}
     .stage-tab.active .stage-badge { background: #fff; color: var(--primary-accent); }
+    [data-theme="dark"] .stage-badge { background: rgba(255,255,255,0.1); }
 
     /* Status Board Horizontal Timeline */
     .status-timeline { display: flex; gap: 6px; margin-top: 15px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: thin; align-items: center; scroll-behavior: smooth;}
@@ -290,26 +290,23 @@
     .print-info-block strong { color: #222; }
 
     /* =========================================
-       PRINT STYLES - Exact 50/50 Halves
+       PRINT STYLES - 2-Page Layout
        ========================================= */
     .print-only { display: none; }
     
     @media print {
         @page { size: A4 portrait; margin: 5mm; }
-        body, html { margin: 0 !important; padding: 0 !important; background: #fff !important; color: #000 !important; width: 100%; height: 100%; }
+        body, html { margin: 0 !important; padding: 0 !important; background: #fff !important; color: #000 !important; width: 100%; }
         * { animation: none !important; transition: none !important; box-shadow: none !important; }
         
         .login-screen, .app-container, .modal, .toast-container { display: none !important; }
         .print-only { display: block !important; width: 100%; background: #fff; }
 
-        .a4-print-layout { display: block; width: 100%; box-sizing: border-box; background: #fff; font-family: sans-serif; overflow: hidden; height: 287mm;}
-
-        /* Exact 50/50 Split for A4 constraints */
-        .print-sec-1 { border-bottom: 2px dashed #000; padding-bottom: 5mm; margin-bottom: 5mm; display: block; width: 100%; height: 140mm; overflow: hidden;}
-        .print-bottom-wrap { display: block; width: 100%; height: 140mm; overflow: hidden; }
-        .print-sec-2 { width: 50%; padding-right: 5mm; border-right: 2px dashed #000; box-sizing: border-box; float: left; height: 100%;}
-        .print-sec-3 { width: 50%; padding-left: 5mm; box-sizing: border-box; float: right; height: 100%;}
-
+        .a4-page { display: block; width: 100%; height: 287mm; box-sizing: border-box; page-break-after: always; overflow: hidden; position: relative;}
+        .print-half { height: 140mm; width: 100%; box-sizing: border-box; overflow: hidden; position: relative; }
+        .print-half.top { border-bottom: 2px dashed #000; padding-bottom: 5mm; margin-bottom: 5mm; }
+        .print-half.bottom { border-top: 2px dashed #000; padding-top: 5mm; }
+        
         .print-header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 12px; align-items: flex-end; }
         .print-title { font-size: 16pt; font-weight: 800; text-transform: uppercase; margin-bottom: 2px; color: #000;}
         .print-company { font-size: 11pt; font-weight: bold; color: #444; }
@@ -338,14 +335,6 @@
 <!-- TOAST NOTIFICATION CONTAINER -->
 <div id="toastContainer" class="toast-container"></div>
 
-<!-- SUCCESS OVERLAY (For saving) -->
-<div class="success-overlay" id="successOverlay">
-    <div class="success-box">
-        <span class="success-icon">✓</span>
-        <div class="success-text">Success!</div>
-    </div>
-</div>
-
 <!-- LOGIN SCREEN -->
 <div class="login-screen" id="loginScreen">
     <div class="login-box">
@@ -358,13 +347,14 @@
         <form id="loginForm" onsubmit="handleLogin(event)">
             <div class="form-group-wrapper" style="margin-bottom: 1.5rem; text-align: left;">
                 <label>User Account</label>
+                <!-- Hardcoded Default User for Instant Loading -->
                 <select id="loginUser" required style="font-weight: bold; cursor: pointer; border-width: 2px;">
-                    <!-- Populated via JS -->
+                    <option value="Packages Dept" selected>Packages Dept</option>
                 </select>
             </div>
             <div class="form-group-wrapper" style="text-align: left;">
                 <label>Password</label>
-                <input type="password" id="loginPass" placeholder="••••••" required autocomplete="current-password" style="border-width: 2px;">
+                <input type="password" id="loginPass" placeholder="••••••" required autocomplete="current-password" style="border-width: 2px;" autofocus>
             </div>
             <button type="submit" class="btn-primary" style="width: 100%; margin-top: 2rem; padding: 1.1rem; font-size: 1.1rem; border-radius: 12px;">Secure Login</button>
         </form>
@@ -385,7 +375,7 @@
             <div class="navbar-center">
                 <div class="nav-tabs">
                     <button class="nav-tab active" data-page="dashboard" onclick="switchPage('dashboard')">◱ Dashboard</button>
-                    <button class="nav-tab" data-page="new-po" onclick="switchPage('new-po')">＋ New Job order</button>
+                    <button class="nav-tab" data-page="new-po" onclick="switchPage('new-po')">＋ New Job Card</button>
                     <button class="nav-tab" data-page="jobs" onclick="switchPage('jobs'); clearJobFilters('jobs');">☰ Detailed Job View</button>
                     <button class="nav-tab" data-page="production-board" onclick="switchPage('production-board')">⛭ Production Board</button>
                     <button class="nav-tab" data-page="status-board" onclick="switchPage('status-board')">◉ Status Board</button>
@@ -461,8 +451,8 @@
             <div id="new-po" class="page">
                 <div class="form-container">
                     <div class="form-header">
-                        <h2>Create New Job order</h2>
-                        <p>Generate a Job order. Add multiple items to tie them directly to this PO.</p>
+                        <h2>Create New Job Card</h2>
+                        <p>Generate a Master Job Card. Add multiple items to tie them directly to this PO.</p>
                     </div>
                     <div class="form-body">
                         <form id="poForm" onsubmit="event.preventDefault();">
@@ -509,7 +499,7 @@
                                 </div>
                             </div>
 
-                            <!-- WORKFLOW & SUMMARY -->
+                            <!-- WORKFLOW & PRINTING DETAILS -->
                             <div class="form-section">
                                 <div class="form-section-title"><span>⛭</span> Master Production Workflow</div>
                                 <div class="form-row">
@@ -533,15 +523,43 @@
                                 </div>
                                 <div id="workflowPreview" class="custom-checkbox-grid" style="margin-top: 1.5rem;"></div>
 
+                                <!-- CONDITIONAL PRINTING DETAILS -->
+                                <div id="printingDetailsSection" style="display:none; margin-top: 2rem; background: var(--bg-tertiary); padding: 1.5rem; border-radius: 12px; border: 1px dashed var(--border);">
+                                    <div class="form-section-title" style="margin-bottom: 1rem; font-size: 1rem;"><span>🖨</span> Printing &amp; Finishing Details</div>
+                                    <div class="form-row">
+                                        <div class="form-group-wrapper">
+                                            <label>Image of Printing</label>
+                                            <input type="file" id="printImageUpload" accept="image/*" onchange="handleImageUpload(event)">
+                                            <img id="printImagePreview" style="display:none; max-width: 100%; height: 120px; object-fit: contain; margin-top: 10px; border-radius: 8px; border: 1px solid var(--border);">
+                                        </div>
+                                        <div class="form-group-wrapper">
+                                            <label class="required">Which Paper Will Be Printed?</label>
+                                            <input type="text" id="printedPaper" placeholder="e.g. Bleach Card 250gsm" oninput="saveDraft()">
+                                        </div>
+                                        <div class="form-group-wrapper">
+                                            <label class="required">Printed Papers QTY</label>
+                                            <input type="number" id="printedQty" placeholder="e.g. 5000" oninput="saveDraft()">
+                                        </div>
+                                        <div class="form-group-wrapper" id="machineNameWrapper" style="display:none;">
+                                            <label class="required">Machine Name</label>
+                                            <input type="text" id="machineName" placeholder="e.g. Heidelberg" oninput="saveDraft()">
+                                        </div>
+                                        <div class="form-group-wrapper" id="lamReelWrapper" style="display:none;">
+                                            <label class="required">Lamination Reel Size (Inches)</label>
+                                            <input type="number" step="0.1" id="lamReelSize" placeholder="e.g. 24" oninput="saveDraft()">
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- AUTO CALCULATED GLOBAL PAPER & ROLLS -->
                                 <h3 style="margin-top: 2.5rem; margin-bottom: 1.5rem; color: var(--text-primary); font-family: var(--font-display);">▤ Global Job Requirements</h3>
                                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
                                     <div style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: 12px; border: 2px solid var(--border);">
-                                        <strong style="color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 10px; display: block;">COMBINED Store Demand (PAPER)</strong>
+                                        <strong style="color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 10px; display: block;">STORE DEMAND (PAPER)</strong>
                                         <pre id="calcPaperSummary" style="font-family: var(--font-mono); font-size: 0.95rem; white-space: pre-wrap; line-height: 1.6; font-weight: 700;">-</pre>
                                     </div>
                                     <div style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: 12px; border: 2px solid var(--border);">
-                                        <strong style="color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 10px; display: block;">COMBINED CORRUGATION W.O. (ROLLS)</strong>
+                                        <strong style="color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 10px; display: block;">CORRUGATION W.O. (ROLLS)</strong>
                                         <pre id="calcRollsSummary" style="font-family: var(--font-mono); font-size: 0.95rem; white-space: pre-wrap; line-height: 1.6; font-weight: 700;">-</pre>
                                     </div>
                                 </div>
@@ -549,7 +567,7 @@
 
                             <div class="button-group">
                                 <button type="button" class="btn-success" onclick="submitForm('save')" style="font-size: 1.05rem; padding: 1rem 2rem;">🖫 Just Save</button>
-                                <button type="button" class="btn-print" onclick="submitForm('print')" style="font-size: 1.05rem; padding: 1rem 2rem;">🖨 Save &amp; Print Job order</button>
+                                <button type="button" class="btn-print" onclick="submitForm('print')" style="font-size: 1.05rem; padding: 1rem 2rem;">🖨 Save &amp; Print Job Order</button>
                                 <button type="button" class="btn-danger btn-small" onclick="startNewPO(false)" style="margin-left: auto;">⟳ Clear Form</button>
                             </div>
                         </form>
@@ -570,7 +588,7 @@
                             </div>
                         </div>
                         <div class="filter-bar">
-                            <input type="text" id="filterPO" placeholder="Filter by Customer PO..." oninput="applyFilters()">
+                            <input type="text" id="filterPO" placeholder="Filter by PO Number..." oninput="applyFilters()">
                             <input type="text" id="filterParty" list="partyDatalist" placeholder="Filter by Customer..." oninput="applyFilters()">
                             <input type="text" id="filterItem" placeholder="Filter by Item Name..." oninput="applyFilters()">
                             <select id="filterStage" onchange="applyFilters()">
@@ -590,7 +608,7 @@
                                     <th>Job/Sub #</th>
                                     <th>Customer</th>
                                     <th>Items (Grouped)</th>
-                                    <th>Total Qty</th>
+                                    <th>QTY</th>
                                     <th>Sizes</th>
                                     <th>Stage</th>
                                     <th>Actions</th>
@@ -636,10 +654,10 @@
                                 <tr>
                                     <th>Date</th>
                                     <th>Job #</th>
-                                    <th>PO #</th>
+                                    <th>Customer PO</th>
                                     <th>Customer</th>
                                     <th>Items</th>
-                                    <th>Total Qty</th>
+                                    <th>QTY</th>
                                     <th>Status &amp; Action</th>
                                 </tr>
                             </thead>
@@ -678,7 +696,7 @@
             <div id="settings" class="page">
                 <div class="page-heading">
                     <div>
-                        <h2>⛭ Application Settings</h2>
+                        <h2>⚙ Application Settings</h2>
                         <p>Manage preferences, users, customers, and visual themes.</p>
                     </div>
                 </div>
@@ -800,7 +818,7 @@
             <div class="timeline-container" id="jobChecklist"></div>
             
             <div style="margin-top: 2rem; display: flex; justify-content:flex-end;">
-                <button class="btn-print" onclick="printJobCard(currentModalJobId)">🖨 Print A4 Job order</button>
+                <button class="btn-print" onclick="printJobCard(currentModalJobId)">🖨 Print A4 Job Card</button>
             </div>
         </div>
     </div>
@@ -856,6 +874,7 @@
     let currentModalJobId = null;
     let editingJobId = null;
     let itemCounter = 0;
+    let currentImageBase64 = ""; // Holds base64 of printing image
     
     let chartParty = null; let chartStage = null; let chartType = null;
     let activeFilter = null; 
@@ -879,8 +898,6 @@
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appContainer').classList.add('active');
             loadJobs();
-            
-            // Restores draft or starts blank without erasing what browser cached
             loadDraft(); 
             switchPage('dashboard');
         }
@@ -929,18 +946,36 @@
         }
     }
 
-    // ===== USERS & LOGIN =====
+    // ===== USERS & LOGIN (INSTANT LOCAL LOAD + SAFE FILTERING) =====
     function loadUsers() {
-        if (usingFirebase) {
+        const stored = localStorage.getItem('zhUsers');
+        if (stored) {
+            try { 
+                const parsed = JSON.parse(stored);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    appUsers = parsed.filter(Boolean);
+                }
+            } catch(e){}
+        }
+        populateLoginDropdown();
+        renderUsersTable();
+
+        if (usingFirebase && db) {
             db.ref('zhUsers').on('value', snap => {
                 const data = snap.val();
-                if (data) appUsers = data; else saveUsersData(appUsers); 
-                populateLoginDropdown(); renderUsersTable();
+                if (data) {
+                    let parsed = Array.isArray(data) ? data : Object.values(data);
+                    appUsers = parsed.filter(Boolean); 
+                    try { localStorage.setItem('zhUsers', JSON.stringify(appUsers)); } catch(e){}
+                } else {
+                    saveUsersData(appUsers);
+                }
+                populateLoginDropdown();
+                renderUsersTable();
+            }, err => {
+                console.warn("Firebase users sync failed, using local fallback:", err);
+                populateLoginDropdown();
             });
-        } else {
-            const stored = localStorage.getItem('zhUsers');
-            if (stored) appUsers = JSON.parse(stored);
-            populateLoginDropdown(); renderUsersTable();
         }
     }
 
@@ -951,8 +986,21 @@
 
     function populateLoginDropdown() {
         const sel = document.getElementById('loginUser');
+        if (!sel) return;
+        if (!appUsers || appUsers.length === 0) {
+            appUsers = [{ u: 'Packages Dept', p: '123' }];
+        }
+        
+        const currentVal = sel.value;
         sel.innerHTML = appUsers.map(u => `<option value="${u.u}">${u.u}</option>`).join('');
-        if(appUsers.some(u => u.u === 'Packages Dept')) sel.value = 'Packages Dept';
+        
+        if (currentVal && appUsers.some(u => u && u.u === currentVal)) {
+            sel.value = currentVal;
+        } else if (appUsers.some(u => u && u.u === 'Packages Dept')) {
+            sel.value = 'Packages Dept';
+        } else if (appUsers.length > 0) {
+            sel.value = appUsers[0].u;
+        }
     }
 
     function handleLogin(e) {
@@ -960,7 +1008,11 @@
         const user = document.getElementById('loginUser').value;
         const pass = document.getElementById('loginPass').value;
         
-        const valid = appUsers.find(u => u.u === user && u.p === pass);
+        if (!appUsers || !Array.isArray(appUsers)) {
+            appUsers = [{ u: 'Packages Dept', p: '123' }];
+        }
+        const valid = appUsers.find(u => u && u.u === user && u.p === pass);
+        
         if (valid) {
             document.getElementById('loginError').classList.remove('show');
             sessionStorage.setItem('zhLogged', 'true');
@@ -991,7 +1043,7 @@
         e.preventDefault();
         const u = document.getElementById('newUserName').value;
         const p = document.getElementById('newUserPass').value;
-        if(appUsers.some(x => x.u === u)) { showToast("User already exists!", "error"); return; }
+        if(appUsers.some(x => x && x.u === u)) { showToast("User already exists!", "error"); return; }
         appUsers.push({u, p}); saveUsersData(appUsers);
         document.getElementById('newUserName').value = ''; document.getElementById('newUserPass').value = '';
         showToast("User added", 'success');
@@ -1007,6 +1059,7 @@
         if(!tbody) return;
         const frag = document.createDocumentFragment();
         appUsers.forEach((user, i) => {
+            if(!user) return;
             const tr = document.createElement('tr');
             tr.innerHTML = `<td style="padding: 10px; border-bottom: 1px solid var(--border);"><strong>${user.u}</strong></td><td style="padding: 10px; border-bottom: 1px solid var(--border); font-family: monospace;">${user.p}</td><td style="padding: 10px; border-bottom: 1px solid var(--border);"><button type="button" class="btn-danger" style="padding: 4px 8px; font-size:0.75rem; border-radius:6px; box-shadow:none;" onclick="removeUser(${i})">✕ Del</button></td>`;
             frag.appendChild(tr);
@@ -1019,12 +1072,20 @@
         if (usingFirebase) {
             db.ref('zhParties').on('value', snap => {
                 const data = snap.val();
-                if (data) { appParties = data; } else { savePartiesData(appParties); }
+                if (data) { 
+                    let parsed = Array.isArray(data) ? data : Object.values(data);
+                    appParties = parsed.filter(Boolean);
+                } else { 
+                    savePartiesData(appParties); 
+                }
                 populatePartyDropdown(); renderPartiesTable();
             });
         } else {
             const stored = localStorage.getItem('zhParties');
-            if (stored) appParties = JSON.parse(stored);
+            if (stored) {
+                let parsed = JSON.parse(stored);
+                appParties = (Array.isArray(parsed) ? parsed : Object.values(parsed)).filter(Boolean);
+            }
             populatePartyDropdown(); renderPartiesTable();
         }
     }
@@ -1130,6 +1191,41 @@
         if (page === 'status-board') renderStatusBoard();
     }
 
+    // ===== IMAGE UPLOAD COMPRESSION =====
+    function handleImageUpload(event) {
+        const file = event.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 800;
+                const MAX_HEIGHT = 800;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                  if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                } else {
+                  if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+                }
+                canvas.width = width; canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                currentImageBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                const prev = document.getElementById('printImagePreview');
+                if(prev) {
+                    prev.src = currentImageBase64;
+                    prev.style.display = 'block';
+                }
+                saveDraft();
+            }
+            img.src = e.target.result;
+        }
+        reader.readAsDataURL(file);
+    }
+
     // ===== SAFE PRINTING ENGINE =====
     function triggerPrint(html) {
         const printArea = document.getElementById('printArea');
@@ -1160,7 +1256,7 @@
                 }
             }
             if (loadedCount === images.length) setTimeout(doPrint, 100);
-            setTimeout(doPrint, 800); // Failsafe override
+            setTimeout(doPrint, 800); 
         }
     }
 
@@ -1175,6 +1271,8 @@
     // ===== MULTI-ITEM CALCULATIONS =====
     let globalPaperText = "-"; 
     let globalRollText = "-";
+    let globalPaperArray = [];
+    let globalRollsArray = [];
 
     function convertToInches(val, unit) {
         val = parseFloat(val) || 0;
@@ -1342,12 +1440,12 @@
                     const rollObj = buildRollsSummaryObj(specStr, finalCL, qty);
                     let itemRText = `${itemName}:\n`; let addedR = false;
                     for(let key in rollObj) {
-                        // New exact format requested by user: HPK200+HPK200    (22/73)    108.3 Rolls
-                        let rKey = `${key}    (${finalRS}/${finalCL.toFixed(2)})`;
+                        // Store securely with a clean pipe delimiter for the Array conversion later
+                        let rKey = `${key}|${finalRS}/${finalCL.toFixed(2)}`;
                         globalRollObj[rKey] = (globalRollObj[rKey] || 0) + rollObj[key];
-                        // Also format the display block
+                        // Also format UI display text
                         let paddedKey = key.padEnd(25, ' ');
-                        itemRText += `  • ${paddedKey}(${finalRS}/${finalCL.toFixed(2)})`.padEnd(50, ' ') + `${Number(rollObj[key]).toFixed(1)} Rolls\n`;
+                        itemRText += `  • ${paddedKey}(${finalRS}/${finalCL.toFixed(2)})`.padEnd(50, ' ') + `${Math.ceil(rollObj[key])} Rolls\n`;
                         addedR = true;
                     }
                     if(addedR) perItemRollText += itemRText + '\n';
@@ -1361,23 +1459,36 @@
             }
         });
 
-        // Sorted outputs
+        // Building the structured Arrays for Printout
+        globalPaperArray = [];
         if(Object.keys(globalPaperObj).length > 0) {
             let finalPaperText = blocks.length > 1 ? perItemPaperText + "------------------\nTOTAL REQUIREMENT:\n" : "TOTAL REQUIREMENT:\n";
-            for(let key of Object.keys(globalPaperObj).sort()) { finalPaperText += `${key} = ${Math.ceil(globalPaperObj[key])} KGs\n`; }
+            let idx = 1;
+            for(let key of Object.keys(globalPaperObj).sort()) { 
+                globalPaperArray.push({ type: key, kgs: Math.ceil(globalPaperObj[key]) });
+                finalPaperText += `${idx}. ${key} = ${Math.ceil(globalPaperObj[key])} KGs\n`; 
+                idx++;
+            }
             globalPaperText = finalPaperText; document.getElementById('calcPaperSummary').textContent = globalPaperText;
         } else { globalPaperText = "-"; document.getElementById('calcPaperSummary').textContent = "-"; }
 
+        globalRollsArray = [];
         if(Object.keys(globalRollObj).length > 0) {
             let finalRollText = blocks.length > 1 ? perItemRollText + "------------------\nTOTAL REQUIREMENT:\n" : "TOTAL REQUIREMENT:\n";
+            let idx = 1;
             for(let key of Object.keys(globalRollObj).sort()) { 
-                let exactKeySplit = key.split('    ');
+                let exactKeySplit = key.split('|');
                 let actualPaper = exactKeySplit[0] || '';
                 let sizes = exactKeySplit[1] || '';
-                let paddedPaper = actualPaper.padEnd(25, ' ');
+                let rollsCeil = Math.ceil(globalRollObj[key]);
+                
+                globalRollsArray.push({ details: actualPaper, sizes: sizes, qty: rollsCeil });
+                
+                let paddedPaper = (`${idx}. ` + actualPaper).padEnd(25, ' ');
                 let paddedSizes = sizes.padEnd(20, ' ');
                 
-                finalRollText += `${paddedPaper}${paddedSizes} ${Number(globalRollObj[key]).toFixed(1)} Rolls\n`; 
+                finalRollText += `${paddedPaper}(${sizes})    ${rollsCeil} Rolls\n`; 
+                idx++;
             }
             globalRollText = finalRollText; document.getElementById('calcRollsSummary').textContent = globalRollText;
         } else { globalRollText = "-"; document.getElementById('calcRollsSummary').textContent = "-"; }
@@ -1415,6 +1526,11 @@
             poNumber: document.getElementById('poNumber').value,
             cartonType: document.getElementById('cartonType').value,
             laminationVarnish: document.getElementById('laminationVarnish').value,
+            printedPaper: document.getElementById('printedPaper') ? document.getElementById('printedPaper').value : '',
+            printedQty: document.getElementById('printedQty') ? document.getElementById('printedQty').value : '',
+            machineName: document.getElementById('machineName') ? document.getElementById('machineName').value : '',
+            lamReelSize: document.getElementById('lamReelSize') ? document.getElementById('lamReelSize').value : '',
+            printingImageBase64: currentImageBase64,
             items: itemsArray
         };
         localStorage.setItem('zhDraft', JSON.stringify(draft));
@@ -1434,8 +1550,22 @@
         document.getElementById('partyName').value = draft.partyName || '';
         document.getElementById('poNumber').value = draft.poNumber || '';
         document.getElementById('cartonType').value = draft.cartonType || '';
-        updateCartonWorkflow();
+        
         if (draft.laminationVarnish) document.getElementById('laminationVarnish').value = draft.laminationVarnish;
+        
+        updateCartonWorkflow();
+
+        if (document.getElementById('printedPaper')) document.getElementById('printedPaper').value = draft.printedPaper || '';
+        if (document.getElementById('printedQty')) document.getElementById('printedQty').value = draft.printedQty || '';
+        if (document.getElementById('machineName')) document.getElementById('machineName').value = draft.machineName || '';
+        if (document.getElementById('lamReelSize')) document.getElementById('lamReelSize').value = draft.lamReelSize || '';
+        
+        currentImageBase64 = draft.printingImageBase64 || '';
+        const prev = document.getElementById('printImagePreview');
+        if (prev) {
+            if(currentImageBase64) { prev.src = currentImageBase64; prev.style.display = 'block'; }
+            else { prev.style.display = 'none'; }
+        }
 
         document.getElementById('itemsContainer').innerHTML = '';
         itemCounter = 0;
@@ -1472,163 +1602,54 @@
     }
 
     // ===== WORKFLOW & PO GENERATION =====
-    function addItemBlock() {
-        const index = itemCounter++;
-        const defaultUnit = localStorage.getItem('zhDefUnit') || 'INCH';
-        const html = `
-            <div class="item-block" id="itemBlock_${index}" style="background: var(--bg-primary); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 2px solid var(--border); box-shadow: var(--shadow-sm); animation: popIn .3s var(--ease);">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.5rem;">
-                    <strong style="color:var(--primary-accent); font-size:1.1rem; text-transform: uppercase; letter-spacing:0.05em;">🗃 Item Details</strong>
-                    ${index > 0 ? `<button type="button" class="btn-danger btn-small" onclick="removeItemBlock(${index})" style="box-shadow:none;">✕ Remove Item</button>` : ''}
-                </div>
-                <div class="form-row">
-                    <div class="form-group-wrapper">
-                        <label class="required">Item Name</label>
-                        <select class="item-name" required onchange="saveDraft()">
-                            <option value="">Select Item</option>
-                            <option value="Carton">Carton</option>
-                            <option value="Stiffener">Stiffener</option>
-                        </select>
-                    </div>
-                    <div class="form-group-wrapper">
-                        <label class="required">Ply</label>
-                        <select class="item-ply" required onchange="handlePlyChange(this)">
-                            <option value="">Select Ply</option>
-                            <option value="3-Ply">3-Ply</option>
-                            <option value="5-Ply">5-Ply</option>
-                            <option value="7-Ply">7-Ply</option>
-                        </select>
-                    </div>
-                    <div class="form-group-wrapper">
-                        <label class="required">Quantity</label>
-                        <input type="number" class="item-qty" placeholder="0" required oninput="calculateAllJobs()">
-                    </div>
-                    <div class="form-group-wrapper">
-                        <label>Detail / Notes</label>
-                        <input type="text" class="item-notes" placeholder="Additional info..." oninput="saveDraft()">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group-wrapper"><label class="required">L (Length)</label><input type="number" class="item-l" placeholder="0" step="0.01" required oninput="calculateAllJobs()"></div>
-                    <div class="form-group-wrapper"><label class="required">W (Width)</label><input type="number" class="item-w" placeholder="0" step="0.01" required oninput="calculateAllJobs()"></div>
-                    <div class="form-group-wrapper"><label class="required">H (Height)</label><input type="number" class="item-h" placeholder="0" step="0.01" required oninput="calculateAllJobs()"></div>
-                    <div class="form-group-wrapper">
-                        <label class="required">Unit</label>
-                        <select class="item-unit" required onchange="calculateAllJobs()">
-                            <option value="INCH" ${defaultUnit === 'INCH' ? 'selected' : ''}>Inches</option>
-                            <option value="CM" ${defaultUnit === 'CM' ? 'selected' : ''}>Centimeters</option>
-                            <option value="MM" ${defaultUnit === 'MM' ? 'selected' : ''}>Millimeters</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-row ply-inputs-row" style="margin-bottom:0;">
-                    <div class="form-group-wrapper" style="grid-column: 1 / -1; background: var(--bg-tertiary); padding: 1rem; border-radius: 10px; border: 1px dashed var(--border);">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <label class="required">Paper Specifications</label>
-                            ${index > 0 ? `<button type="button" class="btn-secondary btn-small" onclick="copyPreviousItem(${index})" style="box-shadow:none; padding:4px 8px; font-size:0.75rem;">⟳ Copy Above</button>` : ''}
-                        </div>
-                        <div class="ply-inputs-container" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 5px;">
-                            <span style="color: var(--text-secondary); font-size: 0.85rem;">Please select a Ply config first.</span>
-                        </div>
-                        <input type="hidden" class="item-spec" value="">
-                    </div>
-                </div>
-                <div class="calc-grid" style="margin: 1.5rem 0;">
-                    <div class="calc-box" style="padding: 1.2rem; background: var(--bg-tertiary);">
-                        <div class="calc-label">Roll Size (W+H)</div>
-                        <div class="calc-value calc-rs">-</div>
-                        <div class="calc-sub-value calc-rs-actual">Actual: -</div>
-                        <div style="display: flex; gap: 5px; margin-top: 8px;">
-                            <input type="number" class="item-manual-rs" placeholder="Override" step="1" style="padding: 0.4rem; border-radius: 6px;">
-                            <button type="button" class="btn-secondary btn-small" onclick="calculateAllJobs()" style="padding: 0.4rem 0.8rem; box-shadow: none;">Apply</button>
-                        </div>
-                    </div>
-                    <div class="calc-box" style="padding: 1.2rem; background: var(--bg-tertiary);">
-                        <div class="calc-label">Cut Length</div>
-                        <div class="calc-value calc-cl">-</div>
-                        <div class="calc-sub-value calc-cl-actual">Actual: -</div>
-                        <div style="display: flex; gap: 5px; margin-top: 8px;">
-                            <input type="number" class="item-manual-cl" placeholder="Override" step="0.01" style="padding: 0.4rem; border-radius: 6px;">
-                            <button type="button" class="btn-secondary btn-small" onclick="calculateAllJobs()" style="padding: 0.4rem 0.8rem; box-shadow: none;">Apply</button>
-                        </div>
-                    </div>
-                    <div class="calc-box" style="padding: 1.2rem; background: var(--bg-tertiary);">
-                        <div class="calc-label">Area (Sq. In)</div>
-                        <div class="calc-value calc-area">-</div>
-                    </div>
-                </div>
-            </div>
-        `;
-        document.getElementById('itemsContainer').insertAdjacentHTML('beforeend', html);
-        saveDraft();
-    }
-
-    function removeItemBlock(index) {
-        const block = document.getElementById(`itemBlock_${index}`);
-        if(block) { block.remove(); calculateAllJobs(); saveDraft(); }
-    }
-
-    function startNewPO(silent = false) {
-        editingJobId = null;
-        document.getElementById('poForm').reset();
-        document.getElementById('jobNumber').value = '';
-        document.getElementById('poDate').valueAsDate = new Date();
-        document.getElementById('itemsContainer').innerHTML = '';
-        itemCounter = 0; addItemBlock(); updateCartonWorkflow();
-        document.getElementById('calcPaperSummary').textContent = '-';
-        document.getElementById('calcRollsSummary').textContent = '-';
-        localStorage.removeItem('zhDraft');
-        if (!silent) showToast("Form Reset & Cleared", 'success');
-    }
-
-function generateJobNumber() {
-    const today = new Date();
-
-    // Format date as DDMMYY
-    const dStr =
-        String(today.getDate()).padStart(2, '0') +
-        String(today.getMonth() + 1).padStart(2, '0') +
-        String(today.getFullYear()).slice(-2);
-
-    // Find today's jobs
-    const todaysJobs = allJobs.filter(j =>
-        j.jobNumber && j.jobNumber.includes(`JO-${dStr}-`)
-    );
-
-    let maxSeq = 0;
-
-    todaysJobs.forEach(j => {
-        const parts = j.jobNumber.split('-');
-
-        if (parts.length === 3) {
-            const seq = parseInt(parts[2], 10);
-            if (!isNaN(seq) && seq > maxSeq) {
-                maxSeq = seq;
+    function generateJobNumber() {
+        const today = new Date();
+        const dStr = String(today.getDate()).padStart(2, '0') + String(today.getMonth() + 1).padStart(2, '0') + String(today.getFullYear()).slice(-2);
+        const todaysJobs = allJobs.filter(j => j.jobNumber && j.jobNumber.includes(dStr));
+        let maxSeq = 0;
+        todaysJobs.forEach(j => {
+            const parts = j.jobNumber.split('-');
+            if(parts.length === 2) {
+                const seq = parseInt(parts[1]);
+                if(seq > maxSeq) maxSeq = seq;
             }
-        }
-    });
-
-    // Next sequence, 3 digits
-    const nextSeq = String(maxSeq + 1).padStart(3, '0');
-
-    return `JO-${dStr}-${nextSeq}`;
-}
+        });
+        return `JO${dStr}-${String(maxSeq + 1).padStart(3, '0')}`;
+    }
 
     function updateCartonWorkflow() {
         const type = document.getElementById('cartonType').value;
         const offsetWrap = document.getElementById('offsetFinishingWrapper');
         const preview = document.getElementById('workflowPreview');
-        if (type === 'Offset') {
-            offsetWrap.style.display = 'flex';
-            document.getElementById('laminationVarnish').required = true;
-        } else {
-            offsetWrap.style.display = 'none';
-            document.getElementById('laminationVarnish').required = false;
-        }
+        const printSec = document.getElementById('printingDetailsSection');
+        const machineWrap = document.getElementById('machineNameWrapper');
+        const lamReelWrap = document.getElementById('lamReelWrapper');
         
         let finishVal = document.getElementById('laminationVarnish').value;
         if (finishVal === 'Shine') finishVal = 'Shine Lamination';
         if (finishVal === 'Matt') finishVal = 'Matt Lamination';
+
+        if (type === 'Offset') {
+            offsetWrap.style.display = 'flex';
+            document.getElementById('laminationVarnish').required = true;
+            printSec.style.display = 'block';
+            machineWrap.style.display = 'block';
+            if (finishVal === 'Shine Lamination' || finishVal === 'Matt Lamination') {
+                lamReelWrap.style.display = 'block';
+            } else {
+                lamReelWrap.style.display = 'none';
+            }
+        } else if (type === 'Flexo') {
+            offsetWrap.style.display = 'none';
+            document.getElementById('laminationVarnish').required = false;
+            printSec.style.display = 'block';
+            machineWrap.style.display = 'none';
+            lamReelWrap.style.display = 'none';
+        } else {
+            offsetWrap.style.display = 'none';
+            document.getElementById('laminationVarnish').required = false;
+            printSec.style.display = 'none';
+        }
         
         let defaultTasks = [];
         if (type === 'Unprinted') {
@@ -1705,7 +1726,7 @@ function generateJobNumber() {
             
             let subJob = jobNo;
             if (blocks.length > 1) {
-                subJob = `${jobNo}-${String.fromCharCode(65 + idx)}`;
+                subJob = `${jobNo}(${String.fromCharCode(65 + idx)})`;
             }
 
             itemsArray.push({
@@ -1713,10 +1734,10 @@ function generateJobNumber() {
                 itemName: block.querySelector('.item-name').value,
                 ply: block.querySelector('.item-ply').value,
                 quantity: parseFloat(block.querySelector('.item-qty').value) || 0,
-                detailNotes: block.querySelector('.item-notes').value,
-                dimensions: { L: block.querySelector('.item-l').value, W: block.querySelector('.item-w').value, H: block.querySelector('.item-h').value, unit: block.querySelector('.item-unit').value },
-                calc: { RS: block.querySelector('.calc-rs').textContent, CL: block.querySelector('.calc-cl').textContent, Area: block.querySelector('.calc-area').textContent },
-                specString: specVal, manualRS: block.querySelector('.item-manual-rs').value, manualCL: block.querySelector('.item-manual-cl').value
+                detailNotes: block.querySelector('.item-notes').value || '',
+                dimensions: { L: block.querySelector('.item-l').value || '', W: block.querySelector('.item-w').value || '', H: block.querySelector('.item-h').value || '', unit: block.querySelector('.item-unit').value || '' },
+                calc: { RS: block.querySelector('.calc-rs').textContent || '', CL: block.querySelector('.calc-cl').textContent || '', Area: block.querySelector('.calc-area').textContent || '' },
+                specString: specVal || '', manualRS: block.querySelector('.item-manual-rs').value || '', manualCL: block.querySelector('.item-manual-cl').value || ''
             });
         });
 
@@ -1726,11 +1747,21 @@ function generateJobNumber() {
         const checkboxes = document.querySelectorAll('.workflow-checkbox:checked');
         if (checkboxes.length === 0) { showToast("Please select at least one workflow step.", "error"); return; }
 
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+        const printedPaper = document.getElementById('printedPaper') ? document.getElementById('printedPaper').value : '';
+        const printedQty = document.getElementById('printedQty') ? document.getElementById('printedQty').value : '';
+        const machineName = document.getElementById('machineName') ? document.getElementById('machineName').value : '';
+        const lamReelSize = document.getElementById('lamReelSize') ? document.getElementById('lamReelSize').value : '';
+
         const baseFields = {
-            jobNumber: jobNo, date: document.getElementById('poDate').value, targetDeliveryDate: document.getElementById('targetDeliveryDate').value,
-            party: partyInput, po: document.getElementById('poNumber').value, items: itemsArray,
-            itemName: itemsArray.map(i => i.itemName).join(', '), quantity: itemsArray.reduce((acc, i) => acc + i.quantity, 0), dimensions: itemsArray[0].dimensions, 
-            paperSummaryText: globalPaperText, rollsSummaryText: globalRollText, cartonType: type, laminationVarnish: type === 'Offset' ? finishVal : ''
+            jobNumber: jobNo, date: document.getElementById('poDate').value || '', time: timeStr || '', targetDeliveryDate: document.getElementById('targetDeliveryDate').value || '',
+            party: partyInput || '', po: document.getElementById('poNumber').value || '', items: itemsArray,
+            itemName: itemsArray.map(i => i.itemName).join(', ') || '', quantity: itemsArray.reduce((acc, i) => acc + i.quantity, 0) || 0, dimensions: itemsArray[0].dimensions, 
+            paperSummaryText: globalPaperText || '', rollsSummaryText: globalRollText || '', cartonType: type || '', laminationVarnish: type === 'Offset' ? finishVal : '',
+            paperArray: globalPaperArray, rollsArray: globalRollsArray,
+            printedPaper: printedPaper, printedQty: printedQty, machineName: machineName, laminationReelSize: lamReelSize, printingImageBase64: currentImageBase64
         };
 
         if (editingJobId) {
@@ -1777,8 +1808,21 @@ function generateJobNumber() {
         document.getElementById('partyName').value = job.party;
         document.getElementById('poNumber').value = job.po;
         document.getElementById('cartonType').value = job.cartonType;
-        updateCartonWorkflow(); 
         if (job.laminationVarnish) document.getElementById('laminationVarnish').value = job.laminationVarnish;
+        
+        updateCartonWorkflow(); 
+
+        if (document.getElementById('printedPaper')) document.getElementById('printedPaper').value = job.printedPaper || '';
+        if (document.getElementById('printedQty')) document.getElementById('printedQty').value = job.printedQty || '';
+        if (document.getElementById('machineName')) document.getElementById('machineName').value = job.machineName || '';
+        if (document.getElementById('lamReelSize')) document.getElementById('lamReelSize').value = job.laminationReelSize || '';
+        
+        currentImageBase64 = job.printingImageBase64 || '';
+        const prev = document.getElementById('printImagePreview');
+        if (prev) {
+            if(currentImageBase64) { prev.src = currentImageBase64; prev.style.display = 'block'; }
+            else { prev.style.display = 'none'; }
+        }
 
         document.getElementById('itemsContainer').innerHTML = '';
         itemCounter = 0;
@@ -1811,7 +1855,7 @@ function generateJobNumber() {
         
         calculateAllJobs();
         switchPage('new-po');
-        showToast("Editing Job order " + job.jobNumber, "success");
+        showToast("Editing Job Card " + job.jobNumber, "success");
     }
 
     function duplicateJob(id) {
@@ -1894,26 +1938,6 @@ function generateJobNumber() {
 
     function goToJobs(type, value) { activeFilter = { type, value }; switchPage('jobs'); }
 
-    function loadJobs() {
-        if (usingFirebase) {
-            db.ref('zhJobs').on('value', (snapshot) => { 
-                const data = snapshot.val(); 
-                allJobs = data ? data : []; 
-                try { localStorage.setItem('zhJobs', JSON.stringify(allJobs)); } catch(e){}
-                updateUIOnLoad(); 
-            });
-        } else {
-            const stored = localStorage.getItem('zhJobs'); if (stored) allJobs = JSON.parse(stored); updateUIOnLoad();
-        }
-    }
-    
-    function updateUIOnLoad() {
-        if (document.getElementById('dashboard').classList.contains('active')) loadDashboard();
-        if (document.getElementById('jobs').classList.contains('active')) renderJobsTable();
-        if (document.getElementById('production-board').classList.contains('active')) { renderStageTabs(); renderProdBoardTable(); }
-        if (document.getElementById('status-board').classList.contains('active')) renderStatusBoard();
-    }
-
     function applyFilters() { renderJobsTable(); }
     function applySBFilters() { renderStatusBoard(); }
 
@@ -1975,7 +1999,7 @@ function generateJobNumber() {
             tr.innerHTML = `
                 <td class="cb-cell"><input type="checkbox" class="job-cb" value="${job.id}"></td>
                 <td>${job.date}</td>
-                <td><strong>${job.jobNumber}</strong><br><small style="color:var(--text-secondary)">PO: ${job.po}</small></td>
+                <td><strong>${job.jobNumber}</strong><br><small style="color:var(--text-secondary)">Customer PO: ${job.po}</small></td>
                 <td>${job.party}</td>
                 <td>${itemsStr}</td>
                 <td>${qtyTotal}</td>
@@ -2048,7 +2072,7 @@ function generateJobNumber() {
                 <div class="status-card-header">
                     <div>
                         <div class="sc-jobno">${job.jobNumber}</div>
-                        <div class="sc-party">${job.party} | PO: ${job.po}</div>
+                        <div class="sc-party">${job.party} | Customer PO: ${job.po}</div>
                     </div>
                     <div style="text-align: right; font-size: 0.75rem; color: var(--text-secondary); font-weight: 700;">Target: ${job.targetDeliveryDate}</div>
                 </div>
@@ -2210,7 +2234,7 @@ function generateJobNumber() {
         const jobItems = job.items ? job.items : [job];
         let itemsHtml = `
             <table class="print-table" style="width:100%; margin-bottom: 2rem;">
-                <thead><tr><th>Item/Sub #</th><th>Ply</th><th>Size</th><th>Quantity</th><th>Roll Size</th><th>Cut Length</th></tr></thead>
+                <thead><tr><th>Item/Sub #</th><th>Ply</th><th>Size</th><th>QTY</th><th>Roll Size</th><th>Cut Length</th></tr></thead>
                 <tbody>
                     ${jobItems.map(i => `<tr><td><strong>${i.subJobNumber || job.jobNumber}</strong><br><small>${i.itemName}</small></td><td>${i.ply}</td><td>${i.dimensions.L}×${i.dimensions.W}×${i.dimensions.H} ${i.dimensions.unit}</td><td>${i.quantity}</td><td>${i.calc.RS}</td><td>${i.calc.CL}</td></tr>`).join('')}
                 </tbody>
@@ -2218,7 +2242,7 @@ function generateJobNumber() {
 
         const html = `
             <div class="detail-grid">
-                <div class="detail-item"><strong> Job Number</strong><span>${job.jobNumber}</span></div>
+                <div class="detail-item"><strong>JOB ORDER</strong><span>${job.jobNumber}</span></div>
                 <div class="detail-item"><strong>Customer / Party</strong><span>${job.party}</span></div>
                 <div class="detail-item"><strong>Customer PO</strong><span>${job.po}</span></div>
                 <div class="detail-item"><strong>Date</strong><span>${job.date}</span></div>
@@ -2228,7 +2252,7 @@ function generateJobNumber() {
             <h3 style="margin-top:1rem; font-weight:800; color:var(--text-primary);">🗃 Sub-Items in this Job</h3>
             ${itemsHtml}
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
-                <div class="detail-item"><strong>COMBINED Store Demand</strong><pre style="font-family: var(--font-mono); font-size: 0.9rem; margin-top:0.4rem;">${job.paperSummaryText}</pre></div>
+                <div class="detail-item"><strong>COMBINED STORE DEMAND</strong><pre style="font-family: var(--font-mono); font-size: 0.9rem; margin-top:0.4rem;">${job.paperSummaryText}</pre></div>
                 <div class="detail-item"><strong>COMBINED CORRUGATION WORK ORDER</strong><pre style="font-family: var(--font-mono); font-size: 0.9rem; margin-top:0.4rem;">${job.rollsSummaryText}</pre></div>
             </div>`;
         document.getElementById('jobDetail').innerHTML = html;
@@ -2290,7 +2314,7 @@ function generateJobNumber() {
     function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
 
     function deleteJob(id) {
-        if(confirm('Delete this Job order completely?')) {
+        if(confirm('Delete this Job Order completely?')) {
             allJobs = allJobs.filter(j => j.id !== id); saveAllJobsData(allJobs);
             renderJobsTable(); loadDashboard();
             if (document.getElementById('production-board').classList.contains('active')) { renderStageTabs(); renderProdBoardTable(); }
@@ -2308,20 +2332,51 @@ function generateJobNumber() {
         const jobRows = jobItems.map(i => `<tr><td style="padding:4px 6px;"><strong>${i.subJobNumber || job.jobNumber}</strong><br><small>${i.itemName}</small></td><td style="padding:4px 6px;">${i.dimensions.L}×${i.dimensions.W}×${i.dimensions.H}</td><td style="padding:4px 6px;">${i.quantity}</td><td style="padding:4px 6px;">${i.calc.RS}</td><td style="padding:4px 6px;">${i.calc.CL}</td><td style="padding:4px 6px;">${i.specString}</td></tr>`).join('');
         const jobSteps = job.tasks ? job.tasks.map(t => `<span style="display:inline-block; width:12px; height:12px; border:1px solid #000; margin-right:4px; vertical-align:-2px;"></span>${t.label}`).join(' &nbsp;&nbsp;➔&nbsp;&nbsp; ') : '';
 
+        // Safely extract just the Paper table format required
+        let paperRowsHtml = '';
+        if (job.paperArray && job.paperArray.length > 0) {
+            paperRowsHtml = job.paperArray.map((p, idx) => `<tr><td>${idx+1}. <pre style="display:inline; margin:0; font-family:var(--font-mono); font-size:8pt;">${p.type}</pre></td><td style="text-align:right;"><strong>${p.kgs}</strong></td></tr>`).join('');
+            // Add lam reel if applicable
+            if (job.laminationReelSize) {
+                paperRowsHtml += `<tr><td colspan="2" style="background:#e2e8f0 !important; font-weight:900; font-size:9pt; padding:6px 4px; text-align:center;">LAMINATION REEL: ${job.laminationReelSize}"</td></tr>`;
+            }
+        } else {
+            paperRowsHtml = `<tr><td colspan="2" style="text-align:center;">No paper required</td></tr>`;
+        }
+
+        // Safely extract just the Rolls table format required
+        let rollsRowsHtml = '';
+        if (job.rollsArray && job.rollsArray.length > 0) {
+            rollsRowsHtml = job.rollsArray.map((r, idx) => `<tr><td>${idx+1}. <pre style="display:inline; margin:0; font-family:var(--font-mono); font-size:8pt;">${r.details}</pre></td><td>(${r.sizes})</td><td style="text-align:right;"><strong>${r.qty}</strong></td></tr>`).join('');
+        } else {
+            rollsRowsHtml = `<tr><td colspan="3" style="text-align:center;">No rolls required</td></tr>`;
+        }
+
+        let rs_cl_display = '';
+        if (jobItems.length === 1) {
+            rs_cl_display = `<b>RS:</b> ${jobItems[0].calc.RS}" &nbsp;|&nbsp; <b>CL:</b> ${jobItems[0].calc.CL}"`;
+        } else {
+            rs_cl_display = `<b>Multiple Sizes:</b> ` + jobItems.map(i => `[${i.calc.RS}"/${i.calc.CL}"]`).join(', ');
+        }
+
+        const isPrinted = (job.cartonType === 'Offset' || job.cartonType === 'Flexo');
+
         const html = `
-            <div class="a4-print-layout">
-                <div class="print-sec-1">
+            <!-- PAGE 1 -->
+            <div class="a4-page">
+                <div class="print-half top">
                     <div class="print-header">
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <img src="Logo.jpeg" alt="Zafar Habib Logo" class="print-logo-main" onerror="this.style.display='none'">
-                            <div><div class="print-company">Zafar Habib Packages (Pvt) Ltd</div><div class="print-title">Job order</div></div>
+                            <div><div class="print-company">Zafar Habib Packages (Pvt) Ltd</div><div class="print-title">JOB ORDER</div></div>
                         </div>
-                        <div style="text-align: right;"><div class="print-job-no">${job.jobNumber}</div><div class="print-date">Date: ${job.date}</div></div>
+                        <div style="text-align: right;"><div class="print-job-no">${job.jobNumber}</div><div class="print-date">Date: ${job.date} <br>Time: ${job.time || ''}</div></div>
                     </div>
                     <div class="print-grid-4" style="margin-bottom: 8px;">
                         <div class="print-field" style="grid-column: span 2;"><strong>Customer Name:</strong> <span>${job.party}</span></div>
                         <div class="print-field"><strong>Customer PO:</strong> <span>${job.po}</span></div>
-                        <div class="print-field"><strong>Total Qty:</strong> <span>${totalQty}</span></div>
+                        <div class="print-field"><strong>Target Date:</strong> <span>${job.targetDeliveryDate}</span></div>
+                        <div class="print-field"><strong>QTY:</strong> <span>${totalQty}</span></div>
                     </div>
                     ${jobSteps ? `<div style="text-align: center; margin: 10px 0; padding: 6px; border: 1.5px solid #000; background: #f8fafc !important; font-size: 9pt; font-weight: 700; border-radius: 4px; -webkit-print-color-adjust: exact;"><strong>PRODUCTION WORKFLOW:</strong> ${jobSteps}</div>` : ''}
                     <div style="font-size: 8pt; font-weight: bold; margin-bottom: 2px;">Sub-Items in this Job:</div>
@@ -2330,45 +2385,60 @@ function generateJobNumber() {
                         <tbody>${jobRows}</tbody>
                     </table>
                 </div>
-                <div class="print-bottom-wrap clearfix">
-                    <div class="print-sec-2">
-                        <div class="print-header-small">
-                            <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">Store Demand</div></div>
-                            <div style="text-align: right;"><div style="font-weight: bold; font-size: 11pt;">${job.jobNumber}</div><div style="font-size: 8pt;">Date: ${job.date}</div></div>
-                        </div>
-                        <div class="print-info-block"><strong>Customer:</strong> ${job.party} <br><strong>Customer PO:</strong> ${job.po} &nbsp;|&nbsp; <strong>Target:</strong> ${job.targetDeliveryDate} <br><strong>Total Quantity:</strong> ${totalQty}</div>
-                        <table class="print-table" style="margin-bottom: auto;">
-                            <tr><th>Paper Requirements (Type/GSM)</th><th>Total KGs</th></tr>
-                            ${getPrintTotalPaper(job.paperSummaryText).split('\n').map(line => {
-                                if(!line.trim() || line.includes('---')) return ''; 
-                                if(line.includes('TOTAL REQUIREMENT')) return `<tr><td colspan="2" style="background:#e2e8f0 !important; font-weight:900; font-size:9pt; padding:6px 4px; text-align:center;">${line}</td></tr>`; 
-                                const pts = line.split('='); 
-                                if(pts.length === 2) return `<tr><td>${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`; 
-                                return `<tr><td colspan="2">${line}</td></tr>`;
-                            }).join('')}
-                        </table>
-                        <div class="print-signatures"><div class="sig-line">Issued By</div><div class="sig-line">Received By</div></div>
+                <div class="print-half bottom">
+                    <div class="print-header-small">
+                        <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">STORE DEMAND</div></div>
+                        <div style="text-align: right;"><div style="font-weight: bold; font-size: 11pt;">${job.jobNumber}</div><div style="font-size: 8pt;">Date: ${job.date}</div></div>
                     </div>
-                    <div class="print-sec-3">
-                        <div class="print-header-small">
-                            <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">CORRUGATION W.O.</div></div>
-                            <div style="text-align: right;"><div style="font-weight: bold; font-size: 11pt;">${job.jobNumber}</div><div style="font-size: 8pt;">Date: ${job.date}</div></div>
-                        </div>
-                        <div class="print-info-block"><strong>Customer:</strong> ${job.party} <br><strong>Customer PO:</strong> ${job.po} &nbsp;|&nbsp; <strong>Target:</strong> ${job.targetDeliveryDate} <br><strong>Process:</strong> ${job.cartonType} &nbsp;|&nbsp; <strong>Total Cuts:</strong> ${totalQty}</div>
-                        <table class="print-table" style="margin-bottom: auto;">
-                            <tr><th>Paired Roll Setup (Size & Layers)</th><th style="text-align:right;">Total Rolls</th></tr>
-                            ${getPrintTotalPaper(job.rollsSummaryText).split('\n').map(line => {
-                                if(!line.trim() || line.includes('---')) return ''; 
-                                if(line.includes('TOTAL REQUIREMENT')) return `<tr><td colspan="2" style="background:#e2e8f0 !important; font-weight:900; font-size:9pt; padding:6px 4px; text-align:center;">${line}</td></tr>`; 
-                                const pts = line.split('='); 
-                                if(pts.length === 2) return `<tr><td>${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`; 
-                                return `<tr><td colspan="2">${line}</td></tr>`;
-                            }).join('')}
-                        </table>
-                        <div class="print-signatures"><div class="sig-line">Operator</div><div class="sig-line">QC Check</div></div>
-                    </div>
+                    <div class="print-info-block"><strong>Customer:</strong> ${job.party} <br><strong>Customer PO:</strong> ${job.po} &nbsp;|&nbsp; <strong>Target:</strong> ${job.targetDeliveryDate} <br><strong>QTY:</strong> ${totalQty}</div>
+                    <table class="print-table" style="margin-bottom: auto;">
+                        <tr><th>Paper Reel Issue</th><th>Total KGs</th></tr>
+                        ${paperRowsHtml}
+                    </table>
+                    <div class="print-signatures"><div class="sig-line">Issued By</div><div class="sig-line">Received By</div></div>
                 </div>
-            </div>`;
+            </div>
+            
+            <!-- PAGE 2 -->
+            <div class="a4-page">
+                <div class="print-half ${isPrinted ? 'top' : ''}">
+                    <div class="print-header-small">
+                        <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">CORRUGATION W.O.</div></div>
+                        <div style="text-align: right;"><div style="font-weight: bold; font-size: 11pt;">${job.jobNumber}</div><div style="font-size: 8pt;">Date: ${job.date}</div></div>
+                    </div>
+                    <div class="print-info-block"><strong>Customer:</strong> ${job.party} <br><strong>Customer PO:</strong> ${job.po} &nbsp;|&nbsp; <strong>Target:</strong> ${job.targetDeliveryDate} <br><strong>Process:</strong> ${job.cartonType} &nbsp;|&nbsp; <strong>Total Cuts:</strong> ${totalQty}</div>
+                    <table class="print-table" style="margin-bottom: auto;">
+                        <tr><th>Roll Paper Details</th><th>Roll Size (RS/CL)</th><th>Total QTY</th></tr>
+                        ${rollsRowsHtml}
+                    </table>
+                    <div class="print-signatures"><div class="sig-line">Operator</div><div class="sig-line">QC Check</div></div>
+                </div>
+                ${isPrinted ? `
+                <div class="print-half bottom" style="display: flex; flex-direction: column;">
+                    <div class="print-header-small">
+                        <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">PRINTING PROGRAM</div></div>
+                        <div style="text-align: right;"><div style="font-weight: bold; font-size: 11pt;">${job.jobNumber}</div><div style="font-size: 8pt;">Date: ${job.date}</div></div>
+                    </div>
+                    <div style="font-size: 11pt; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 10px; line-height: 1.5;">
+                        <div style="display:flex; justify-content:space-between;">
+                            <div><b>Customer:</b> ${job.party}</div>
+                            <div><b>Customer PO:</b> ${job.po}</div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-top: 5px; font-size: 13pt;">
+                            <div>${rs_cl_display}</div>
+                            <div><b>Printed QTY:</b> ${job.printedQty || '-'}</div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-top: 5px;">
+                            <div><b>Printed Paper Layer:</b> ${job.printedPaper || '-'}</div>
+                            <div>${job.cartonType === 'Offset' ? `<b>Machine:</b> ${job.machineName || '-'}` : `<b>Process:</b> ${job.cartonType}`}</div>
+                        </div>
+                    </div>
+                    <div style="flex: 1; text-align: center; overflow: hidden; position: relative;">
+                        ${job.printingImageBase64 ? `<img src="${job.printingImageBase64}" style="max-width: 100%; max-height: 100%; object-fit: contain;">` : '<div style="color:#999; margin-top:50px;"><i>No printing image provided</i></div>'}
+                    </div>
+                </div>` : ''}
+            </div>
+        `;
         triggerPrint(html);
     }
 
@@ -2390,26 +2460,21 @@ function generateJobNumber() {
             });
             
             htmlContentPaper += `<tr><td colspan="2" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">JOB: ${job.jobNumber} (${job.party})</td></tr>`;
-            getPrintTotalPaper(job.paperSummaryText).split('\n').forEach(line => {
-                if(!line.trim() || line.includes('TOTAL REQUIREMENT') || line.includes('---')) return;
-                if(line.includes(':') && !line.includes('=')) {
-                    htmlContentPaper += `<tr><td colspan="2" style="font-weight:bold; padding-top:4px;">${line}</td></tr>`;
-                } else {
-                    const pts = line.split('=');
-                    if(pts.length === 2) htmlContentPaper += `<tr><td>${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`;
+            if (job.paperArray && job.paperArray.length > 0) {
+                htmlContentPaper += job.paperArray.map((p, idx) => `<tr><td>${idx+1}. <pre style="display:inline; margin:0; font-family:var(--font-mono); font-size:8pt;">${p.type}</pre></td><td style="text-align:right;"><strong>${p.kgs} KGs</strong></td></tr>`).join('');
+                if (job.laminationReelSize) {
+                    htmlContentPaper += `<tr><td colspan="2" style="font-weight:bold; text-align:center;">LAMINATION REEL: ${job.laminationReelSize}"</td></tr>`;
                 }
-            });
+            } else {
+                htmlContentPaper += `<tr><td colspan="2" style="text-align:center;">No paper required</td></tr>`;
+            }
 
-            htmlContentRolls += `<tr><td colspan="2" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">JOB: ${job.jobNumber} (${job.party})</td></tr>`;
-            getPrintTotalPaper(job.rollsSummaryText).split('\n').forEach(line => {
-                if(!line.trim() || line.includes('TOTAL REQUIREMENT') || line.includes('---')) return;
-                if(line.includes(':') && !line.includes('=')) {
-                    htmlContentRolls += `<tr><td colspan="2" style="font-weight:bold; padding-top:4px;">${line}</td></tr>`;
-                } else {
-                    const pts = line.split('=');
-                    if(pts.length === 2) htmlContentRolls += `<tr><td>${pts[0]}</td><td style="text-align:right;"><strong>${pts[1]}</strong></td></tr>`;
-                }
-            });
+            htmlContentRolls += `<tr><td colspan="3" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">JOB: ${job.jobNumber} (${job.party})</td></tr>`;
+            if (job.rollsArray && job.rollsArray.length > 0) {
+                htmlContentRolls += job.rollsArray.map((r, idx) => `<tr><td>${idx+1}. <pre style="display:inline; margin:0; font-family:var(--font-mono); font-size:8pt;">${r.details}</pre></td><td>(${r.sizes})</td><td style="text-align:right;"><strong>${r.qty} Rolls</strong></td></tr>`).join('');
+            } else {
+                htmlContentRolls += `<tr><td colspan="3" style="text-align:center;">No rolls required</td></tr>`;
+            }
         });
 
         const parties = Array.from(new Set(jobs.map(j => j.party))).join(', ');
@@ -2419,26 +2484,26 @@ function generateJobNumber() {
 
         if (printType === 'paper') {
             printTemplate = `
-                <div class="a4-print-layout">
+                <div class="a4-page" style="height:auto;">
                     <div class="print-sec-1" style="height: auto; border: none;">
                         <div class="print-header">
                             <div style="display: flex; align-items: center; gap: 12px;">
                                 <img src="Logo.jpeg" alt="Zafar Habib Logo" class="print-logo-main" onerror="this.style.display='none'">
-                                <div><div class="print-company">Zafar Habib Packages (Pvt) Ltd</div><div class="print-title">BATCH MATERIAL SLIP</div></div>
+                                <div><div class="print-company">Zafar Habib Packages (Pvt) Ltd</div><div class="print-title">BATCH STORE DEMAND</div></div>
                             </div>
                             <div style="text-align: right;"><div class="print-job-no" style="font-size:12pt;">PAPER ONLY</div><div class="print-date">Date: ${new Date().toLocaleDateString()}</div></div>
                         </div>
-                        <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos}</div>
+                        <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>Customer POs:</strong> ${pos}</div>
                         <table class="print-table" style="margin-bottom: 20px;">
-                            <tr><th colspan="2">Consolidated Paper Requirement Breakdown</th></tr>
-                            ${htmlContentPaper || '<tr><td colspan="2" style="text-align:center;">No paper required</td></tr>'}
+                            <tr><th>Paper Reel Issue Breakdown</th><th style="text-align:right;">Total KGs</th></tr>
+                            ${htmlContentPaper}
                         </table>
                         <div class="print-signatures"><div class="sig-line">Issued By</div><div class="sig-line">Received By</div></div>
                     </div>
                 </div>`;
         } else if (printType === 'rolls') {
             printTemplate = `
-                <div class="a4-print-layout">
+                <div class="a4-page" style="height:auto;">
                     <div class="print-sec-1" style="height: auto; border: none;">
                         <div class="print-header">
                             <div style="display: flex; align-items: center; gap: 12px;">
@@ -2447,18 +2512,18 @@ function generateJobNumber() {
                             </div>
                             <div style="text-align: right;"><div class="print-job-no" style="font-size:12pt;">ROLLS ONLY</div><div class="print-date">Date: ${new Date().toLocaleDateString()}</div></div>
                         </div>
-                        <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos}</div>
+                        <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>Customer POs:</strong> ${pos}</div>
                         <table class="print-table" style="margin-bottom: 20px;">
-                            <tr><th colspan="2">Consolidated Paired Roll Setup Breakdown</th></tr>
-                            ${htmlContentRolls || '<tr><td colspan="2" style="text-align:center;">No rolls required</td></tr>'}
+                            <tr><th>Paired Roll Setup</th><th>Size (RS/CL)</th><th style="text-align:right;">Total Rolls</th></tr>
+                            ${htmlContentRolls}
                         </table>
                         <div class="print-signatures"><div class="sig-line">Operator</div><div class="sig-line">QC Check</div></div>
                     </div>
                 </div>`;
         } else {
             printTemplate = `
-                <div class="a4-print-layout">
-                    <div class="print-sec-1">
+                <div class="a4-page">
+                    <div class="print-sec-1" style="height: auto; border-bottom: none;">
                         <div class="print-header">
                             <div style="display: flex; align-items: center; gap: 12px;">
                                 <img src="Logo.jpeg" alt="Zafar Habib Logo" class="print-logo-main" onerror="this.style.display='none'">
@@ -2469,7 +2534,7 @@ function generateJobNumber() {
                         <div class="print-grid-4" style="margin-bottom: 4px;">
                             <div class="print-field" style="grid-column: span 2;"><strong>Customer(s):</strong> <span>${parties}</span></div>
                             <div class="print-field"><strong>Customer PO(s):</strong> <span>${pos}</span></div>
-                            <div class="print-field"><strong>Total Qty:</strong> <span>${totalQty}</span></div>
+                            <div class="print-field"><strong>QTY:</strong> <span>${totalQty}</span></div>
                         </div>
                         <div style="font-size: 8pt; font-weight: bold; margin-bottom: 2px;">All Items in Batch:</div>
                         <table class="print-table" style="margin-top:0;">
@@ -2477,31 +2542,29 @@ function generateJobNumber() {
                             <tbody>${jobRowsHtml}</tbody>
                         </table>
                     </div>
-                    <div class="print-bottom-wrap clearfix">
-                        <div class="print-sec-2">
-                            <div class="print-header-small">
-                                <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">Store Demand</div></div>
-                                <div style="text-align: right; font-weight: bold; font-size:10pt;">CONSOLIDATED</div>
-                            </div>
-                            <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos} <br><strong>Total Batch Qty:</strong> ${totalQty}</div>
-                            <table class="print-table" style="margin-bottom: auto;">
-                                <tr><th colspan="2">Paper Requirement Breakdown</th></tr>
-                                ${htmlContentPaper || '<tr><td colspan="2" style="text-align:center;">No paper required</td></tr>'}
-                            </table>
-                            <div class="print-signatures"><div class="sig-line">Issued By</div><div class="sig-line">Received By</div></div>
+                </div>
+                <div class="a4-page">
+                    <div class="print-half top">
+                        <div class="print-header-small">
+                            <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">BATCH STORE DEMAND</div></div>
+                            <div style="text-align: right; font-weight: bold; font-size:10pt;">CONSOLIDATED</div>
                         </div>
-                        <div class="print-sec-3">
-                            <div class="print-header-small">
-                                <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">CORRUGATION WORK ORDER</div></div>
-                                <div style="text-align: right; font-weight: bold; font-size:10pt;">CONSOLIDATED</div>
-                            </div>
-                            <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos} <br><strong>Total Batch Qty:</strong> ${totalQty}</div>
-                            <table class="print-table" style="margin-bottom: auto;">
-                                <tr><th colspan="2">Paired Roll Setup Breakdown</th></tr>
-                                ${htmlContentRolls || '<tr><td colspan="2" style="text-align:center;">No rolls required</td></tr>'}
-                            </table>
-                            <div class="print-signatures"><div class="sig-line">Operator</div><div class="sig-line">QC Check</div></div>
+                        <table class="print-table" style="margin-bottom: auto;">
+                            <tr><th>Paper Reel Issue Breakdown</th><th style="text-align:right;">Total KGs</th></tr>
+                            ${htmlContentPaper}
+                        </table>
+                        <div class="print-signatures"><div class="sig-line">Issued By</div><div class="sig-line">Received By</div></div>
+                    </div>
+                    <div class="print-half bottom">
+                        <div class="print-header-small">
+                            <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">BATCH CORRUGATION W.O.</div></div>
+                            <div style="text-align: right; font-weight: bold; font-size:10pt;">CONSOLIDATED</div>
                         </div>
+                        <table class="print-table" style="margin-bottom: auto;">
+                            <tr><th>Paired Roll Setup</th><th>Size (RS/CL)</th><th style="text-align:right;">Total Rolls</th></tr>
+                            ${htmlContentRolls}
+                        </table>
+                        <div class="print-signatures"><div class="sig-line">Operator</div><div class="sig-line">QC Check</div></div>
                     </div>
                 </div>`;
         }
@@ -2510,4 +2573,3 @@ function generateJobNumber() {
 </script>
 </body>
 </html>
-      
