@@ -535,7 +535,11 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div id="workflowPreview" class="custom-checkbox-grid" style="margin-top: 1.5rem;"></div>
+                                <div style="margin-top:1.5rem; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+                                    <strong style="font-size:.85rem; color:var(--text-secondary);">WORKFLOW STEPS — use ↑ / ↓ to change the sequence</strong>
+                                    <button type="button" class="btn-secondary btn-small" onclick="addCustomWorkflowStep()">＋ Add Workflow Step</button>
+                                </div>
+                                <div id="workflowPreview" style="margin-top:10px; display:flex; flex-direction:column; gap:8px;"></div>
 
                                 <!-- CONDITIONAL PRINTING DETAILS -->
                                 <div id="printingDetailsSection" style="display:none; margin-top: 2rem; background: var(--bg-tertiary); padding: 1.5rem; border-radius: 12px; border: 1px dashed var(--border);">
@@ -548,11 +552,17 @@
                                         </div>
                                         <div class="form-group-wrapper">
                                             <label class="required">Which Paper Will Be Printed?</label>
-                                            <input type="text" id="printedPaper" placeholder="e.g. Bleach Card 250gsm" oninput="saveDraft()">
+                                            <select id="printedPaper" onchange="updatePrintedPaperSelection()">
+                                                <option value="">Select paper from Product Specifications</option>
+                                            </select>
                                         </div>
                                         <div class="form-group-wrapper">
                                             <label class="required">Printed Papers QTY</label>
-                                            <input type="number" id="printedQty" placeholder="e.g. 5000" oninput="saveDraft()">
+                                            <input type="number" id="printedQty" min="1" placeholder="e.g. 1250" oninput="updatePrintedPaperSelection(); saveDraft()">
+                                        </div>
+                                        <div class="form-group-wrapper">
+                                            <label>Paper Cutting Size</label>
+                                            <input type="text" id="printedCutSize" placeholder="e.g. 22 X 15" readonly>
                                         </div>
                                         <div class="form-group-wrapper" id="machineNameWrapper" style="display:none;">
                                             <label class="required">Machine Name</label>
@@ -560,7 +570,15 @@
                                         </div>
                                         <div class="form-group-wrapper" id="lamReelWrapper" style="display:none;">
                                             <label class="required">Lamination Reel Size (Inches)</label>
-                                            <input type="number" step="0.1" id="lamReelSize" placeholder="e.g. 24" oninput="saveDraft()">
+                                            <input type="number" step="0.1" min="1" id="lamReelSize" placeholder="e.g. 24" oninput="saveDraft()">
+                                        </div>
+                                        <div class="form-group-wrapper" id="lamLossWrapper" style="display:none;">
+                                            <label>Lamination Loss (KG)</label>
+                                            <input type="number" id="laminationLossKg" min="3" max="5" step="1" value="5" oninput="updatePrintedPaperSelection(); saveDraft()">
+                                        </div>
+                                        <div class="form-group-wrapper" id="lamKgWrapper" style="display:none;">
+                                            <label>Lamination Requirement</label>
+                                            <input type="text" id="laminationKg" placeholder="Calculated KG" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -571,6 +589,10 @@
                                     <div style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: 12px; border: 2px solid var(--border);">
                                         <strong style="color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 10px; display: block;">STORE DEMAND (PAPER)</strong>
                                         <pre id="calcPaperSummary" style="font-family: var(--font-mono); font-size: 0.95rem; white-space: pre-wrap; line-height: 1.6; font-weight: 700;">-</pre>
+                                        <div id="printingStoreSlip" style="margin-top:1rem; padding:1rem; border:2px dashed var(--primary-accent); border-radius:10px; background:var(--bg-primary);">
+                                            <strong style="display:block; margin-bottom:.5rem; color:var(--primary-accent);">PAPER CUTTING / LAMINATION SLIP</strong>
+                                            <pre id="printingStoreSlipText" style="font-family:var(--font-mono); font-size:.9rem; white-space:pre-wrap; line-height:1.6; margin:0;">Not required</pre>
+                                        </div>
                                     </div>
                                     <div style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: 12px; border: 2px solid var(--border);">
                                         <strong style="color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 10px; display: block;">CORRUGATION W.O. (ROLLS)</strong>
@@ -893,12 +915,16 @@
     let chartParty = null; let chartStage = null; let chartType = null;
     let activeFilter = null; 
 
-    const ALL_STAGES = [
+    let ALL_STAGES = [
         'Reel Issue', 'Offset Printing', 'Shine Lamination', 'Matt Lamination', 'Varnish',
         'Corrugation', 'Pasting', 'Rotary', 'Flexo', 'Flexo Printing',
         'Glue (Gluing)', 'Pin', 'Drying/Bending', 'Dispatch'
     ];
     let currentBoardStage = 'Reel Issue';
+    let customWorkflowSteps = [];
+    let workflowOrder = [];
+    let workflowState = {};
+    let draftSaveTimer = null;
 
     document.addEventListener('DOMContentLoaded', () => {
         const theme = localStorage.getItem('zhTheme') || 'light';
@@ -1339,53 +1365,29 @@
         return results;
     }
 
-    // ===== MULTI-ITEM UI =====
     function addItemBlock() {
         const container = document.getElementById('itemsContainer');
-        if (!container) {
-            console.error('itemsContainer not found');
-            return;
-        }
+        if (!container) return;
 
-        const index = itemCounter;
-        itemCounter++;
-
+        const index = itemCounter++;
         const block = document.createElement('div');
         block.className = 'item-block';
         block.id = `itemBlock_${index}`;
-        block.style.cssText = `
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            margin-bottom: 1.25rem;
-            box-shadow: var(--shadow-sm);
-        `;
+        block.style.cssText = 'background:var(--bg-secondary); border:2px solid var(--border); border-radius:14px; padding:1.25rem; margin-bottom:1rem;';
 
         block.innerHTML = `
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:1.2rem;">
-                <div>
-                    <div style="font-family:var(--font-display);font-weight:800;font-size:1.05rem;color:var(--primary-accent);">ITEM ${index + 1}</div>
-                    <div style="font-size:.8rem;color:var(--text-secondary);margin-top:3px;">Product specification</div>
-                </div>
-                <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                    ${index > 0 ? `
-                        <button type="button" class="btn-secondary btn-small" onclick="copyPreviousItem(${index})">
-                            ⧉ Copy Previous
-                        </button>
-                    ` : ''}
-                    <button type="button" class="btn-danger btn-small" onclick="removeItemBlock(${index})">
-                        ✕ Remove
-                    </button>
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:1rem;">
+                <h3 style="margin:0; color:var(--primary-accent); font-family:var(--font-display); font-size:1rem;">ITEM ${index + 1}</h3>
+                <div style="display:flex; gap:8px;">
+                    ${index > 0 ? `<button type="button" class="btn-secondary btn-small" onclick="copyPreviousItem(${index})">⧉ Copy Previous</button>` : ''}
+                    <button type="button" class="btn-danger btn-small" onclick="removeItemBlock(${index})">✕ Remove</button>
                 </div>
             </div>
-
             <div class="form-row">
                 <div class="form-group-wrapper">
                     <label class="required">Item Name</label>
                     <input type="text" class="item-name" value="Carton" placeholder="e.g. Display Box" required oninput="calculateAllJobs()">
                 </div>
-
                 <div class="form-group-wrapper">
                     <label class="required">Ply</label>
                     <select class="item-ply" required onchange="handlePlyChange(this)">
@@ -1395,86 +1397,37 @@
                         <option value="7Ply">7 Ply</option>
                     </select>
                 </div>
-
                 <div class="form-group-wrapper">
                     <label class="required">Quantity</label>
-                    <input type="number" class="item-qty" min="1" step="1" placeholder="e.g. 1000" required oninput="calculateAllJobs()">
+                    <input type="number" class="item-qty" min="1" placeholder="e.g. 1250" required oninput="calculateAllJobs()">
                 </div>
             </div>
-
-            <div style="margin-top:1rem;padding:1rem;background:var(--bg-primary);border:1px solid var(--border);border-radius:12px;">
-                <div style="font-family:var(--font-display);font-weight:800;color:var(--text-primary);margin-bottom:1rem;">Dimensions</div>
-
-                <div class="form-row">
-                    <div class="form-group-wrapper">
-                        <label class="required">Length</label>
-                        <input type="number" class="item-l" step="0.01" min="0" placeholder="Length" required oninput="calculateAllJobs()">
-                    </div>
-
-                    <div class="form-group-wrapper">
-                        <label class="required">Width</label>
-                        <input type="number" class="item-w" step="0.01" min="0" placeholder="Width" required oninput="calculateAllJobs()">
-                    </div>
-
-                    <div class="form-group-wrapper">
-                        <label class="required">Height</label>
-                        <input type="number" class="item-h" step="0.01" min="0" placeholder="Height" required oninput="calculateAllJobs()">
-                    </div>
-
-                    <div class="form-group-wrapper">
-                        <label>Unit</label>
-                        <select class="item-unit" onchange="calculateAllJobs()">
-                            <option value="INCH">INCH</option>
-                            <option value="CM">CM</option>
-                            <option value="MM">MM</option>
-                        </select>
-                    </div>
-                </div>
+            <div class="form-row">
+                <div class="form-group-wrapper"><label class="required">Length</label><input type="number" step="0.01" class="item-l" required oninput="calculateAllJobs()"></div>
+                <div class="form-group-wrapper"><label class="required">Width</label><input type="number" step="0.01" class="item-w" required oninput="calculateAllJobs()"></div>
+                <div class="form-group-wrapper"><label class="required">Height</label><input type="number" step="0.01" class="item-h" required oninput="calculateAllJobs()"></div>
+                <div class="form-group-wrapper"><label>Unit</label><select class="item-unit" onchange="calculateAllJobs()"><option value="INCH">INCH</option><option value="CM">CM</option><option value="MM">MM</option></select></div>
             </div>
-
-            <div style="margin-top:1rem;padding:1rem;background:var(--bg-primary);border:1px solid var(--border);border-radius:12px;">
-                <label class="required">Paper / Corrugation Specifications</label>
-                <div class="ply-inputs-container custom-checkbox-grid">
-                    <span style="color:var(--text-secondary);font-size:.85rem;">Please select a Ply config first.</span>
+            <div style="margin-top:1rem; padding:1rem; border:1px solid var(--border); border-radius:10px; background:var(--bg-primary);">
+                <strong style="display:block; margin-bottom:.8rem;">Paper / Corrugation Specifications</strong>
+                <div class="ply-inputs-container custom-checkbox-grid" style="display:flex; flex-wrap:wrap; gap:10px;">
+                    <span style="color:var(--text-secondary); font-size:.85rem;">Please select a Ply config first.</span>
                 </div>
                 <input type="hidden" class="item-spec">
             </div>
-
             <div class="form-row" style="margin-top:1rem;">
-                <div class="form-group-wrapper">
-                    <label>Manual RS</label>
-                    <input type="number" class="item-manual-rs" step="0.01" min="0" placeholder="Auto" oninput="calculateAllJobs()">
-                </div>
-
-                <div class="form-group-wrapper">
-                    <label>Manual CL</label>
-                    <input type="number" class="item-manual-cl" step="0.01" min="0" placeholder="Auto" oninput="calculateAllJobs()">
-                </div>
+                <div class="form-group-wrapper"><label>Manual RS</label><input type="number" step="0.01" class="item-manual-rs" placeholder="Auto" oninput="calculateAllJobs()"></div>
+                <div class="form-group-wrapper"><label>Manual CL</label><input type="number" step="0.01" class="item-manual-cl" placeholder="Auto" oninput="calculateAllJobs()"></div>
             </div>
-
             <div class="calc-grid">
-                <div class="calc-box">
-                    <div class="calc-label">RS</div>
-                    <div class="calc-value calc-rs">-</div>
-                    <div class="calc-sub-value calc-rs-actual">Actual: -</div>
-                </div>
-                <div class="calc-box">
-                    <div class="calc-label">CL</div>
-                    <div class="calc-value calc-cl">-</div>
-                    <div class="calc-sub-value calc-cl-actual">Actual: -</div>
-                </div>
-                <div class="calc-box">
-                    <div class="calc-label">Area</div>
-                    <div class="calc-value calc-area">-</div>
-                    <div class="calc-sub-value">RS × CL</div>
-                </div>
+                <div class="calc-box"><div class="calc-label">RS</div><div class="calc-value calc-rs">-</div><div class="calc-sub-value calc-rs-actual">Actual: -</div></div>
+                <div class="calc-box"><div class="calc-label">CL</div><div class="calc-value calc-cl">-</div><div class="calc-sub-value calc-cl-actual">Actual: -</div></div>
+                <div class="calc-box"><div class="calc-label">Area</div><div class="calc-value calc-area">-</div><div class="calc-sub-value">RS × CL</div></div>
             </div>
-
             <div class="form-group-wrapper" style="margin-top:1rem;">
-                <label>Detail Notes</label>
+                <label>Notes</label>
                 <input type="text" class="item-notes" placeholder="Additional item notes..." oninput="saveDraft()">
-            </div>
-        `;
+            </div>`;
 
         container.appendChild(block);
         calculateAllJobs();
@@ -1483,13 +1436,10 @@
     function removeItemBlock(index) {
         const block = document.getElementById(`itemBlock_${index}`);
         if (!block) return;
-
-        const blocks = document.querySelectorAll('.item-block');
-        if (blocks.length <= 1) {
+        if (document.querySelectorAll('.item-block').length <= 1) {
             showToast('At least one item is required.', 'error');
             return;
         }
-
         block.remove();
         calculateAllJobs();
     }
@@ -1544,6 +1494,89 @@
             calculateAllJobs();
             showToast("Specifications Copied", "success");
         }, 50);
+    }
+
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
+    function refreshPrintedPaperOptions() {
+        const select = document.getElementById('printedPaper');
+        if (!select) return;
+        const previous = select.value;
+        const options = ['<option value="">Select paper from Product Specifications</option>'];
+        const blocks = document.querySelectorAll('.item-block');
+
+        blocks.forEach((block, itemIndex) => {
+            const inputs = block.querySelectorAll('.ply-layer-input');
+            const rs = (block.querySelector('.calc-rs')?.textContent || '').replace('"','');
+            const cl = (block.querySelector('.calc-cl')?.textContent || '').replace('"','');
+            const qty = block.querySelector('.item-qty')?.value || '';
+            inputs.forEach((input, layerIndex) => {
+                if (layerIndex % 2 !== 0) return;
+                const paper = input.value.trim().toUpperCase();
+                if (!paper) return;
+                const gsmMatch = paper.match(/(\d+(?:\.\d+)?)/);
+                const gsm = gsmMatch ? parseFloat(gsmMatch[1]) : 0;
+                const key = `${itemIndex}:${layerIndex}`;
+                options.push(`<option value="${escapeHtml(key)}" data-paper="${escapeHtml(paper)}" data-gsm="${gsm}" data-rs="${escapeHtml(rs)}" data-cl="${escapeHtml(cl)}" data-qty="${escapeHtml(qty)}">Item ${itemIndex + 1} — ${escapeHtml(paper)}${rs && cl ? ` | ${escapeHtml(rs)} X ${escapeHtml(cl)}` : ''}</option>`);
+            });
+        });
+        select.innerHTML = options.join('');
+        if (previous && Array.from(select.options).some(o => o.value === previous)) select.value = previous;
+    }
+
+    function updatePrintedPaperSelection(shouldSave = true) {
+        const select = document.getElementById('printedPaper');
+        const qtyEl = document.getElementById('printedQty');
+        const cutEl = document.getElementById('printedCutSize');
+        const kgEl = document.getElementById('laminationKg');
+        const slipEl = document.getElementById('printingStoreSlipText');
+        const lossEl = document.getElementById('laminationLossKg');
+        if (!select) return;
+
+        const opt = select.options[select.selectedIndex];
+        if (!opt || !opt.value) {
+            if (cutEl) cutEl.value = '';
+            if (kgEl) kgEl.value = '';
+            if (slipEl) slipEl.textContent = 'Not required';
+            if (shouldSave) saveDraft();
+            return;
+        }
+
+        const paper = opt.dataset.paper || '';
+        const gsm = parseFloat(opt.dataset.gsm) || 0;
+        const rs = parseFloat(opt.dataset.rs) || 0;
+        const cl = parseFloat(opt.dataset.cl) || 0;
+        const qty = parseFloat(qtyEl?.value || opt.dataset.qty || 0) || 0;
+        const cutSize = rs && cl ? `${rs} X ${cl}` : '-';
+        if (cutEl) cutEl.value = cutSize;
+
+        const loss = Math.min(5, Math.max(3, parseFloat(lossEl?.value || 5) || 5));
+        if (lossEl) lossEl.value = loss;
+
+        let laminationKg = 0;
+        if (gsm > 0 && rs > 0 && cl > 0 && qty > 0) {
+            const baseKg = (rs * cl * gsm / 1000 / 1550) * qty;
+            laminationKg = Math.ceil(baseKg + loss);
+        }
+        if (kgEl) kgEl.value = laminationKg ? `${laminationKg} KGs` : '';
+
+        const type = document.getElementById('cartonType')?.value || '';
+        const isLaminated = type === 'Offset' && ['Shine Lamination','Matt Lamination'].includes(document.getElementById('laminationVarnish')?.value);
+        const reel = document.getElementById('lamReelSize')?.value || '';
+        if (slipEl) {
+            if (type === 'Offset' || type === 'Flexo') {
+                let text = `Paper: ${paper}\nPaper Cutting: ${cutSize}\nTotal: ${qty ? Math.round(qty) : 0} Pcs`;
+                if (isLaminated) {
+                    text += `\nLamination Reel: ${reel ? reel + '"' : '-'}\nLamination: ${laminationKg ? laminationKg + ' KGs' : '-'} (incl. ${loss} KG loss)`;
+                }
+                slipEl.textContent = text;
+            } else {
+                slipEl.textContent = 'Not required';
+            }
+        }
+        if (shouldSave) saveDraft();
     }
 
     function calculateAllJobs() {
@@ -1658,18 +1691,18 @@
             }
             globalRollText = finalRollText; document.getElementById('calcRollsSummary').textContent = globalRollText;
         } else { globalRollText = "-"; document.getElementById('calcRollsSummary').textContent = "-"; }
-        
+
+        refreshPrintedPaperOptions();
+        updatePrintedPaperSelection(false);
         saveDraft();
     }
 
     // ===== DRAFTS (AUTO-SAVE) =====
     function saveDraft() {
-        if(editingJobId) return; 
-        
-        let itemsArray = [];
-        const blocks = document.querySelectorAll('.item-block');
-        blocks.forEach(block => {
-            const plyInputs = Array.from(block.querySelectorAll('.ply-layer-input')).map(inp => inp.value);
+        if (editingJobId) return;
+        captureWorkflowState();
+        const itemsArray = [];
+        document.querySelectorAll('.item-block').forEach(block => {
             itemsArray.push({
                 itemName: block.querySelector('.item-name').value,
                 ply: block.querySelector('.item-ply').value,
@@ -1681,7 +1714,7 @@
                 unit: block.querySelector('.item-unit').value,
                 manualRS: block.querySelector('.item-manual-rs').value,
                 manualCL: block.querySelector('.item-manual-cl').value,
-                plyInputs: plyInputs
+                plyInputs: Array.from(block.querySelectorAll('.ply-layer-input')).map(inp => inp.value)
             });
         });
 
@@ -1692,87 +1725,103 @@
             poNumber: document.getElementById('poNumber').value,
             cartonType: document.getElementById('cartonType').value,
             laminationVarnish: document.getElementById('laminationVarnish').value,
-            printedPaper: document.getElementById('printedPaper') ? document.getElementById('printedPaper').value : '',
-            printedQty: document.getElementById('printedQty') ? document.getElementById('printedQty').value : '',
-            machineName: document.getElementById('machineName') ? document.getElementById('machineName').value : '',
-            lamReelSize: document.getElementById('lamReelSize') ? document.getElementById('lamReelSize').value : '',
+            printedPaper: document.getElementById('printedPaper')?.value || '',
+            printedQty: document.getElementById('printedQty')?.value || '',
+            printedCutSize: document.getElementById('printedCutSize')?.value || '',
+            machineName: document.getElementById('machineName')?.value || '',
+            lamReelSize: document.getElementById('lamReelSize')?.value || '',
+            laminationLossKg: document.getElementById('laminationLossKg')?.value || '5',
+            laminationKg: document.getElementById('laminationKg')?.value || '',
             printingImageBase64: currentImageBase64,
+            workflowOrder: workflowOrder,
+            workflowState: workflowState,
+            customWorkflowSteps: customWorkflowSteps,
             items: itemsArray
         };
-        localStorage.setItem('zhDraft', JSON.stringify(draft));
+
+        const data = JSON.stringify(draft);
+        try { localStorage.setItem('zhDraft', data); } catch(e) { console.error('Draft local save error:', e); }
+
+        clearTimeout(draftSaveTimer);
+        if (usingFirebase && db) {
+            draftSaveTimer = setTimeout(() => {
+                db.ref('zhDraft').set(draft).catch(err => console.error('Firebase draft save error:', err));
+            }, 400);
+        }
     }
 
-    function loadDraft() {
-        const draftStr = localStorage.getItem('zhDraft');
-        if (!draftStr) {
-            if (itemCounter === 0) addItemBlock();
-            updateCartonWorkflow();
-            return;
-        }
-        
-        let draft;
-        try {
-            draft = JSON.parse(draftStr);
-        } catch(e) {
-            localStorage.removeItem('zhDraft');
-            if (itemCounter === 0) addItemBlock();
-            updateCartonWorkflow();
-            return;
-        }
-
+    function applyDraft(draft) {
         document.getElementById('poDate').value = draft.date || '';
         document.getElementById('targetDeliveryDate').value = draft.targetDeliveryDate || '';
         document.getElementById('partyName').value = draft.partyName || '';
         document.getElementById('poNumber').value = draft.poNumber || '';
         document.getElementById('cartonType').value = draft.cartonType || '';
-        
         if (draft.laminationVarnish) document.getElementById('laminationVarnish').value = draft.laminationVarnish;
-        
+
+        workflowOrder = Array.isArray(draft.workflowOrder) ? draft.workflowOrder : [];
+        workflowState = draft.workflowState || {};
+        customWorkflowSteps = Array.isArray(draft.customWorkflowSteps) ? draft.customWorkflowSteps : [];
+        customWorkflowSteps.forEach(step => { if (!ALL_STAGES.includes(step)) ALL_STAGES.push(step); });
+
         updateCartonWorkflow();
 
         if (document.getElementById('printedPaper')) document.getElementById('printedPaper').value = draft.printedPaper || '';
         if (document.getElementById('printedQty')) document.getElementById('printedQty').value = draft.printedQty || '';
+        if (document.getElementById('printedCutSize')) document.getElementById('printedCutSize').value = draft.printedCutSize || '';
         if (document.getElementById('machineName')) document.getElementById('machineName').value = draft.machineName || '';
         if (document.getElementById('lamReelSize')) document.getElementById('lamReelSize').value = draft.lamReelSize || '';
-        
+        if (document.getElementById('laminationLossKg')) document.getElementById('laminationLossKg').value = draft.laminationLossKg || '5';
+
         currentImageBase64 = draft.printingImageBase64 || '';
         const prev = document.getElementById('printImagePreview');
-        if (prev) {
-            if(currentImageBase64) { prev.src = currentImageBase64; prev.style.display = 'block'; }
-            else { prev.style.display = 'none'; }
-        }
+        if (prev) { prev.src = currentImageBase64; prev.style.display = currentImageBase64 ? 'block' : 'none'; }
 
-        document.getElementById('itemsContainer').innerHTML = '';
+        const container = document.getElementById('itemsContainer');
+        container.innerHTML = '';
         itemCounter = 0;
-        
-        if(draft.items && draft.items.length > 0) {
+        if (draft.items && draft.items.length) {
             draft.items.forEach(i => {
                 addItemBlock();
                 const block = document.getElementById(`itemBlock_${itemCounter - 1}`);
                 block.querySelector('.item-name').value = i.itemName || 'Carton';
                 block.querySelector('.item-ply').value = i.ply || '';
-                
-                handlePlyChange(block.querySelector('.item-ply')); 
-                
+                handlePlyChange(block.querySelector('.item-ply'));
                 block.querySelector('.item-qty').value = i.quantity || '';
                 block.querySelector('.item-notes').value = i.detailNotes || '';
                 block.querySelector('.item-l').value = i.l || '';
                 block.querySelector('.item-w').value = i.w || '';
                 block.querySelector('.item-h').value = i.h || '';
-                if(i.unit) block.querySelector('.item-unit').value = i.unit;
+                if (i.unit) block.querySelector('.item-unit').value = i.unit;
                 block.querySelector('.item-manual-rs').value = i.manualRS || '';
                 block.querySelector('.item-manual-cl').value = i.manualCL || '';
-                
-                setTimeout(() => {
-                    const inputs = block.querySelectorAll('.ply-layer-input');
-                    if(i.plyInputs) {
-                        inputs.forEach((inp, idx) => { if(i.plyInputs[idx]) inp.value = i.plyInputs[idx]; });
-                    }
-                    calculateAllJobs();
-                }, 50);
+                const inputs = block.querySelectorAll('.ply-layer-input');
+                (i.plyInputs || []).forEach((v, idx) => { if (inputs[idx]) inputs[idx].value = v; });
             });
         } else {
             addItemBlock();
+        }
+        calculateAllJobs();
+        if (draft.printedPaper) {
+            document.getElementById('printedPaper').value = draft.printedPaper;
+            updatePrintedPaperSelection(false);
+        }
+    }
+
+    function loadDraft() {
+        const localDraft = localStorage.getItem('zhDraft');
+        if (localDraft) {
+            try { applyDraft(JSON.parse(localDraft)); return; } catch(e) { localStorage.removeItem('zhDraft'); }
+        }
+
+        if (usingFirebase && db) {
+            db.ref('zhDraft').once('value').then(snap => {
+                const draft = snap.val();
+                if (draft) applyDraft(draft);
+                else { if (itemCounter === 0) addItemBlock(); updateCartonWorkflow(); }
+            }).catch(() => { if (itemCounter === 0) addItemBlock(); updateCartonWorkflow(); });
+        } else {
+            if (itemCounter === 0) addItemBlock();
+            updateCartonWorkflow();
         }
     }
 
@@ -1792,40 +1841,129 @@
         return `JO${dStr}-${String(maxSeq + 1).padStart(3, '0')}`;
     }
 
+    function captureWorkflowState() {
+        const boxes = document.querySelectorAll('.workflow-checkbox');
+        if (!boxes.length) return;
+        workflowOrder = Array.from(boxes).map(cb => cb.value);
+        workflowState = {};
+        boxes.forEach(cb => { workflowState[cb.value] = cb.checked; });
+    }
+
+    function renderWorkflowSteps(defaultTasks) {
+        const preview = document.getElementById('workflowPreview');
+        if (!preview) return;
+
+        const allowed = new Set([...(defaultTasks || []), ...(defaultTasks && defaultTasks.length ? [] : workflowOrder), ...customWorkflowSteps]);
+        let order = workflowOrder.length ? workflowOrder.filter(x => allowed.has(x)) : [];
+
+        // Add missing default steps while keeping the user's existing order.
+        (defaultTasks || []).forEach((task, idx) => {
+            if (order.includes(task)) return;
+            let before = null;
+            for (let j = idx + 1; j < defaultTasks.length; j++) {
+                if (order.includes(defaultTasks[j])) { before = defaultTasks[j]; break; }
+            }
+            if (before) order.splice(order.indexOf(before), 0, task);
+            else order.push(task);
+        });
+
+        customWorkflowSteps.forEach(task => { if (!order.includes(task)) order.push(task); });
+        workflowOrder = order;
+
+        preview.innerHTML = order.map((task, idx) => {
+            const checked = Object.prototype.hasOwnProperty.call(workflowState, task) ? workflowState[task] : true;
+            const isCustom = customWorkflowSteps.includes(task);
+            const safe = String(task).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+            return `
+                <div class="workflow-step-row" data-step="${escapeHtml(task)}" style="display:flex; align-items:center; gap:8px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:9px; padding:8px 10px;">
+                    <input type="checkbox" class="workflow-checkbox" value="${escapeHtml(task)}" ${checked ? 'checked' : ''} onchange="captureWorkflowState(); saveDraft()" style="width:17px;height:17px;accent-color:var(--primary-accent);">
+                    <span style="font-weight:800; min-width:30px; color:var(--text-secondary);">${idx + 1}.</span>
+                    <span style="flex:1; font-weight:700;">${escapeHtml(task)}</span>
+                    ${isCustom ? `<button type="button" class="btn-danger btn-small" onclick="removeCustomWorkflowStep('${safe}')" title="Remove">✕</button>` : ''}
+                    <button type="button" class="btn-secondary btn-small" onclick="moveWorkflowStep(${idx}, -1)" ${idx === 0 ? 'disabled' : ''}>↑</button>
+                    <button type="button" class="btn-secondary btn-small" onclick="moveWorkflowStep(${idx}, 1)" ${idx === order.length - 1 ? 'disabled' : ''}>↓</button>
+                </div>`;
+        }).join('');
+    }
+
+    function addCustomWorkflowStep() {
+        const name = prompt('Enter the new production workflow step:');
+        if (!name) return;
+        const step = name.trim();
+        if (!step) return;
+        captureWorkflowState();
+        if (workflowOrder.includes(step) || customWorkflowSteps.includes(step)) {
+            showToast('This workflow step already exists.', 'error');
+            return;
+        }
+        customWorkflowSteps.push(step);
+        workflowOrder.push(step);
+        workflowState[step] = true;
+        if (!ALL_STAGES.includes(step)) ALL_STAGES.push(step);
+        renderWorkflowSteps([]);
+        saveDraft();
+    }
+
+    function removeCustomWorkflowStep(name) {
+        captureWorkflowState();
+        customWorkflowSteps = customWorkflowSteps.filter(x => x !== name);
+        workflowOrder = workflowOrder.filter(x => x !== name);
+        delete workflowState[name];
+        renderWorkflowSteps([]);
+        saveDraft();
+    }
+
+    function moveWorkflowStep(index, direction) {
+        captureWorkflowState();
+        const target = index + direction;
+        if (target < 0 || target >= workflowOrder.length) return;
+        const temp = workflowOrder[index];
+        workflowOrder[index] = workflowOrder[target];
+        workflowOrder[target] = temp;
+        renderWorkflowSteps([]);
+        saveDraft();
+    }
+
     function updateCartonWorkflow() {
+        captureWorkflowState();
         const type = document.getElementById('cartonType').value;
         const offsetWrap = document.getElementById('offsetFinishingWrapper');
-        const preview = document.getElementById('workflowPreview');
         const printSec = document.getElementById('printingDetailsSection');
         const machineWrap = document.getElementById('machineNameWrapper');
         const lamReelWrap = document.getElementById('lamReelWrapper');
-        
+        const lamLossWrap = document.getElementById('lamLossWrapper');
+        const lamKgWrap = document.getElementById('lamKgWrapper');
+        const printedPaper = document.getElementById('printedPaper');
+        const printedQty = document.getElementById('printedQty');
+        const machineName = document.getElementById('machineName');
+        const lamReelSize = document.getElementById('lamReelSize');
+
         let finishVal = document.getElementById('laminationVarnish').value;
         if (finishVal === 'Shine') finishVal = 'Shine Lamination';
         if (finishVal === 'Matt') finishVal = 'Matt Lamination';
 
+        const isPrinted = type === 'Offset' || type === 'Flexo';
+        const isLaminated = type === 'Offset' && (finishVal === 'Shine Lamination' || finishVal === 'Matt Lamination');
+
         if (type === 'Offset') {
             offsetWrap.style.display = 'flex';
             document.getElementById('laminationVarnish').required = true;
-            if(printSec) printSec.style.display = 'block';
-            if(machineWrap) machineWrap.style.display = 'block';
-            if (finishVal === 'Shine Lamination' || finishVal === 'Matt Lamination') {
-                if(lamReelWrap) lamReelWrap.style.display = 'block';
-            } else {
-                if(lamReelWrap) lamReelWrap.style.display = 'none';
-            }
-        } else if (type === 'Flexo') {
-            offsetWrap.style.display = 'none';
-            document.getElementById('laminationVarnish').required = false;
-            if(printSec) printSec.style.display = 'block';
-            if(machineWrap) machineWrap.style.display = 'none';
-            if(lamReelWrap) lamReelWrap.style.display = 'none';
         } else {
             offsetWrap.style.display = 'none';
             document.getElementById('laminationVarnish').required = false;
-            if(printSec) printSec.style.display = 'none';
         }
-        
+
+        if (printSec) printSec.style.display = isPrinted ? 'block' : 'none';
+        if (machineWrap) machineWrap.style.display = type === 'Offset' ? 'block' : 'none';
+        if (lamReelWrap) lamReelWrap.style.display = isLaminated ? 'block' : 'none';
+        if (lamLossWrap) lamLossWrap.style.display = isLaminated ? 'block' : 'none';
+        if (lamKgWrap) lamKgWrap.style.display = isLaminated ? 'block' : 'none';
+
+        if (printedPaper) printedPaper.required = isPrinted;
+        if (printedQty) printedQty.required = isPrinted;
+        if (machineName) machineName.required = type === 'Offset';
+        if (lamReelSize) lamReelSize.required = isLaminated;
+
         let defaultTasks = [];
         if (type === 'Unprinted') {
             defaultTasks = ['Reel Issue', 'Corrugation', 'Pasting', 'Rotary', 'Flexo', 'Glue (Gluing)', 'Pin', 'Drying/Bending', 'Dispatch'];
@@ -1836,91 +1974,62 @@
             defaultTasks = ['Reel Issue', 'Offset Printing', finish, 'Corrugation', 'Pasting', 'Rotary', 'Flexo', 'Glue (Gluing)', 'Pin', 'Drying/Bending', 'Dispatch'];
         }
 
-        if (defaultTasks.length > 0) {
-            const tasksHtml = defaultTasks.map(t => `
-                <label class="custom-cb-label">
-                    <input type="checkbox" class="workflow-checkbox" value="${t}" checked> ${t}
-                </label>
-            `).join('');
-            preview.innerHTML = tasksHtml;
-        } else {
-            preview.innerHTML = '';
-        }
+        defaultTasks.forEach(step => { if (!ALL_STAGES.includes(step)) ALL_STAGES.push(step); });
+        renderWorkflowSteps(defaultTasks);
+        refreshPrintedPaperOptions();
+        updatePrintedPaperSelection(false);
         saveDraft();
     }
 
     function buildJobTasks(existingTasks) {
-        const checkboxes = document.querySelectorAll('.workflow-checkbox:checked');
-        let selectedTasks = Array.from(checkboxes).map(cb => cb.value);
-        
-        let mapped = selectedTasks.map((label, idx) => ({ id: `task_${idx}`, label: label, done: false }));
-        
-        if (existingTasks && existingTasks.length) {
-            mapped.forEach(t => {
-                const prev = existingTasks.find(p => p.label === t.label);
-                if (prev) { t.done = !!prev.done; t.completedBy = prev.completedBy; t.completedAt = prev.completedAt; }
-            });
-        }
-        return mapped;
-    }
-function loadJobs() {
+        captureWorkflowState();
+        const checkboxes = document.querySelectorAll('.workflow-checkbox');
+        const selectedTasks = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+        selectedTasks.forEach(label => { if (!ALL_STAGES.includes(label)) ALL_STAGES.push(label); });
 
-    try {
-        const stored = localStorage.getItem('zhJobs');
-
-        if (stored) {
-            const parsed = JSON.parse(stored);
-
-            if (Array.isArray(parsed)) {
-                allJobs = parsed;
+        return selectedTasks.map((label, idx) => {
+            const t = { id: `task_${idx}`, label: label, done: false };
+            if (existingTasks && existingTasks.length) {
+                const prev = existingTasks.find(p => p.label === label);
+                if (prev) {
+                    t.done = !!prev.done;
+                    t.completedBy = prev.completedBy;
+                    t.completedAt = prev.completedAt;
+                }
             }
-        }
-    } catch (e) {
-        console.error("Error loading local jobs:", e);
-    }
-
-    if (usingFirebase && db) {
-
-        db.ref('zhJobs').once('value').then(function(snapshot) {
-
-            const data = snapshot.val();
-
-            if (data) {
-                allJobs = Array.isArray(data)
-                    ? data
-                    : Object.values(data);
-
-                allJobs = allJobs.filter(Boolean);
-
-                localStorage.setItem(
-                    'zhJobs',
-                    JSON.stringify(allJobs)
-                );
-            }
-
-            renderJobsTable();
-            loadDashboard();
-            renderProdBoardTable();
-            renderStatusBoard();
-
-        }).catch(function(error) {
-
-            console.error("Firebase load error:", error);
-
-            renderJobsTable();
-            loadDashboard();
-            renderProdBoardTable();
-            renderStatusBoard();
+            return t;
         });
-
-    } else {
-
-        renderJobsTable();
-        loadDashboard();
-        renderProdBoardTable();
-        renderStatusBoard();
     }
-}
+
+    function loadJobs() {
+        try {
+            const stored = localStorage.getItem('zhJobs');
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                if (Array.isArray(parsed)) allJobs = parsed;
+            }
+        } catch (e) {
+            console.error('Local jobs load error:', e);
+        }
+
+        if (usingFirebase && db) {
+            db.ref('zhJobs').once('value').then(snap => {
+                const data = snap.val();
+                allJobs = data ? (Array.isArray(data) ? data : Object.values(data)).filter(Boolean) : [];
+                try { localStorage.setItem('zhJobs', JSON.stringify(allJobs)); } catch(e) {}
+                allJobs.forEach(job => (job.tasks || []).forEach(t => { if (!ALL_STAGES.includes(t.label)) ALL_STAGES.push(t.label); }));
+                renderJobsTable(); loadDashboard(); renderProdBoardTable(); renderStatusBoard();
+                renderStageTabs();
+            }).catch(err => {
+                console.error('Firebase jobs load error:', err);
+                renderJobsTable(); loadDashboard(); renderProdBoardTable(); renderStatusBoard(); renderStageTabs();
+            });
+        } else {
+            allJobs.forEach(job => (job.tasks || []).forEach(t => { if (!ALL_STAGES.includes(t.label)) ALL_STAGES.push(t.label); }));
+            renderJobsTable(); loadDashboard(); renderProdBoardTable(); renderStatusBoard(); renderStageTabs();
+        }
+    }
+
     function saveAllJobsData(jobsArray) {
         try { localStorage.setItem('zhJobs', JSON.stringify(jobsArray)); } catch(e){}
         if (usingFirebase && db) {
@@ -1986,6 +2095,10 @@ function loadJobs() {
         const printedQty = document.getElementById('printedQty') ? document.getElementById('printedQty').value : '';
         const machineName = document.getElementById('machineName') ? document.getElementById('machineName').value : '';
         const lamReelSize = document.getElementById('lamReelSize') ? document.getElementById('lamReelSize').value : '';
+        const printedCutSize = document.getElementById('printedCutSize') ? document.getElementById('printedCutSize').value : '';
+        const laminationLossKg = document.getElementById('laminationLossKg') ? parseFloat(document.getElementById('laminationLossKg').value) || 5 : 5;
+        const laminationKgText = document.getElementById('laminationKg') ? document.getElementById('laminationKg').value : '';
+        captureWorkflowState();
 
         const baseFields = {
             jobNumber: jobNo, date: document.getElementById('poDate').value || '', time: timeStr || '', targetDeliveryDate: document.getElementById('targetDeliveryDate').value || '',
@@ -1993,7 +2106,8 @@ function loadJobs() {
             itemName: itemsArray.map(i => i.itemName).join(', ') || '', quantity: itemsArray.reduce((acc, i) => acc + i.quantity, 0) || 0, dimensions: itemsArray[0].dimensions, 
             paperSummaryText: globalPaperText || '', rollsSummaryText: globalRollText || '', cartonType: type || '', laminationVarnish: type === 'Offset' ? finishVal : '',
             paperArray: globalPaperArray, rollsArray: globalRollsArray,
-            printedPaper: printedPaper, printedQty: printedQty, machineName: machineName, laminationReelSize: lamReelSize, printingImageBase64: currentImageBase64
+            printedPaper: printedPaper, printedQty: printedQty, printedCutSize: printedCutSize, machineName: machineName, laminationReelSize: lamReelSize, laminationLossKg: laminationLossKg, laminationKg: laminationKgText, printingImageBase64: currentImageBase64,
+            workflowOrder: workflowOrder.slice(), customWorkflowSteps: customWorkflowSteps.slice()
         };
 
         if (editingJobId) {
@@ -2029,6 +2143,48 @@ function loadJobs() {
         }
     }
 
+    function startNewPO(clearDraft = false) {
+        editingJobId = null;
+        currentImageBase64 = '';
+        itemCounter = 0;
+        workflowOrder = [];
+        workflowState = {};
+        customWorkflowSteps = [];
+
+        if (clearDraft) {
+            localStorage.removeItem('zhDraft');
+            if (usingFirebase && db) db.ref('zhDraft').remove().catch(() => {});
+        }
+
+        const form = document.getElementById('poForm');
+        if (form) form.reset();
+        const container = document.getElementById('itemsContainer');
+        if (container) container.innerHTML = '';
+        itemCounter = 0;
+        addItemBlock();
+
+        const jobNumber = document.getElementById('jobNumber');
+        if (jobNumber) jobNumber.value = generateJobNumber();
+        const poDate = document.getElementById('poDate');
+        if (poDate) poDate.valueAsDate = new Date();
+
+        const preview = document.getElementById('printImagePreview');
+        if (preview) { preview.src = ''; preview.style.display = 'none'; }
+        const printedPaper = document.getElementById('printedPaper');
+        if (printedPaper) printedPaper.value = '';
+        const printedQty = document.getElementById('printedQty');
+        if (printedQty) printedQty.value = '';
+        const printedCutSize = document.getElementById('printedCutSize');
+        if (printedCutSize) printedCutSize.value = '';
+        const lamKg = document.getElementById('laminationKg');
+        if (lamKg) lamKg.value = '';
+        const slip = document.getElementById('printingStoreSlipText');
+        if (slip) slip.textContent = 'Not required';
+
+        updateCartonWorkflow();
+        saveDraft();
+    }
+
     function editJob(id) {
         const job = allJobs.find(j => j.id === id);
         if (!job) return;
@@ -2042,13 +2198,24 @@ function loadJobs() {
         document.getElementById('cartonType').value = job.cartonType;
         
         if (job.laminationVarnish) document.getElementById('laminationVarnish').value = job.laminationVarnish;
-        
-        updateCartonWorkflow(); 
+
+        workflowOrder = (job.tasks || []).map(t => t.label);
+        workflowState = {};
+        (job.tasks || []).forEach(t => { workflowState[t.label] = true; if (!ALL_STAGES.includes(t.label)) ALL_STAGES.push(t.label); });
+        customWorkflowSteps = Array.isArray(job.customWorkflowSteps) ? job.customWorkflowSteps.slice() : (job.tasks || []).map(t => t.label).filter(t => !['Reel Issue','Offset Printing','Shine Lamination','Matt Lamination','Varnish','Corrugation','Pasting','Rotary','Flexo','Flexo Printing','Glue (Gluing)','Pin','Drying/Bending','Dispatch'].includes(t));
+        customWorkflowSteps.forEach(t => { if (!ALL_STAGES.includes(t)) ALL_STAGES.push(t); });
+        updateCartonWorkflow();
+        workflowOrder = (job.tasks || []).map(t => t.label);
+        workflowState = {};
+        (job.tasks || []).forEach(t => { workflowState[t.label] = true; });
+        renderWorkflowSteps([]);
 
         if (document.getElementById('printedPaper')) document.getElementById('printedPaper').value = job.printedPaper || '';
         if (document.getElementById('printedQty')) document.getElementById('printedQty').value = job.printedQty || '';
+        if (document.getElementById('printedCutSize')) document.getElementById('printedCutSize').value = job.printedCutSize || '';
         if (document.getElementById('machineName')) document.getElementById('machineName').value = job.machineName || '';
         if (document.getElementById('lamReelSize')) document.getElementById('lamReelSize').value = job.laminationReelSize || '';
+        if (document.getElementById('laminationLossKg')) document.getElementById('laminationLossKg').value = job.laminationLossKg || 5;
         
         currentImageBase64 = job.printingImageBase64 || '';
         const prev = document.getElementById('printImagePreview');
@@ -2482,6 +2649,7 @@ function loadJobs() {
                 <div class="detail-item"><strong>Target Delivery</strong><span>${job.targetDeliveryDate}</span></div>
                 <div class="detail-item"><strong>Process</strong><span>${job.cartonType}</span></div>
             </div>
+            ${job.printedPaper ? `<div class="detail-item" style="margin-top:1rem;"><strong>PAPER CUTTING / LAMINATION SLIP</strong><span>Paper: ${job.printedPaper} | Paper Cutting: ${job.printedCutSize || '-'} | Total: ${job.printedQty || 0} Pcs${job.laminationReelSize ? ` | Lamination Reel: ${job.laminationReelSize}"` : ''}${job.laminationKg ? ` | Lamination: ${job.laminationKg}` : ''}</span></div>` : ''}
             <h3 style="margin-top:1rem; font-weight:800; color:var(--text-primary);">🗃 Sub-Items in this Job</h3>
             ${itemsHtml}
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
@@ -2557,6 +2725,17 @@ function loadJobs() {
     }
 
     // ===== PRINTING SECTION =====
+    function getPrintedPaperSize(job) {
+        if (job && job.printedCutSize) return job.printedCutSize;
+        const items = job && job.items ? job.items : (job ? [job] : []);
+        if (items.length === 1 && items[0].calc) {
+            const rs = String(items[0].calc.RS || '').replace(/[^0-9.]/g, '');
+            const cl = String(items[0].calc.CL || '').replace(/[^0-9.]/g, '');
+            return rs && cl ? `${rs} X ${cl}` : '-';
+        }
+        return '-';
+    }
+
     function printJobCard(id) {
         const job = allJobs.find(j => j.id === id); if (!job) return;
         const jobItems = job.items ? job.items : [job];
@@ -2568,13 +2747,12 @@ function loadJobs() {
         // Safely extract just the Paper table format required
         let paperRowsHtml = '';
         if (job.paperArray && job.paperArray.length > 0) {
-            paperRowsHtml = job.paperArray.map((p, idx) => `<tr><td>${idx+1}. <pre style="display:inline; margin:0; font-family:var(--font-mono); font-size:8pt;">${p.type}</pre></td><td style="text-align:right;"><strong>${p.kgs}</strong></td></tr>`).join('');
-            // Add lam reel if applicable
-            if (job.laminationReelSize) {
-                paperRowsHtml += `<tr><td colspan="2" style="background:#e2e8f0 !important; font-weight:900; font-size:9pt; padding:6px 4px; text-align:center;">LAMINATION REEL: ${job.laminationReelSize}"</td></tr>`;
-            }
+            paperRowsHtml = job.paperArray.map((p, idx) => `<tr><td>${idx+1}. <pre style="display:inline; margin:0; font-family:var(--font-mono); font-size:8pt;">${p.type}</pre></td><td style="text-align:right;"><strong>${p.kgs} KGs</strong></td></tr>`).join('');
         } else {
             paperRowsHtml = `<tr><td colspan="2" style="text-align:center;">No paper required</td></tr>`;
+        }
+        if (job.printedPaper) {
+            paperRowsHtml += `<tr><td colspan="2" style="background:#eff6ff !important; padding:8px 6px; font-weight:800;">PAPER CUTTING / LAMINATION SLIP<br><span style="font-weight:600;">Paper: ${job.printedPaper}<br>Paper Cutting: ${job.printedCutSize || '-'}<br>Total: ${job.printedQty || 0} Pcs${job.laminationReelSize ? `<br>Lamination Reel: ${job.laminationReelSize}"` : ''}${job.laminationKg ? `<br>Lamination: ${job.laminationKg}${job.laminationLossKg ? ` (incl. ${job.laminationLossKg} KG loss)` : ''}` : ''}</span></td></tr>`;
         }
 
         // Safely extract just the Rolls table format required
@@ -2662,8 +2840,9 @@ function loadJobs() {
                             <div><b>Printed QTY:</b> ${job.printedQty || '-'}</div>
                         </div>
                         <div style="display:flex; justify-content:space-between; margin-top: 5px;">
-                            <div><b>Printed Paper Layer:</b> ${job.printedPaper || '-'}</div>
-                            <div>${job.cartonType === 'Offset' ? `<b>Machine:</b> ${job.machineName || '-'}` : `<b>Process:</b> ${job.cartonType}`}</div>
+                            <div><b>Printed Paper:</b> ${job.printedPaper || '-'}</div>
+                            <div><b>Paper Size:</b> ${getPrintedPaperSize(job)}</div>
+                            <div><b>Process:</b> ${job.cartonType}${job.cartonType === 'Offset' ? ` &nbsp;|&nbsp; <b>Machine:</b> ${job.machineName || '-'}` : ''}</div>
                         </div>
                     </div>
                     <div style="flex: 1; text-align: center; overflow: hidden; position: relative;">
@@ -2695,11 +2874,11 @@ function loadJobs() {
             htmlContentPaper += `<tr><td colspan="2" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">JOB: ${job.jobNumber} (${job.party})</td></tr>`;
             if (job.paperArray && job.paperArray.length > 0) {
                 htmlContentPaper += job.paperArray.map((p, idx) => `<tr><td>${idx+1}. <pre style="display:inline; margin:0; font-family:var(--font-mono); font-size:8pt;">${p.type}</pre></td><td style="text-align:right;"><strong>${p.kgs} KGs</strong></td></tr>`).join('');
-                if (job.laminationReelSize) {
-                    htmlContentPaper += `<tr><td colspan="2" style="font-weight:bold; text-align:center;">LAMINATION REEL: ${job.laminationReelSize}"</td></tr>`;
-                }
             } else {
                 htmlContentPaper += `<tr><td colspan="2" style="text-align:center;">No paper required</td></tr>`;
+            }
+            if (job.printedPaper) {
+                htmlContentPaper += `<tr><td colspan="2" style="background:#eff6ff !important; padding:8px 6px; font-weight:800;">PAPER CUTTING / LAMINATION SLIP<br><span style="font-weight:600;">Paper: ${job.printedPaper}<br>Paper Cutting: ${job.printedCutSize || '-'}<br>Total: ${job.printedQty || 0} Pcs${job.laminationReelSize ? `<br>Lamination Reel: ${job.laminationReelSize}"` : ''}${job.laminationKg ? `<br>Lamination: ${job.laminationKg}${job.laminationLossKg ? ` (incl. ${job.laminationLossKg} KG loss)` : ''}` : ''}</span></td></tr>`;
             }
 
             htmlContentRolls += `<tr><td colspan="3" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">JOB: ${job.jobNumber} (${job.party})</td></tr>`;
