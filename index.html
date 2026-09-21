@@ -66,6 +66,7 @@
     @keyframes popIn { from { opacity: 0; transform: scale(.92) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
     @keyframes slideInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
     @keyframes slideOutRight { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(30px); } }
+    @keyframes successPop { 0% { transform: scale(0.5); opacity: 0; } 60% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
 
     /* Logo & Brand */
     .logo-mark { display: block; width: auto; height: 48px; object-fit: contain; background: #ffffff; padding: 4px 8px; border-radius: 8px; box-shadow: var(--shadow-sm); transition: transform .4s var(--ease); will-change: transform; }
@@ -253,6 +254,12 @@
     .progress-circle { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
     .progress-circle-inner { width: 38px; height: 38px; border-radius: 50%; background: var(--bg-primary); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; color: var(--text-primary); }
 
+    /* Success Overlay Animation */
+    .success-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+    .success-box { background: var(--bg-primary); padding: 3rem; border-radius: var(--radius-lg); text-align: center; box-shadow: var(--shadow-lg); animation: successPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    .success-icon { font-size: 5rem; margin-bottom: 1rem; display: block; color: var(--success); }
+    .success-text { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); font-family: var(--font-display); }
+
     /* Toast Notification System */
     .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; pointer-events: none;}
     .toast { padding: 14px 24px; border-radius: 12px; font-weight: 800; font-size: 0.95rem; color: #fff; background: var(--primary); box-shadow: var(--shadow-lg); animation: slideInRight 0.4s var(--ease) forwards; display: flex; align-items: center; gap: 10px; }
@@ -335,6 +342,14 @@
 <!-- TOAST NOTIFICATION CONTAINER -->
 <div id="toastContainer" class="toast-container"></div>
 
+<!-- SUCCESS OVERLAY (For saving) -->
+<div class="success-overlay" id="successOverlay">
+    <div class="success-box">
+        <span class="success-icon">✓</span>
+        <div class="success-text">Success!</div>
+    </div>
+</div>
+
 <!-- LOGIN SCREEN -->
 <div class="login-screen" id="loginScreen">
     <div class="login-box">
@@ -347,7 +362,6 @@
         <form id="loginForm" onsubmit="handleLogin(event)">
             <div class="form-group-wrapper" style="margin-bottom: 1.5rem; text-align: left;">
                 <label>User Account</label>
-                <!-- Hardcoded Default User for Instant Loading -->
                 <select id="loginUser" required style="font-weight: bold; cursor: pointer; border-width: 2px;">
                     <option value="Packages Dept" selected>Packages Dept</option>
                 </select>
@@ -874,7 +888,7 @@
     let currentModalJobId = null;
     let editingJobId = null;
     let itemCounter = 0;
-    let currentImageBase64 = ""; // Holds base64 of printing image
+    let currentImageBase64 = ""; 
     
     let chartParty = null; let chartStage = null; let chartType = null;
     let activeFilter = null; 
@@ -1324,292 +1338,162 @@
         for (let key in counts) { results[key] = baseRolls * counts[key]; }
         return results;
     }
-function addItemBlock() {
-    const container = document.getElementById('itemsContainer');
 
-    if (!container) {
-        console.error('itemsContainer not found');
-        return;
-    }
+    // ===== MULTI-ITEM UI =====
+    function addItemBlock() {
+        const container = document.getElementById('itemsContainer');
+        if (!container) {
+            console.error('itemsContainer not found');
+            return;
+        }
 
-    const index = itemCounter;
-    itemCounter++;
+        const index = itemCounter;
+        itemCounter++;
 
-    const block = document.createElement('div');
-    block.className = 'item-block';
-    block.id = `itemBlock_${index}`;
+        const block = document.createElement('div');
+        block.className = 'item-block';
+        block.id = `itemBlock_${index}`;
+        block.style.cssText = `
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+            box-shadow: var(--shadow-sm);
+        `;
 
-    block.style.cssText = `
-        background: var(--bg-secondary);
-        border: 2px solid var(--border);
-        border-radius: 14px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        box-shadow: var(--shadow-sm);
-    `;
-
-    block.innerHTML = `
-        <div style="
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            margin-bottom:1.2rem;
-            gap:10px;
-            flex-wrap:wrap;
-        ">
-            <h3 style="
-                margin:0;
-                color:var(--primary-accent);
-                font-family:var(--font-display);
-                font-size:1rem;
-                font-weight:800;
-            ">
-                ITEM ${index + 1}
-            </h3>
-
-            <div style="display:flex; gap:8px;">
-                ${index > 0 ? `
-                    <button type="button"
-                        class="btn-secondary btn-small"
-                        onclick="copyPreviousItem(${index})">
-                        ⧉ Copy Previous
+        block.innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:1.2rem;">
+                <div>
+                    <div style="font-family:var(--font-display);font-weight:800;font-size:1.05rem;color:var(--primary-accent);">ITEM ${index + 1}</div>
+                    <div style="font-size:.8rem;color:var(--text-secondary);margin-top:3px;">Product specification</div>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    ${index > 0 ? `
+                        <button type="button" class="btn-secondary btn-small" onclick="copyPreviousItem(${index})">
+                            ⧉ Copy Previous
+                        </button>
+                    ` : ''}
+                    <button type="button" class="btn-danger btn-small" onclick="removeItemBlock(${index})">
+                        ✕ Remove
                     </button>
-                ` : ''}
-
-                <button type="button"
-                    class="btn-danger btn-small"
-                    onclick="removeItemBlock(${index})">
-                    ✕ Remove
-                </button>
-            </div>
-        </div>
-
-        <div class="form-row">
-
-            <div class="form-group-wrapper">
-                <label class="required">Item Name</label>
-                <input
-                    type="text"
-                    class="item-name"
-                    value="Carton"
-                    placeholder="e.g. Display Box"
-                    required
-                    oninput="calculateAllJobs()"
-                >
-            </div>
-
-            <div class="form-group-wrapper">
-                <label class="required">Ply</label>
-                <select
-                    class="item-ply"
-                    required
-                    onchange="handlePlyChange(this)"
-                >
-                    <option value="">Select Ply</option>
-                    <option value="3Ply">3 Ply</option>
-                    <option value="5Ply">5 Ply</option>
-                    <option value="7Ply">7 Ply</option>
-                </select>
-            </div>
-
-            <div class="form-group-wrapper">
-                <label class="required">Quantity</label>
-                <input
-                    type="number"
-                    class="item-qty"
-                    min="1"
-                    placeholder="e.g. 1000"
-                    required
-                    oninput="calculateAllJobs()"
-                >
-            </div>
-
-        </div>
-
-        <div style="
-            margin-top:1rem;
-            padding:1rem;
-            background:var(--bg-primary);
-            border:1px solid var(--border);
-            border-radius:12px;
-        ">
-
-            <div style="
-                font-weight:800;
-                color:var(--text-primary);
-                margin-bottom:1rem;
-            ">
-                Dimensions
+                </div>
             </div>
 
             <div class="form-row">
-
                 <div class="form-group-wrapper">
-                    <label class="required">Length</label>
-                    <input
-                        type="number"
-                        step="0.01"
-                        class="item-l"
-                        placeholder="Length"
-                        required
-                        oninput="calculateAllJobs()"
-                    >
+                    <label class="required">Item Name</label>
+                    <input type="text" class="item-name" value="Carton" placeholder="e.g. Display Box" required oninput="calculateAllJobs()">
                 </div>
 
                 <div class="form-group-wrapper">
-                    <label class="required">Width</label>
-                    <input
-                        type="number"
-                        step="0.01"
-                        class="item-w"
-                        placeholder="Width"
-                        required
-                        oninput="calculateAllJobs()"
-                    >
-                </div>
-
-                <div class="form-group-wrapper">
-                    <label class="required">Height</label>
-                    <input
-                        type="number"
-                        step="0.01"
-                        class="item-h"
-                        placeholder="Height"
-                        required
-                        oninput="calculateAllJobs()"
-                    >
-                </div>
-
-                <div class="form-group-wrapper">
-                    <label>Unit</label>
-                    <select
-                        class="item-unit"
-                        onchange="calculateAllJobs()"
-                    >
-                        <option value="INCH">INCH</option>
-                        <option value="CM">CM</option>
-                        <option value="MM">MM</option>
+                    <label class="required">Ply</label>
+                    <select class="item-ply" required onchange="handlePlyChange(this)">
+                        <option value="">Select Ply</option>
+                        <option value="3Ply">3 Ply</option>
+                        <option value="5Ply">5 Ply</option>
+                        <option value="7Ply">7 Ply</option>
                     </select>
                 </div>
 
-            </div>
-        </div>
-
-        <div style="margin-top:1rem;">
-
-            <label>Paper / Corrugation Specifications</label>
-
-            <div
-                class="ply-inputs-container custom-checkbox-grid"
-                style="
-                    display:flex;
-                    flex-wrap:wrap;
-                    gap:10px;
-                    margin-top:10px;
-                "
-            >
-                <span style="
-                    color:var(--text-secondary);
-                    font-size:.85rem;
-                ">
-                    Please select a Ply config first.
-                </span>
-            </div>
-
-            <input
-                type="hidden"
-                class="item-spec"
-            >
-
-        </div>
-
-        <div class="form-row" style="margin-top:1rem;">
-
-            <div class="form-group-wrapper">
-                <label>Manual RS</label>
-                <input
-                    type="number"
-                    step="0.01"
-                    class="item-manual-rs"
-                    placeholder="Auto"
-                    oninput="calculateAllJobs()"
-                >
-            </div>
-
-            <div class="form-group-wrapper">
-                <label>Manual CL</label>
-                <input
-                    type="number"
-                    step="0.01"
-                    class="item-manual-cl"
-                    placeholder="Auto"
-                    oninput="calculateAllJobs()"
-                >
-            </div>
-
-        </div>
-
-        <div class="calc-grid" style="margin-top:1rem;">
-
-            <div class="calc-box">
-                <div class="calc-label">RS</div>
-                <div class="calc-value calc-rs">-</div>
-                <div class="calc-sub-value calc-rs-actual">
-                    Actual: -
+                <div class="form-group-wrapper">
+                    <label class="required">Quantity</label>
+                    <input type="number" class="item-qty" min="1" step="1" placeholder="e.g. 1000" required oninput="calculateAllJobs()">
                 </div>
             </div>
 
-            <div class="calc-box">
-                <div class="calc-label">CL</div>
-                <div class="calc-value calc-cl">-</div>
-                <div class="calc-sub-value calc-cl-actual">
-                    Actual: -
+            <div style="margin-top:1rem;padding:1rem;background:var(--bg-primary);border:1px solid var(--border);border-radius:12px;">
+                <div style="font-family:var(--font-display);font-weight:800;color:var(--text-primary);margin-bottom:1rem;">Dimensions</div>
+
+                <div class="form-row">
+                    <div class="form-group-wrapper">
+                        <label class="required">Length</label>
+                        <input type="number" class="item-l" step="0.01" min="0" placeholder="Length" required oninput="calculateAllJobs()">
+                    </div>
+
+                    <div class="form-group-wrapper">
+                        <label class="required">Width</label>
+                        <input type="number" class="item-w" step="0.01" min="0" placeholder="Width" required oninput="calculateAllJobs()">
+                    </div>
+
+                    <div class="form-group-wrapper">
+                        <label class="required">Height</label>
+                        <input type="number" class="item-h" step="0.01" min="0" placeholder="Height" required oninput="calculateAllJobs()">
+                    </div>
+
+                    <div class="form-group-wrapper">
+                        <label>Unit</label>
+                        <select class="item-unit" onchange="calculateAllJobs()">
+                            <option value="INCH">INCH</option>
+                            <option value="CM">CM</option>
+                            <option value="MM">MM</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
-            <div class="calc-box">
-                <div class="calc-label">Area</div>
-                <div class="calc-value calc-area">-</div>
-                <div class="calc-sub-value">
-                    RS × CL
+            <div style="margin-top:1rem;padding:1rem;background:var(--bg-primary);border:1px solid var(--border);border-radius:12px;">
+                <label class="required">Paper / Corrugation Specifications</label>
+                <div class="ply-inputs-container custom-checkbox-grid">
+                    <span style="color:var(--text-secondary);font-size:.85rem;">Please select a Ply config first.</span>
+                </div>
+                <input type="hidden" class="item-spec">
+            </div>
+
+            <div class="form-row" style="margin-top:1rem;">
+                <div class="form-group-wrapper">
+                    <label>Manual RS</label>
+                    <input type="number" class="item-manual-rs" step="0.01" min="0" placeholder="Auto" oninput="calculateAllJobs()">
+                </div>
+
+                <div class="form-group-wrapper">
+                    <label>Manual CL</label>
+                    <input type="number" class="item-manual-cl" step="0.01" min="0" placeholder="Auto" oninput="calculateAllJobs()">
                 </div>
             </div>
 
-        </div>
+            <div class="calc-grid">
+                <div class="calc-box">
+                    <div class="calc-label">RS</div>
+                    <div class="calc-value calc-rs">-</div>
+                    <div class="calc-sub-value calc-rs-actual">Actual: -</div>
+                </div>
+                <div class="calc-box">
+                    <div class="calc-label">CL</div>
+                    <div class="calc-value calc-cl">-</div>
+                    <div class="calc-sub-value calc-cl-actual">Actual: -</div>
+                </div>
+                <div class="calc-box">
+                    <div class="calc-label">Area</div>
+                    <div class="calc-value calc-area">-</div>
+                    <div class="calc-sub-value">RS × CL</div>
+                </div>
+            </div>
 
-        <div class="form-group-wrapper" style="margin-top:1rem;">
-            <label>Notes</label>
-            <input
-                type="text"
-                class="item-notes"
-                placeholder="Additional item notes..."
-                oninput="saveDraft()"
-            >
-        </div>
-    `;
+            <div class="form-group-wrapper" style="margin-top:1rem;">
+                <label>Detail Notes</label>
+                <input type="text" class="item-notes" placeholder="Additional item notes..." oninput="saveDraft()">
+            </div>
+        `;
 
-    container.appendChild(block);
-
-    calculateAllJobs();
-    saveDraft();
-}
-function removeItemBlock(index) {
-    const block = document.getElementById(`itemBlock_${index}`);
-
-    if (!block) return;
-
-    const blocks = document.querySelectorAll('.item-block');
-
-    if (blocks.length <= 1) {
-        showToast("At least one item is required.", "error");
-        return;
+        container.appendChild(block);
+        calculateAllJobs();
     }
 
-    block.remove();
+    function removeItemBlock(index) {
+        const block = document.getElementById(`itemBlock_${index}`);
+        if (!block) return;
 
-    calculateAllJobs();
-    saveDraft();
-}
+        const blocks = document.querySelectorAll('.item-block');
+        if (blocks.length <= 1) {
+            showToast('At least one item is required.', 'error');
+            return;
+        }
+
+        block.remove();
+        calculateAllJobs();
+    }
+
     function handlePlyChange(select) {
         const block = select.closest('.item-block');
         const container = block.querySelector('.ply-inputs-container');
@@ -1725,10 +1609,8 @@ function removeItemBlock(index) {
                     const rollObj = buildRollsSummaryObj(specStr, finalCL, qty);
                     let itemRText = `${itemName}:\n`; let addedR = false;
                     for(let key in rollObj) {
-                        // Store securely with a clean pipe delimiter for the Array conversion later
-                        let rKey = `${key}|${finalRS}/${finalCL.toFixed(2)}`;
+                        let rKey = `${key}|(${finalRS}/${finalCL.toFixed(2)})`;
                         globalRollObj[rKey] = (globalRollObj[rKey] || 0) + rollObj[key];
-                        // Also format UI display text
                         let paddedKey = key.padEnd(25, ' ');
                         itemRText += `  • ${paddedKey}(${finalRS}/${finalCL.toFixed(2)})`.padEnd(50, ' ') + `${Math.ceil(rollObj[key])} Rolls\n`;
                         addedR = true;
@@ -1744,7 +1626,6 @@ function removeItemBlock(index) {
             }
         });
 
-        // Building the structured Arrays for Printout
         globalPaperArray = [];
         if(Object.keys(globalPaperObj).length > 0) {
             let finalPaperText = blocks.length > 1 ? perItemPaperText + "------------------\nTOTAL REQUIREMENT:\n" : "TOTAL REQUIREMENT:\n";
@@ -1772,7 +1653,7 @@ function removeItemBlock(index) {
                 let paddedPaper = (`${idx}. ` + actualPaper).padEnd(25, ' ');
                 let paddedSizes = sizes.padEnd(20, ' ');
                 
-                finalRollText += `${paddedPaper}(${sizes})    ${rollsCeil} Rolls\n`; 
+                finalRollText += `${paddedPaper}${paddedSizes}    ${rollsCeil} Rolls\n`; 
                 idx++;
             }
             globalRollText = finalRollText; document.getElementById('calcRollsSummary').textContent = globalRollText;
@@ -1821,7 +1702,7 @@ function removeItemBlock(index) {
         localStorage.setItem('zhDraft', JSON.stringify(draft));
     }
 
-function loadDraft() {
+    function loadDraft() {
         const draftStr = localStorage.getItem('zhDraft');
         if (!draftStr) {
             if (itemCounter === 0) addItemBlock();
@@ -1832,14 +1713,13 @@ function loadDraft() {
         let draft;
         try {
             draft = JSON.parse(draftStr);
-        } catch (e) {
-            // If the old draft is corrupted, wipe it and start fresh!
+        } catch(e) {
             localStorage.removeItem('zhDraft');
             if (itemCounter === 0) addItemBlock();
             updateCartonWorkflow();
             return;
         }
-   
+
         document.getElementById('poDate').value = draft.date || '';
         document.getElementById('targetDeliveryDate').value = draft.targetDeliveryDate || '';
         document.getElementById('partyName').value = draft.partyName || '';
@@ -1927,23 +1807,23 @@ function loadDraft() {
         if (type === 'Offset') {
             offsetWrap.style.display = 'flex';
             document.getElementById('laminationVarnish').required = true;
-            printSec.style.display = 'block';
-            machineWrap.style.display = 'block';
+            if(printSec) printSec.style.display = 'block';
+            if(machineWrap) machineWrap.style.display = 'block';
             if (finishVal === 'Shine Lamination' || finishVal === 'Matt Lamination') {
-                lamReelWrap.style.display = 'block';
+                if(lamReelWrap) lamReelWrap.style.display = 'block';
             } else {
-                lamReelWrap.style.display = 'none';
+                if(lamReelWrap) lamReelWrap.style.display = 'none';
             }
         } else if (type === 'Flexo') {
             offsetWrap.style.display = 'none';
             document.getElementById('laminationVarnish').required = false;
-            printSec.style.display = 'block';
-            machineWrap.style.display = 'none';
-            lamReelWrap.style.display = 'none';
+            if(printSec) printSec.style.display = 'block';
+            if(machineWrap) machineWrap.style.display = 'none';
+            if(lamReelWrap) lamReelWrap.style.display = 'none';
         } else {
             offsetWrap.style.display = 'none';
             document.getElementById('laminationVarnish').required = false;
-            printSec.style.display = 'none';
+            if(printSec) printSec.style.display = 'none';
         }
         
         let defaultTasks = [];
@@ -2103,6 +1983,7 @@ function loadDraft() {
         document.getElementById('partyName').value = job.party;
         document.getElementById('poNumber').value = job.po;
         document.getElementById('cartonType').value = job.cartonType;
+        
         if (job.laminationVarnish) document.getElementById('laminationVarnish').value = job.laminationVarnish;
         
         updateCartonWorkflow(); 
@@ -2703,7 +2584,7 @@ function loadDraft() {
                     </div>
                     <div class="print-info-block"><strong>Customer:</strong> ${job.party} <br><strong>Customer PO:</strong> ${job.po} &nbsp;|&nbsp; <strong>Target:</strong> ${job.targetDeliveryDate} <br><strong>Process:</strong> ${job.cartonType} &nbsp;|&nbsp; <strong>Total Cuts:</strong> ${totalQty}</div>
                     <table class="print-table" style="margin-bottom: auto;">
-                        <tr><th>Roll Paper Details</th><th>Roll Size (RS/CL)</th><th>Total QTY</th></tr>
+                        <tr><th>Roll Paper Details</th><th>Roll Size (RS/CL)</th><th style="text-align:right;">Total QTY</th></tr>
                         ${rollsRowsHtml}
                     </table>
                     <div class="print-signatures"><div class="sig-line">Operator</div><div class="sig-line">QC Check</div></div>
@@ -2788,7 +2669,7 @@ function loadDraft() {
                             </div>
                             <div style="text-align: right;"><div class="print-job-no" style="font-size:12pt;">PAPER ONLY</div><div class="print-date">Date: ${new Date().toLocaleDateString()}</div></div>
                         </div>
-                        <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>Customer POs:</strong> ${pos}</div>
+                        <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos}</div>
                         <table class="print-table" style="margin-bottom: 20px;">
                             <tr><th>Paper Reel Issue Breakdown</th><th style="text-align:right;">Total KGs</th></tr>
                             ${htmlContentPaper}
@@ -2807,7 +2688,7 @@ function loadDraft() {
                             </div>
                             <div style="text-align: right;"><div class="print-job-no" style="font-size:12pt;">ROLLS ONLY</div><div class="print-date">Date: ${new Date().toLocaleDateString()}</div></div>
                         </div>
-                        <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>Customer POs:</strong> ${pos}</div>
+                        <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos}</div>
                         <table class="print-table" style="margin-bottom: 20px;">
                             <tr><th>Paired Roll Setup</th><th>Size (RS/CL)</th><th style="text-align:right;">Total Rolls</th></tr>
                             ${htmlContentRolls}
