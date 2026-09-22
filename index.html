@@ -312,7 +312,7 @@
         .a4-page { display: block; width: 100%; height: 287mm; box-sizing: border-box; page-break-after: always; overflow: hidden; position: relative;}
         .print-half { height: 140mm; width: 100%; box-sizing: border-box; overflow: hidden; position: relative; }
         .print-half.top { border-bottom: 2px dashed #000; padding-bottom: 5mm; margin-bottom: 5mm; }
-        .print-half.bottom { border-top: 2px dashed #000; padding-top: 5mm; }
+        .print-half.bottom { padding-top: 5mm; }
         
         .print-header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 12px; align-items: flex-end; }
         .print-title { font-size: 16pt; font-weight: 800; text-transform: uppercase; margin-bottom: 2px; color: #000;}
@@ -1344,32 +1344,17 @@
     }
 
     function buildRollsSummaryObj(specs, cutLength, qty) {
-        if (!specs) return {};
-        let layers = specs.split('+').map(s => s.trim());
-        let baseRolls = (cutLength / 2400) * qty;
-        let n = layers.length - 1;
-        let rawKeys = [];
+        if (!specs || !qty || !cutLength) return {};
 
-        if (layers.length === 2) {
-            // Two papers form one corrugation roll set. Do NOT double the roll quantity.
-            rawKeys.push(layers[0] + "+" + layers[1]);
-        } else if (n >= 2 && n % 2 === 0) {
-            if (n === 2) {
-                rawKeys.push(layers[0] + "+" + layers[1]);
-                rawKeys.push(layers[n] + "+" + layers[n - 1]);
-            } else {
-                for (let p = 0; p <= n - 4; p += 2) { rawKeys.push(layers[p] + "+" + layers[p + 1]); }
-                rawKeys.push(layers[n] + "+" + layers[n - 1]);
-            }
-        } else {
-            for (let p = 0; p <= n; p++) { rawKeys.push(layers[p]); }
-        }
+        const layers = specs.split('+').map(s => s.trim()).filter(Boolean);
+        if (!layers.length) return {};
 
-        let counts = {};
-        for (let key of rawKeys) { counts[key] = (counts[key] || 0) + 1; }
-        let results = {};
-        for (let key in counts) { results[key] = baseRolls * counts[key]; }
-        return results;
+        // One corrugation roll set is required for the cutting length.
+        // Keep all paper layers together in one Roll Paper Details line.
+        const paperDetails = layers.join('+');
+        const baseRolls = (cutLength / 2400) * qty;
+
+        return { [paperDetails]: baseRolls };
     }
 
     function addItemBlock() {
@@ -2786,12 +2771,12 @@
             corrugationPaperRowsHtml = `<tr><td colspan="2" style="text-align:center;">No paper required for corrugation</td></tr>`;
         }
         const printedPaperDisplay = job.printedPaperName || (job.printedPaper && !/^\d+:\d+$/.test(String(job.printedPaper)) ? job.printedPaper : '');
-        const printingPaperSlipHtml = printedPaperDisplay ? `<div style="height:100%; box-sizing:border-box; padding:8px 4px; font-size:8pt; line-height:1.45;"><strong>PAPER FOR PRINTING / LAMINATION</strong><br><strong>Paper: ${printedPaperDisplay}</strong><br>Paper Cutting: ${job.printedCutSize || '-'}<br>Total: ${job.printedQty || 0} Pcs${job.laminationReelSize ? `<br>Lamination Reel: ${job.laminationReelSize}"` : ''}${job.laminationKg ? `<br>Lamination: ${job.laminationKg}` : ''}</div>` : `<div style="height:100%; box-sizing:border-box; padding:8px 4px; font-size:8pt;"><strong>PAPER FOR PRINTING / LAMINATION</strong><br>Not required</div>`;
+        const printingPaperSlipHtml = printedPaperDisplay ? `<div style="height:100%; box-sizing:border-box; padding:6px; overflow:hidden; font-size:7.5pt;"><div style="font-size:8pt; font-weight:900; margin-bottom:3px;">② PAPER FOR PRINTING / LAMINATION</div><table class="print-table" style="margin:0; font-size:7.5pt;"><tr><th>Paper Reel Issue</th><th>Details</th></tr><tr><td><strong>${printedPaperDisplay}</strong></td><td><strong>Paper Cutting:</strong> ${job.printedCutSize || '-'}<br><strong>Total:</strong> ${job.printedQty || 0} Pcs${job.laminationReelSize ? `<br><strong>Lamination Reel:</strong> ${job.laminationReelSize}"` : ''}${job.laminationKg ? `<br><strong>Lamination:</strong> ${job.laminationKg}` : ''}</td></tr></table></div>` : `<div style="height:100%; box-sizing:border-box; padding:6px; font-size:7.5pt;"><div style="font-size:8pt; font-weight:900; margin-bottom:3px;">② PAPER FOR PRINTING / LAMINATION</div><table class="print-table" style="margin:0; font-size:7.5pt;"><tr><th>Paper Reel Issue</th><th>Details</th></tr><tr><td colspan="2" style="text-align:center;">Not required</td></tr></table></div>`;
 
         // Safely extract just the Rolls table format required
         let rollsRowsHtml = '';
         if (job.rollsArray && job.rollsArray.length > 0) {
-            rollsRowsHtml = job.rollsArray.map((r, idx) => `<tr><td>${idx+1}. <pre style="display:inline; margin:0; font-family:var(--font-mono); font-size:8pt;">${r.details}</pre></td><td>${r.sizes}</td><td style="text-align:right;"><strong>${r.qty}</strong></td></tr>`).join('');
+            rollsRowsHtml = job.rollsArray.map((r, idx) => `<tr><td>${idx+1}. <pre style="display:inline; margin:0; font-family:var(--font-mono); font-size:8pt;">${r.details}</pre></td><td>${r.sizes}</td><td style="text-align:right;"><strong>${r.qty} Rolls</strong></td></tr>`).join('');
         } else {
             rollsRowsHtml = `<tr><td colspan="3" style="text-align:center;">No rolls required</td></tr>`;
         }
