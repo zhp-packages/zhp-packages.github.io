@@ -1686,18 +1686,24 @@
         if(Object.keys(globalRollObj).length > 0) {
             let finalRollText = blocks.length > 1 ? perItemRollText + "------------------\nTOTAL REQUIREMENT:\n" : "TOTAL REQUIREMENT:\n";
             let idx = 1;
-            for(let key of Object.keys(globalRollObj).sort()) { 
+            const consolidatedRolls = {};
+            for(let key of Object.keys(globalRollObj).sort()) {
                 let exactKeySplit = key.split('|');
                 let actualPaper = exactKeySplit[0] || '';
                 let sizes = exactKeySplit[1] || '';
                 let rollsCeil = Math.ceil(globalRollObj[key]);
-                
+                const rollKey = sizes;
+                if (!consolidatedRolls[rollKey]) consolidatedRolls[rollKey] = { papers: [], qty: 0 };
+                if (actualPaper && !consolidatedRolls[rollKey].papers.includes(actualPaper)) consolidatedRolls[rollKey].papers.push(actualPaper);
+                consolidatedRolls[rollKey].qty += rollsCeil;
+            }
+            for (let sizes of Object.keys(consolidatedRolls).sort()) {
+                const actualPaper = consolidatedRolls[sizes].papers.join('+');
+                const rollsCeil = consolidatedRolls[sizes].qty;
                 globalRollsArray.push({ details: actualPaper, sizes: sizes, qty: rollsCeil });
-                
                 let paddedPaper = (`${idx}. ` + actualPaper).padEnd(25, ' ');
                 let paddedSizes = sizes.padEnd(20, ' ');
-                
-                finalRollText += `${paddedPaper}${paddedSizes}    ${rollsCeil} Rolls\n`; 
+                finalRollText += `${paddedPaper}${paddedSizes}    ${rollsCeil} Rolls\n`;
                 idx++;
             }
             globalRollText = finalRollText; document.getElementById('calcRollsSummary').textContent = globalRollText;
@@ -2102,7 +2108,9 @@
         const now = new Date();
         const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
-        const printedPaper = document.getElementById('printedPaper') ? document.getElementById('printedPaper').value : '';
+        const printedPaperSelect = document.getElementById('printedPaper');
+        const printedPaper = printedPaperSelect ? printedPaperSelect.value : '';
+        const printedPaperName = printedPaperSelect && printedPaperSelect.selectedIndex > 0 ? (printedPaperSelect.options[printedPaperSelect.selectedIndex].dataset.paper || '') : '';
         const printedQty = document.getElementById('printedQty') ? document.getElementById('printedQty').value : '';
         const machineName = document.getElementById('machineName') ? document.getElementById('machineName').value : '';
         const lamReelSize = document.getElementById('lamReelSize') ? document.getElementById('lamReelSize').value : '';
@@ -2117,7 +2125,8 @@
             itemName: itemsArray.map(i => i.itemName).join(', ') || '', quantity: itemsArray.reduce((acc, i) => acc + i.quantity, 0) || 0, dimensions: itemsArray[0].dimensions, 
             paperSummaryText: globalPaperText || '', rollsSummaryText: globalRollText || '', cartonType: type || '', laminationVarnish: type === 'Offset' ? finishVal : '',
             paperArray: globalPaperArray, rollsArray: globalRollsArray,
-            printedPaper: printedPaper, printedQty: printedQty, printedCutSize: printedCutSize, machineName: machineName, laminationReelSize: lamReelSize, laminationLossKg: laminationLossKg, laminationKg: laminationKgText, printingImageBase64: currentImageBase64,
+            printedPaper: printedPaper, printedPaperName: printedPaperName, printedQty: printedQty, printedCutSize: printedCutSize, machineName: machineName, laminationReelSize: lamReelSize, laminationLossKg: laminationLossKg, laminationKg: laminationKgText, printingImageBase64: currentImageBase64,
+            notes: itemsArray.map(i => i.detailNotes).filter(Boolean).join(' | '),
             workflowOrder: workflowOrder.slice(), customWorkflowSteps: customWorkflowSteps.slice()
         };
 
@@ -2660,7 +2669,7 @@
                 <div class="detail-item"><strong>Target Delivery</strong><span>${job.targetDeliveryDate}</span></div>
                 <div class="detail-item"><strong>Process</strong><span>${job.cartonType}</span></div>
             </div>
-            ${job.printedPaper ? `<div class="detail-item" style="margin-top:1rem;"><strong>PAPER CUTTING / LAMINATION SLIP</strong><span>Paper: ${job.printedPaper} | Paper Cutting: ${job.printedCutSize || '-'} | Total: ${job.printedQty || 0} Pcs${job.laminationReelSize ? ` | Lamination Reel: ${job.laminationReelSize}"` : ''}${job.laminationKg ? ` | Lamination: ${job.laminationKg}` : ''}</span></div>` : ''}
+            ${job.printedPaper ? `<div class="detail-item" style="margin-top:1rem;"><strong>PAPER CUTTING / LAMINATION SLIP</strong><span>Paper Cutting: ${job.printedCutSize || '-'} | Total: ${job.printedQty || 0} Pcs${job.laminationReelSize ? ` | Lamination Reel: ${job.laminationReelSize}"` : ''}${job.laminationKg ? ` | Lamination: ${job.laminationKg}` : ''}</span></div>` : ''}
             <h3 style="margin-top:1rem; font-weight:800; color:var(--text-primary);">🗃 Sub-Items in this Job</h3>
             ${itemsHtml}
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
@@ -2753,7 +2762,7 @@
         let totalQty = jobItems.reduce((s, i) => s + (parseInt(i.quantity)||0), 0);
 
         const jobRows = jobItems.map(i => `<tr><td style="padding:4px 6px;"><strong>${i.subJobNumber || job.jobNumber}</strong><br><small>${i.itemName}</small></td><td style="padding:4px 6px;">${i.dimensions.L}×${i.dimensions.W}×${i.dimensions.H}</td><td style="padding:4px 6px;">${i.quantity}</td><td style="padding:4px 6px;">${i.calc.RS}</td><td style="padding:4px 6px;">${i.calc.CL}</td><td style="padding:4px 6px;">${i.specString}</td></tr>`).join('');
-        const jobSteps = job.tasks ? job.tasks.map(t => `<span style="display:inline-block; width:12px; height:12px; border:1px solid #000; margin-right:4px; vertical-align:-2px;"></span>${t.label}`).join(' &nbsp;&nbsp;➔&nbsp;&nbsp; ') : '';
+        const jobSteps = job.tasks ? job.tasks.map(t => `<span style="display:inline-block; width:14px; height:14px; border:1.5px solid #000; margin-right:4px; vertical-align:-3px; text-align:center; line-height:12px; font-size:11px; font-weight:900;">✓</span>${t.label}`).join(' &nbsp;&nbsp;➔&nbsp;&nbsp; ') : '';
 
         // Safely extract just the Paper table format required
         let corrugationPaperRowsHtml = '';
@@ -2762,7 +2771,8 @@
         } else {
             corrugationPaperRowsHtml = `<tr><td colspan="2" style="text-align:center;">No paper required for corrugation</td></tr>`;
         }
-        const printingPaperSlipHtml = job.printedPaper ? `<div style="height:100%; box-sizing:border-box; padding:8px 4px; font-size:8pt; line-height:1.45;"><strong>PAPER FOR PRINTING / LAMINATION</strong><br>Paper: ${job.printedPaper}<br>Paper Cutting: ${job.printedCutSize || '-'}<br>Total: ${job.printedQty || 0} Pcs${job.laminationReelSize ? `<br>Lamination Reel: ${job.laminationReelSize}"` : ''}${job.laminationKg ? `<br>Lamination: ${job.laminationKg}${job.laminationLossKg ? ` (incl. ${job.laminationLossKg} KG loss)` : ''}` : ''}</div>` : `<div style="height:100%; box-sizing:border-box; padding:8px 4px; font-size:8pt;"><strong>PAPER FOR PRINTING / LAMINATION</strong><br>Not required</div>`;
+        const printedPaperDisplay = job.printedPaperName || (job.printedPaper && !/^\d+:\d+$/.test(String(job.printedPaper)) ? job.printedPaper : '');
+        const printingPaperSlipHtml = printedPaperDisplay ? `<div style="height:100%; box-sizing:border-box; padding:8px 4px; font-size:8pt; line-height:1.45;"><strong>PAPER FOR PRINTING / LAMINATION</strong><br>Paper Cutting: ${job.printedCutSize || '-'}<br>Total: ${job.printedQty || 0} Pcs${job.laminationReelSize ? `<br>Lamination Reel: ${job.laminationReelSize}"` : ''}${job.laminationKg ? `<br>Lamination: ${job.laminationKg}` : ''}</div>` : `<div style="height:100%; box-sizing:border-box; padding:8px 4px; font-size:8pt;"><strong>PAPER FOR PRINTING / LAMINATION</strong><br>Not required</div>`;
 
         // Safely extract just the Rolls table format required
         let rollsRowsHtml = '';
@@ -2792,6 +2802,7 @@
                         <div class="print-field"><strong>QTY:</strong> <span>${totalQty}</span></div>
                     </div>
                     ${jobSteps ? `<div style="text-align: center; margin: 10px 0; padding: 6px; border: 1.5px solid #000; background: #f8fafc !important; font-size: 9pt; font-weight: 700; border-radius: 4px; -webkit-print-color-adjust: exact;"><strong>PRODUCTION WORKFLOW:</strong> ${jobSteps}</div>` : ''}
+                    ${job.notes ? `<div style="font-size: 8pt; border:1px solid #000; padding:5px 7px; margin:6px 0;"><strong>NOTES:</strong> ${job.notes}</div>` : ''}
                     <div style="font-size: 8pt; font-weight: bold; margin-bottom: 2px;">Sub-Items in this Job:</div>
                     <table class="print-table" style="margin-top:0;">
                         <thead><tr><th>Item (Job #)</th><th>Dimensions</th><th>Qty</th><th>Roll Size</th><th>Cut Length</th><th>Paper Specs</th></tr></thead>
@@ -2816,7 +2827,6 @@
                             ${printingPaperSlipHtml}
                         </div>
                     </div>
-                    <div style="font-size:7pt; font-weight:900; text-align:center; margin:3px 0;">✂ CUT HERE — TWO STORE DEMAND SLIPS</div>
                     <div class="print-signatures"><div class="sig-line">Issued By</div><div class="sig-line">Received By</div></div>
                 </div>
             </div>
@@ -2828,7 +2838,7 @@
                         <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">CORRUGATION W.O.</div></div>
                         <div style="text-align: right;"><div style="font-weight: bold; font-size: 11pt;">${job.jobNumber}</div><div style="font-size: 8pt;">Date: ${job.date}</div></div>
                     </div>
-                    <div class="print-info-block"><strong>Customer:</strong> ${job.party} <br><strong>Customer PO:</strong> ${job.po} &nbsp;|&nbsp; <strong>Target:</strong> ${job.targetDeliveryDate} <br><strong>Process:</strong> ${job.cartonType} &nbsp;|&nbsp; <strong>Total Cuts:</strong> ${totalQty}</div>
+                    <div class="print-info-block"><strong>Customer:</strong> ${job.party} <br><strong>Customer PO:</strong> ${job.po} &nbsp;|&nbsp; <strong>Target:</strong> ${job.targetDeliveryDate}</div>
                     <table class="print-table" style="margin-bottom: auto;">
                         <tr><th>Roll Paper Details</th><th>Roll Size / Cut Length</th><th style="text-align:right;">Total QTY</th></tr>
                         ${rollsRowsHtml}
@@ -2850,7 +2860,6 @@
                             <div><b>Printed QTY:</b> ${job.printedQty || '-'}</div>
                         </div>
                         <div style="display:flex; justify-content:space-between; margin-top: 5px;">
-                            <div><b>Printed Paper:</b> ${job.printedPaper || '-'}</div>
                             <div><b>Paper Size:</b> ${getPrintedPaperSize(job)}</div>
                             <div><b>Process:</b> ${job.cartonType}${job.cartonType === 'Offset' ? ` &nbsp;|&nbsp; <b>Machine:</b> ${job.machineName || '-'}` : ''}</div>
                         </div>
@@ -2889,7 +2898,7 @@
                 htmlContentPaper += `<tr><td colspan="2" style="text-align:center;">No paper required for corrugation</td></tr>`;
             }
             htmlContentPrinting += `<tr><td colspan="2" style="background:#eff6ff !important; font-weight:900; padding:6px 4px;">JOB: ${job.jobNumber} (${job.party})</td></tr>`;
-            htmlContentPrinting += job.printedPaper ? `<tr><td>Paper: ${job.printedPaper}<br>Paper Cutting: ${job.printedCutSize || '-'}<br>Total: ${job.printedQty || 0} Pcs${job.laminationReelSize ? `<br>Lamination Reel: ${job.laminationReelSize}"` : ''}${job.laminationKg ? `<br>Lamination: ${job.laminationKg}${job.laminationLossKg ? ` (incl. ${job.laminationLossKg} KG loss)` : ''}` : ''}</td><td></td></tr>` : `<tr><td colspan="2">Not required</td></tr>`;
+            htmlContentPrinting += (job.printedPaperName || job.printedCutSize) ? `<tr><td>Paper Size: ${getPrintedPaperSize(job)}<br>Total: ${job.printedQty || 0} Pcs${job.laminationReelSize ? `<br>Lamination Reel: ${job.laminationReelSize}"` : ''}${job.laminationKg ? `<br>Lamination: ${job.laminationKg}` : ''}</td><td></td></tr>` : `<tr><td colspan="2">Not required</td></tr>`;
 
             htmlContentRolls += `<tr><td colspan="3" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">JOB: ${job.jobNumber} (${job.party})</td></tr>`;
             if (job.rollsArray && job.rollsArray.length > 0) {
@@ -2987,7 +2996,6 @@
                                 </table>
                             </div>
                         </div>
-                        <div style="font-size:7pt; font-weight:900; text-align:center; margin:3px 0;">✂ CUT HERE — TWO STORE DEMAND SLIPS</div>
                         <div class="print-signatures"><div class="sig-line">Issued By</div><div class="sig-line">Received By</div></div>
                     </div>
                     <div class="print-half bottom">
