@@ -586,13 +586,17 @@
                                 <!-- AUTO CALCULATED GLOBAL PAPER & ROLLS -->
                                 <h3 style="margin-top: 2.5rem; margin-bottom: 1.5rem; color: var(--text-primary); font-family: var(--font-display);">▤ Global Job Requirements</h3>
                                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
-                                    <div style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: 12px; border: 2px solid var(--border);">
-                                        <strong style="color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 10px; display: block;">STORE DEMAND (PAPER)</strong>
-                                        <pre id="calcPaperSummary" style="font-family: var(--font-mono); font-size: 0.95rem; white-space: pre-wrap; line-height: 1.6; font-weight: 700;">-</pre>
-                                        <div id="printingStoreSlip" style="margin-top:1rem; padding:1rem; border:2px dashed var(--primary-accent); border-radius:10px; background:var(--bg-primary);">
-                                            <strong style="display:block; margin-bottom:.5rem; color:var(--primary-accent);">PAPER CUTTING / LAMINATION SLIP</strong>
-                                            <pre id="printingStoreSlipText" style="font-family:var(--font-mono); font-size:.9rem; white-space:pre-wrap; line-height:1.6; margin:0;">Not required</pre>
+                                    <div style="background: var(--bg-tertiary); padding: 1.2rem; border-radius: 12px; border: 2px solid var(--border);">
+                                        <strong style="color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 10px; display: block;">STORE DEMAND</strong>
+                                        <div style="background:var(--bg-primary); border:2px solid var(--border); border-radius:10px; padding:1rem; margin-bottom:1rem;">
+                                            <strong style="display:block; margin-bottom:.5rem; color:var(--primary-accent);">① PAPER FOR CORRUGATION</strong>
+                                            <pre id="calcPaperSummary" style="font-family: var(--font-mono); font-size: 0.9rem; white-space: pre-wrap; line-height: 1.55; font-weight: 700; margin:0;">-</pre>
                                         </div>
+                                        <div id="printingStoreSlip" style="background:var(--bg-primary); border:2px dashed var(--primary-accent); border-radius:10px; padding:1rem;">
+                                            <strong style="display:block; margin-bottom:.5rem; color:var(--primary-accent);">② PAPER FOR PRINTING / LAMINATION</strong>
+                                            <pre id="printingStoreSlipText" style="font-family:var(--font-mono); font-size:.9rem; white-space:pre-wrap; line-height:1.55; margin:0;">Not required</pre>
+                                        </div>
+                                        <div style="margin-top:.7rem; padding-top:.5rem; border-top:1px dashed var(--border); text-align:center; font-size:.72rem; font-weight:800; color:var(--text-secondary);">✂ CUT HERE — GIVE EACH SLIP TO THE RELEVANT PERSON</div>
                                     </div>
                                     <div style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: 12px; border: 2px solid var(--border);">
                                         <strong style="color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 10px; display: block;">CORRUGATION W.O. (ROLLS)</strong>
@@ -1585,6 +1589,7 @@
         let perItemPaperText = ''; 
         let perItemRollText = '';
         
+        const selectedPrintedKey = document.getElementById('printedPaper')?.value || '';
         const blocks = document.querySelectorAll('.item-block');
         blocks.forEach((block, index) => {
             const itemName = block.querySelector('.item-name').value || `Item ${index+1}`;
@@ -1630,7 +1635,13 @@
                 block.querySelector('.calc-area').textContent = area.toFixed(2);
 
                 if (specStr && qty > 0) {
-                    const pbObj = buildPaperBreakdownObj(specStr, area, qty, finalRS);
+                    const selectedParts = selectedPrintedKey ? selectedPrintedKey.split(':') : [];
+                    const selectedItemIndex = selectedParts.length === 2 ? parseInt(selectedParts[0], 10) : -1;
+                    const selectedLayerIndex = selectedParts.length === 2 ? parseInt(selectedParts[1], 10) : -1;
+                    const isThisPrintedLayer = selectedItemIndex === index && selectedLayerIndex >= 0;
+                    const corrugationLayers = plyInputs.filter((v, layerIndex) => !(isThisPrintedLayer && layerIndex === selectedLayerIndex));
+                    const corrugationSpecStr = corrugationLayers.join('+');
+                    const pbObj = buildPaperBreakdownObj(corrugationSpecStr, area, qty, finalRS);
                     let itemPText = `${itemName}:\n`; let addedP = false;
                     for(let key in pbObj) {
                         globalPaperObj[key] = (globalPaperObj[key] || 0) + pbObj[key];
@@ -1639,13 +1650,13 @@
                     }
                     if(addedP) perItemPaperText += itemPText + '\n';
                     
-                    const rollObj = buildRollsSummaryObj(specStr, finalCL, qty);
+                    const rollObj = buildRollsSummaryObj(corrugationSpecStr, finalCL, qty);
                     let itemRText = `${itemName}:\n`; let addedR = false;
                     for(let key in rollObj) {
-                        let rKey = `${key}|(${finalRS}/${finalCL.toFixed(2)})`;
+                        let rKey = `${key}|${finalRS}/${finalCL.toFixed(2)}`;
                         globalRollObj[rKey] = (globalRollObj[rKey] || 0) + rollObj[key];
                         let paddedKey = key.padEnd(25, ' ');
-                        itemRText += `  • ${paddedKey}(${finalRS}/${finalCL.toFixed(2)})`.padEnd(50, ' ') + `${Math.ceil(rollObj[key])} Rolls\n`;
+                        itemRText += `  • ${paddedKey}${finalRS}/${finalCL.toFixed(2)}`.padEnd(50, ' ') + `${Math.ceil(rollObj[key])} Rolls\n`;
                         addedR = true;
                     }
                     if(addedR) perItemRollText += itemRText + '\n';
@@ -2745,29 +2756,20 @@
         const jobSteps = job.tasks ? job.tasks.map(t => `<span style="display:inline-block; width:12px; height:12px; border:1px solid #000; margin-right:4px; vertical-align:-2px;"></span>${t.label}`).join(' &nbsp;&nbsp;➔&nbsp;&nbsp; ') : '';
 
         // Safely extract just the Paper table format required
-        let paperRowsHtml = '';
+        let corrugationPaperRowsHtml = '';
         if (job.paperArray && job.paperArray.length > 0) {
-            paperRowsHtml = job.paperArray.map((p, idx) => `<tr><td>${idx+1}. <pre style="display:inline; margin:0; font-family:var(--font-mono); font-size:8pt;">${p.type}</pre></td><td style="text-align:right;"><strong>${p.kgs} KGs</strong></td></tr>`).join('');
+            corrugationPaperRowsHtml = job.paperArray.map((p, idx) => `<tr><td>${idx+1}. <pre style="display:inline; margin:0; font-family:var(--font-mono); font-size:8pt;">${p.type}</pre></td><td style="text-align:right;"><strong>${p.kgs} KGs</strong></td></tr>`).join('');
         } else {
-            paperRowsHtml = `<tr><td colspan="2" style="text-align:center;">No paper required</td></tr>`;
+            corrugationPaperRowsHtml = `<tr><td colspan="2" style="text-align:center;">No paper required for corrugation</td></tr>`;
         }
-        if (job.printedPaper) {
-            paperRowsHtml += `<tr><td colspan="2" style="background:#eff6ff !important; padding:8px 6px; font-weight:800;">PAPER CUTTING / LAMINATION SLIP<br><span style="font-weight:600;">Paper: ${job.printedPaper}<br>Paper Cutting: ${job.printedCutSize || '-'}<br>Total: ${job.printedQty || 0} Pcs${job.laminationReelSize ? `<br>Lamination Reel: ${job.laminationReelSize}"` : ''}${job.laminationKg ? `<br>Lamination: ${job.laminationKg}${job.laminationLossKg ? ` (incl. ${job.laminationLossKg} KG loss)` : ''}` : ''}</span></td></tr>`;
-        }
+        const printingPaperSlipHtml = job.printedPaper ? `<div style="height:100%; box-sizing:border-box; padding:8px 4px; font-size:8pt; line-height:1.45;"><strong>PAPER FOR PRINTING / LAMINATION</strong><br>Paper: ${job.printedPaper}<br>Paper Cutting: ${job.printedCutSize || '-'}<br>Total: ${job.printedQty || 0} Pcs${job.laminationReelSize ? `<br>Lamination Reel: ${job.laminationReelSize}"` : ''}${job.laminationKg ? `<br>Lamination: ${job.laminationKg}${job.laminationLossKg ? ` (incl. ${job.laminationLossKg} KG loss)` : ''}` : ''}</div>` : `<div style="height:100%; box-sizing:border-box; padding:8px 4px; font-size:8pt;"><strong>PAPER FOR PRINTING / LAMINATION</strong><br>Not required</div>`;
 
         // Safely extract just the Rolls table format required
         let rollsRowsHtml = '';
         if (job.rollsArray && job.rollsArray.length > 0) {
-            rollsRowsHtml = job.rollsArray.map((r, idx) => `<tr><td>${idx+1}. <pre style="display:inline; margin:0; font-family:var(--font-mono); font-size:8pt;">${r.details}</pre></td><td>(${r.sizes})</td><td style="text-align:right;"><strong>${r.qty}</strong></td></tr>`).join('');
+            rollsRowsHtml = job.rollsArray.map((r, idx) => `<tr><td>${idx+1}. <pre style="display:inline; margin:0; font-family:var(--font-mono); font-size:8pt;">${r.details}</pre></td><td>${r.sizes}</td><td style="text-align:right;"><strong>${r.qty}</strong></td></tr>`).join('');
         } else {
             rollsRowsHtml = `<tr><td colspan="3" style="text-align:center;">No rolls required</td></tr>`;
-        }
-
-        let rs_cl_display = '';
-        if (jobItems.length === 1) {
-            rs_cl_display = `<b>RS:</b> ${jobItems[0].calc.RS}" &nbsp;|&nbsp; <b>CL:</b> ${jobItems[0].calc.CL}"`;
-        } else {
-            rs_cl_display = `<b>Multiple Sizes:</b> ` + jobItems.map(i => `[${i.calc.RS}"/${i.calc.CL}"]`).join(', ');
         }
 
         const isPrinted = (job.cartonType === 'Offset' || job.cartonType === 'Flexo');
@@ -2802,10 +2804,19 @@
                         <div style="text-align: right;"><div style="font-weight: bold; font-size: 11pt;">${job.jobNumber}</div><div style="font-size: 8pt;">Date: ${job.date}</div></div>
                     </div>
                     <div class="print-info-block"><strong>Customer:</strong> ${job.party} <br><strong>Customer PO:</strong> ${job.po} &nbsp;|&nbsp; <strong>Target:</strong> ${job.targetDeliveryDate} <br><strong>QTY:</strong> ${totalQty}</div>
-                    <table class="print-table" style="margin-bottom: auto;">
-                        <tr><th>Paper Reel Issue</th><th>Total KGs</th></tr>
-                        ${paperRowsHtml}
-                    </table>
+                    <div style="height:76%; display:flex; flex-direction:column; border:1px solid #000;">
+                        <div style="height:50%; box-sizing:border-box; padding:6px; border-bottom:2px dashed #000; overflow:hidden;">
+                            <div style="font-size:8pt; font-weight:900; margin-bottom:3px;">① PAPER FOR CORRUGATION</div>
+                            <table class="print-table" style="margin:0; font-size:7.5pt;">
+                                <tr><th>Paper Reel Issue</th><th>Total KGs</th></tr>
+                                ${corrugationPaperRowsHtml}
+                            </table>
+                        </div>
+                        <div style="height:50%; box-sizing:border-box; padding:6px; overflow:hidden;">
+                            ${printingPaperSlipHtml}
+                        </div>
+                    </div>
+                    <div style="font-size:7pt; font-weight:900; text-align:center; margin:3px 0;">✂ CUT HERE — TWO STORE DEMAND SLIPS</div>
                     <div class="print-signatures"><div class="sig-line">Issued By</div><div class="sig-line">Received By</div></div>
                 </div>
             </div>
@@ -2819,7 +2830,7 @@
                     </div>
                     <div class="print-info-block"><strong>Customer:</strong> ${job.party} <br><strong>Customer PO:</strong> ${job.po} &nbsp;|&nbsp; <strong>Target:</strong> ${job.targetDeliveryDate} <br><strong>Process:</strong> ${job.cartonType} &nbsp;|&nbsp; <strong>Total Cuts:</strong> ${totalQty}</div>
                     <table class="print-table" style="margin-bottom: auto;">
-                        <tr><th>Roll Paper Details</th><th>Roll Size (RS/CL)</th><th style="text-align:right;">Total QTY</th></tr>
+                        <tr><th>Roll Paper Details</th><th>Roll Size / Cut Length</th><th style="text-align:right;">Total QTY</th></tr>
                         ${rollsRowsHtml}
                     </table>
                     <div class="print-signatures"><div class="sig-line">Operator</div><div class="sig-line">QC Check</div></div>
@@ -2836,7 +2847,6 @@
                             <div><b>Customer PO:</b> ${job.po}</div>
                         </div>
                         <div style="display:flex; justify-content:space-between; margin-top: 5px; font-size: 13pt;">
-                            <div>${rs_cl_display}</div>
                             <div><b>Printed QTY:</b> ${job.printedQty || '-'}</div>
                         </div>
                         <div style="display:flex; justify-content:space-between; margin-top: 5px;">
@@ -2860,6 +2870,7 @@
         const jobs = allJobs.filter(j => selectedIds.includes(j.id));
         
         let htmlContentPaper = '';
+        let htmlContentPrinting = '';
         let htmlContentRolls = '';
         let totalQty = 0; 
         let jobRowsHtml = '';
@@ -2875,15 +2886,14 @@
             if (job.paperArray && job.paperArray.length > 0) {
                 htmlContentPaper += job.paperArray.map((p, idx) => `<tr><td>${idx+1}. <pre style="display:inline; margin:0; font-family:var(--font-mono); font-size:8pt;">${p.type}</pre></td><td style="text-align:right;"><strong>${p.kgs} KGs</strong></td></tr>`).join('');
             } else {
-                htmlContentPaper += `<tr><td colspan="2" style="text-align:center;">No paper required</td></tr>`;
+                htmlContentPaper += `<tr><td colspan="2" style="text-align:center;">No paper required for corrugation</td></tr>`;
             }
-            if (job.printedPaper) {
-                htmlContentPaper += `<tr><td colspan="2" style="background:#eff6ff !important; padding:8px 6px; font-weight:800;">PAPER CUTTING / LAMINATION SLIP<br><span style="font-weight:600;">Paper: ${job.printedPaper}<br>Paper Cutting: ${job.printedCutSize || '-'}<br>Total: ${job.printedQty || 0} Pcs${job.laminationReelSize ? `<br>Lamination Reel: ${job.laminationReelSize}"` : ''}${job.laminationKg ? `<br>Lamination: ${job.laminationKg}${job.laminationLossKg ? ` (incl. ${job.laminationLossKg} KG loss)` : ''}` : ''}</span></td></tr>`;
-            }
+            htmlContentPrinting += `<tr><td colspan="2" style="background:#eff6ff !important; font-weight:900; padding:6px 4px;">JOB: ${job.jobNumber} (${job.party})</td></tr>`;
+            htmlContentPrinting += job.printedPaper ? `<tr><td>Paper: ${job.printedPaper}<br>Paper Cutting: ${job.printedCutSize || '-'}<br>Total: ${job.printedQty || 0} Pcs${job.laminationReelSize ? `<br>Lamination Reel: ${job.laminationReelSize}"` : ''}${job.laminationKg ? `<br>Lamination: ${job.laminationKg}${job.laminationLossKg ? ` (incl. ${job.laminationLossKg} KG loss)` : ''}` : ''}</td><td></td></tr>` : `<tr><td colspan="2">Not required</td></tr>`;
 
             htmlContentRolls += `<tr><td colspan="3" style="background:#f1f5f9 !important; font-weight:900; padding:6px 4px;">JOB: ${job.jobNumber} (${job.party})</td></tr>`;
             if (job.rollsArray && job.rollsArray.length > 0) {
-                htmlContentRolls += job.rollsArray.map((r, idx) => `<tr><td>${idx+1}. <pre style="display:inline; margin:0; font-family:var(--font-mono); font-size:8pt;">${r.details}</pre></td><td>(${r.sizes})</td><td style="text-align:right;"><strong>${r.qty} Rolls</strong></td></tr>`).join('');
+                htmlContentRolls += job.rollsArray.map((r, idx) => `<tr><td>${idx+1}. <pre style="display:inline; margin:0; font-family:var(--font-mono); font-size:8pt;">${r.details}</pre></td><td>${r.sizes}</td><td style="text-align:right;"><strong>${r.qty} Rolls</strong></td></tr>`).join('');
             } else {
                 htmlContentRolls += `<tr><td colspan="3" style="text-align:center;">No rolls required</td></tr>`;
             }
@@ -2926,7 +2936,7 @@
                         </div>
                         <div class="print-info-block"><strong>Customers:</strong> ${parties} <br><strong>POs:</strong> ${pos}</div>
                         <table class="print-table" style="margin-bottom: 20px;">
-                            <tr><th>Paired Roll Setup</th><th>Size (RS/CL)</th><th style="text-align:right;">Total Rolls</th></tr>
+                            <tr><th>Paired Roll Setup</th><th>Roll Size / Cut Length</th><th style="text-align:right;">Total Rolls</th></tr>
                             ${htmlContentRolls}
                         </table>
                         <div class="print-signatures"><div class="sig-line">Operator</div><div class="sig-line">QC Check</div></div>
@@ -2961,10 +2971,23 @@
                             <div style="display: flex; align-items: center; gap: 8px;"><img src="Logo.jpeg" alt="Logo" class="print-logo-sub" onerror="this.style.display='none'"><div class="print-title-small">BATCH STORE DEMAND</div></div>
                             <div style="text-align: right; font-weight: bold; font-size:10pt;">CONSOLIDATED</div>
                         </div>
-                        <table class="print-table" style="margin-bottom: auto;">
-                            <tr><th>Paper Reel Issue Breakdown</th><th style="text-align:right;">Total KGs</th></tr>
-                            ${htmlContentPaper}
-                        </table>
+                        <div style="height:76%; display:flex; flex-direction:column; border:1px solid #000;">
+                            <div style="height:50%; box-sizing:border-box; padding:6px; border-bottom:2px dashed #000; overflow:hidden;">
+                                <div style="font-size:8pt; font-weight:900; margin-bottom:3px;">① PAPER FOR CORRUGATION</div>
+                                <table class="print-table" style="margin:0; font-size:7.5pt;">
+                                    <tr><th>Paper Reel Issue</th><th style="text-align:right;">Total KGs</th></tr>
+                                    ${htmlContentPaper}
+                                </table>
+                            </div>
+                            <div style="height:50%; box-sizing:border-box; padding:6px; overflow:hidden;">
+                                <div style="font-size:8pt; font-weight:900; margin-bottom:3px;">② PAPER FOR PRINTING / LAMINATION</div>
+                                <table class="print-table" style="margin:0; font-size:7.5pt;">
+                                    <tr><th>Printing Paper</th><th>Total</th></tr>
+                                    ${htmlContentPrinting}
+                                </table>
+                            </div>
+                        </div>
+                        <div style="font-size:7pt; font-weight:900; text-align:center; margin:3px 0;">✂ CUT HERE — TWO STORE DEMAND SLIPS</div>
                         <div class="print-signatures"><div class="sig-line">Issued By</div><div class="sig-line">Received By</div></div>
                     </div>
                     <div class="print-half bottom">
@@ -2973,7 +2996,7 @@
                             <div style="text-align: right; font-weight: bold; font-size:10pt;">CONSOLIDATED</div>
                         </div>
                         <table class="print-table" style="margin-bottom: auto;">
-                            <tr><th>Paired Roll Setup</th><th>Size (RS/CL)</th><th style="text-align:right;">Total Rolls</th></tr>
+                            <tr><th>Paired Roll Setup</th><th>Roll Size / Cut Length</th><th style="text-align:right;">Total Rolls</th></tr>
                             ${htmlContentRolls}
                         </table>
                         <div class="print-signatures"><div class="sig-line">Operator</div><div class="sig-line">QC Check</div></div>
